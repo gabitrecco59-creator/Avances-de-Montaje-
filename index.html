@@ -557,6 +557,7 @@ function render(){
   m.innerHTML=h;document.body.classList.toggle('modal-open',!!(UI.ov||UI.cfgOpen));
   const a0=document.querySelector('#ov .ovscroll'),a1=document.querySelector('#cfgw .ovscroll');if(a0)a0.scrollTop=y0;if(a1)a1.scrollTop=y1;
   const slot=document.getElementById('simslot');if(slot){if(!simEl)simBuild();slot.appendChild(simEl)}
+  requestAnimationFrame(fitMap);
 }
 const isDark=()=>{const t=document.documentElement.dataset.theme;return t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches};
 try{const t=localStorage.getItem('tema');if(t)document.documentElement.dataset.theme=t}catch(e){}
@@ -842,9 +843,14 @@ function mapSvg(){
   return s;
 }
 let drag=null;const ptrs=new Map();
-let AR_=.7;function AR(){if(!UI.pres)return .7;const m=document.querySelector('.pres-map');if(m&&m.clientWidth)AR_=Math.max(.2,Math.min(2,m.clientHeight/m.clientWidth));return AR_}
+let AR_=.7,MAR=.7;function AR(){if(!UI.pres)return MAR;const m=document.querySelector('.pres-map');if(m&&m.clientWidth)AR_=Math.max(.2,Math.min(2,m.clientHeight/m.clientWidth));return AR_}
 function vbStr(){const v=UI.vb;return `${v.x.toFixed(1)} ${v.y.toFixed(1)} ${v.w.toFixed(1)} ${(v.w*AR()).toFixed(1)}`}
 function setVB(v){v.w=Math.max(60,Math.min(15000,v.w));UI.vb=v;const m=document.getElementById('map');if(m)m.setAttribute('viewBox',vbStr());clearTimeout(setVB.t);setVB.t=setTimeout(()=>{try{localStorage.setItem('wtg-vb',JSON.stringify(UI.vb))}catch(_){}},400)}
+/* mapa más alto cuando la pantalla es vertical (Android en modo escritorio): ocupa el alto sobrante */
+function fitMap(){const m=document.getElementById('map'),lay=document.querySelector('.maplay');let t=.7;
+  if(m&&lay&&!UI.pres&&UI.tab==='mapa'&&innerWidth>900&&innerHeight>innerWidth*1.1){const r=m.getBoundingClientRect();
+    const slack=innerHeight-(lay.getBoundingClientRect().bottom+16);t=Math.max(.7,Math.min(1.9,(r.height+slack)/r.width))}
+  if(Math.abs(t-MAR)<.01)return;const v=UI.vb;if(v){v.y+=v.w*(MAR-t)/2}MAR=t;if(m&&v)setVB(v)}
 function zoomAt(f,cx,cy){const m=document.getElementById('map');if(!m)return;const r=m.getBoundingClientRect(),v=UI.vb;
   if(cx==null){cx=r.left+r.width/2;cy=r.top+r.height/2}
   const sx=v.x+(cx-r.left)/r.width*v.w,sy=v.y+(cy-r.top)/r.height*v.w*AR(),w=Math.max(60,Math.min(15000,v.w*f));
@@ -1189,7 +1195,7 @@ setInterval(()=>{if(UI.pres&&!document.hidden&&document.querySelector('.car-trk'
 let carHold=false,carX=null;
 document.addEventListener('touchstart',e=>{const c=e.target.closest('.car');if(!c)return;carX=e.touches[0].clientX;carHold=true},{passive:true});
 document.addEventListener('touchend',e=>{if(carX==null)return;const dx=e.changedTouches[0].clientX-carX;carX=null;setTimeout(()=>carHold=false,4000);if(Math.abs(dx)>40){UI.car=(UI.car||0)+(dx<0?1:-1);carGo()}},{passive:true});
-addEventListener('resize',()=>{if(UI.pres&&!drag)render()});
+addEventListener('resize',()=>{if(UI.pres&&!drag)render();else{clearTimeout(fitMap.t);fitMap.t=setTimeout(fitMap,150)}});
 
 /* ===== resumen ===== */
 const tile=(cls,title,body,act)=>`<div class="tile ${cls}" ${act?`data-act="tab2" data-v="${act}" style="cursor:pointer"`:''}><div class="tt"><span>${title}</span></div><div class="tc">${body}</div></div>`;
