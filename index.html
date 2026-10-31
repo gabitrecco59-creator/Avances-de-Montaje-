@@ -199,6 +199,20 @@ body.pres header{display:none}body.pres main{padding:0;max-width:none}body.pres 
 .pb-row{display:flex;gap:10px;align-items:center;min-height:0}.pb-ring{width:min(42%,120px);flex:none}.kq-s{gap:6px}.kq-s b{font-size:18px}.kq-s>div{padding:5px 7px}
 .pb-sc{overflow:auto;min-height:0}.pb-wx .cmp{width:80px;height:80px}.pb-wx .big-n{font-size:28px}.pb-wx .hr{margin-top:4px}.pb-al{font-size:11px;margin-top:3px}
 @media(max-width:900px){.pres-bot{grid-template-columns:1fr 1fr;height:auto;max-height:45vh;overflow:auto}.pb-sim{display:none}}
+.car{height:min(34vh,300px);flex:none;border-top:1px solid var(--bd);background:color-mix(in srgb,var(--card) 70%,var(--bg));overflow:hidden;display:flex;flex-direction:column;padding:8px 0 4px}
+.car-trk{flex:1;display:flex;transition:transform .6s cubic-bezier(.2,.7,.2,1);min-height:0}
+.car-s{flex:0 0 100%;padding:0 12px;min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.car-s .cmp{width:84px;height:84px}.car-s .big-n{font-size:30px}
+.car-sim{flex:1;min-height:0;display:flex;justify-content:center}.car-sim .simbox{height:100%;display:flex;flex-direction:column;align-items:center}.car-sim .simsvg{height:calc(100% - 22px);width:auto}
+.car-dots{display:flex;justify-content:center;gap:6px;padding-top:4px}.car-dots button{width:8px;height:8px;border-radius:50%;padding:0;border:0;background:var(--bd)}.car-dots button.on{background:var(--g1);width:20px;border-radius:4px}
+.pm-flo{position:relative}
+@media(max-width:700px){.pres-top{gap:6px;padding:6px 10px}.pres-top>.mut{display:none}.pt-t{font-size:15px}.pt-k{font-size:13px}body.pres .alarmb{font-size:13px;padding:7px 10px}}
+.fo{position:absolute;background:color-mix(in srgb,var(--card) 78%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--bd);border-radius:12px;padding:6px 9px;font-size:12px;line-height:1.35;box-shadow:0 6px 18px -8px rgba(0,0,0,.5)}
+.fo-tl{top:8px;left:8px;display:flex;gap:8px;align-items:center}.fo-tr{top:8px;right:8px;text-align:right;display:flex;flex-direction:column;align-items:flex-end}
+.fo-v{font-size:22px;font-weight:800;line-height:1}.fo-v small{font-size:11px;color:var(--mu)}
+.fo-bl{left:8px;bottom:48px;width:92px;height:150px;padding:4px}.fo-bl #simslot,.fo-bl .simbox{height:100%}.fo-bl .simsvg{height:calc(100% - 20px);width:auto;margin:0 auto}.fo-bl .simcap{font-size:10px;display:block;text-align:center}.fo-bl .simcap span{display:none}
+.fo-tk{left:8px;right:8px;bottom:8px;white-space:nowrap;overflow:hidden;padding:7px 0}.fo-tk span{display:inline-block;padding-left:100%;animation:tick 22s linear infinite;margin-right:-60%}
+@keyframes tick{to{transform:translateX(-100%)}}
 .locb{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px dashed var(--bd);border-radius:12px;margin:6px 0 4px}.locb a{color:var(--ac)}
 #locw .ovbar{flex-wrap:wrap}#locmap .leaflet-control-layers{color:#1a2233}
 .bn{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px;margin-bottom:12px}
@@ -1021,12 +1035,12 @@ function presView(){
   const c=S.cfg,ts=c.turbs,n=ts.length||1,TT=n*NM,pz=ts.reduce((a,t)=>a+prog(t.id).ok,0),p=pz/TT*100,I=S.info||{};
   const full=ts.filter(t=>prog(t.id).ok===NM).length,ener=ts.filter(t=>prog(t.id).ener).length,run=ts.filter(t=>prog(t.id).run).length,cur=ts.reduce((a,t)=>a+prog(t.id).cur,0);
   const r=50,C=2*Math.PI*r,nw=WX?wxNow():null,l=nw?wxLvl(nw.v,nw.g,nw.code,nw.cape):0,R=recos().slice(0,3);
-  const now=new Date().toLocaleString('es-AR',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+  const now=new Date().toLocaleString('es-AR',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}),mob=innerWidth<700&&innerWidth<innerHeight,lay=UI.plMob||'car';
   const al=actAlarms();
   return `<div class="pres-wrap">${al.map(a=>`<div class="alarmb" data-act="goAlarm" data-v="${esc(a.turb)}">🚨 ALARMA · ${esc(tName(a.turb))} · ${esc(a.motivo)} · desde ${fmt(a.inicio)} · ⏱ <span data-since="${a.inicio}">${durS(aDur(a))}</span></div>`).join('')}${wxBanner()}
    <div class="pres-top"><b class="pt-t">${esc(I.nombre||'')}</b><span class="mut">${esc([I.modelo,`${n} WTG`,totMW(I)].filter(Boolean).join(' · '))}</span><span class="grow"></span>
-    <span class="pt-k">${p.toFixed(1)}% montado</span><span class="mut">${now}</span><button class="sm" data-act="zreset" title="Ver todo el parque">⤢</button><button class="sm" data-act="presx">✕ Salir</button></div>
-   <div class="pres-map"><svg id="map" class="map" viewBox="${vbStr()}" preserveAspectRatio="xMidYMid meet">${mapSvg()}</svg></div>
+    <span class="pt-k">${p.toFixed(1)}% montado</span>${mob?`<button class="sm" data-act="plmob" title="Cambiar diseño">${lay==='car'?'▦ Flotante':'▤ Carrusel'}</button>`:`<span class="mut">${now}</span>`}<button class="sm" data-act="zreset" title="Ver todo el parque">⤢</button><button class="sm" data-act="presx">✕ Salir</button></div>
+   ${mob?presMob(lay,{p,pz,TT,n,full,ener,run,cur,nw,l,R,I,r,C}):`<div class="pres-map"><svg id="map" class="map" viewBox="${vbStr()}" preserveAspectRatio="xMidYMid meet">${mapSvg()}</svg></div>
    <div class="pres-bot">
     <div class="pb pb-sim"><div class="tt"><span>Secuencia de montaje</span></div><div id="simslot"></div></div>
     <div class="pb"><div class="tt"><span>Avance del parque</span></div><div class="pb-row"><svg viewBox="0 0 120 120" class="pb-ring"><defs><linearGradient id="gpr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--g1)"/><stop offset="1" stop-color="var(--g2)"/></linearGradient></defs><circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--pe)" stroke-width="12"/>${p>0?`<circle cx="60" cy="60" r="${r}" fill="none" stroke="${p>=100?'var(--ok)':'url(#gpr)'}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C*p/100} ${C}" transform="rotate(-90 60 60)"/>`:''}<text x="60" y="64" text-anchor="middle" font-size="22" font-weight="800" fill="var(--tx)">${Math.round(p)}%</text><text x="60" y="80" text-anchor="middle" font-size="8" fill="var(--mu)">${pz}/${TT} piezas</text></svg>
@@ -1034,12 +1048,37 @@ function presView(){
     <div class="pb"><div class="tt"><span>Avance por circuito</span></div><div class="pb-sc">${hbars(c.circs.map((ci,i)=>{const T=ts.filter(t=>t.circ===i),okp=T.reduce((a,t)=>a+prog(t.id).ok,0),tot=T.length*NM||1;return [esc(ci.name),okp,tot,cc(i),Math.round(okp/tot*100)+'%']}))}</div></div>
     <div class="pb pb-wx"><div class="tt"><span>Clima · viento a 100 m</span>${nw?`<span class="lv" style="background:${LV[l][1]}">${['OK','Precaución','ALARMA'][l]}</span>`:''}</div>
      ${I.lat==null?'<p class="mut" style="font-size:12px">Sin ubicación del parque.</p>':nw?`<div class="pb-row"><div>${wxCompass(nw.d)}</div><div><div class="big-n">${nw.v.toFixed(1)}<small> m/s</small></div><div class="mut" style="font-size:12px">del ${dirName(nw.d)} · ráfagas ${nw.g.toFixed(0)} · ${wxIcon(nw.code)} ${Math.round(nw.t)}°</div>${R.map(([e,t])=>`<div class="pb-al">${e} ${esc(t)}</div>`).join('')}</div></div>${wxHourly()}`:`<p class="mut" style="font-size:12px">${esc(WXerr||'Cargando clima…')}</p>`}</div>
-   </div></div>`}
+   </div>`}</div>`}
+function presMob(lay,d){const {p,pz,TT,n,full,ener,run,cur,nw,l,R,I,r,C}=d,c=S.cfg,ts=c.turbs;
+  const map=`<svg id="map" class="map" viewBox="${vbStr()}" preserveAspectRatio="xMidYMid meet">${mapSvg()}</svg>`;
+  const ring=sz=>`<svg viewBox="0 0 120 120" style="width:${sz}px;height:${sz}px;flex:none"><defs><linearGradient id="gpm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--g1)"/><stop offset="1" stop-color="var(--g2)"/></linearGradient></defs><circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--pe)" stroke-width="12"/>${p>0?`<circle cx="60" cy="60" r="${r}" fill="none" stroke="${p>=100?'var(--ok)':'url(#gpm)'}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C*p/100} ${C}" transform="rotate(-90 60 60)"/>`:''}<text x="60" y="66" text-anchor="middle" font-size="24" font-weight="800" fill="var(--tx)">${Math.round(p)}%</text></svg>`;
+  if(lay==='flo'){
+    return `<div class="pres-map pm-flo">${map}
+      <div class="fo fo-tl">${ring(54)}<div><b>${full}/${n}</b> montadas<br><span style="color:#facc15">⚡${ener}</span> · <span style="color:var(--ok)">▶${run}</span>${cur?` · <span style="color:var(--nt)">⏳${cur}</span>`:''}</div></div>
+      <div class="fo fo-tr">${nw?`<div class="fo-v">${nw.v.toFixed(1)}<small> m/s</small></div><div>${dirName(nw.d)} · ${wxIcon(nw.code)} ${Math.round(nw.t)}°</div><span class="lv" style="background:${LV[l][1]};margin:3px 0 0">${['OK','Precaución','ALARMA'][l]}</span>`:`<div class="mut">${I.lat==null?'Sin ubicación':'Sin clima'}</div>`}</div>
+      <div class="fo fo-bl"><div id="simslot"></div></div>
+      <div class="fo fo-tk">${R.length?R.map(([e,t])=>`<span>${e} ${esc(t)}</span>`).join(''):'<span>✅ Sin alertas</span>'}</div></div>`}
+  const slides=[
+    ['Avance del parque',`<div class="pb-row">${ring(96)}<div class="kq kq-s" style="flex:1"><div><b style="color:var(--g1)">${full}<small>/${n}</small></b><span>montadas</span></div><div><b style="color:#facc15">${ener}</b><span>⚡ energiz.</span></div><div><b style="color:var(--ok)">${run}</b><span>▶ RUN</span></div><div><b style="color:var(--nt)">${cur}</b><span>izando</span></div></div></div>`],
+    ['Clima · viento a 100 m',I.lat==null?'<p class="mut">Sin ubicación del parque.</p>':nw?`<div class="pb-row"><div style="flex:none">${wxCompass(nw.d)}</div><div><div class="big-n">${nw.v.toFixed(1)}<small> m/s</small></div><div class="mut" style="font-size:12px">del ${dirName(nw.d)} · ráfagas ${nw.g.toFixed(0)} · ${wxIcon(nw.code)} ${Math.round(nw.t)}°</div><span class="lv" style="background:${LV[l][1]}">${['OK','Precaución','ALARMA'][l]}</span></div></div>${wxHourly()}`:`<p class="mut">${esc(WXerr||'Cargando clima…')}</p>`],
+    ['Secuencia de montaje','<div id="simslot" class="car-sim"></div>'],
+    ['Avance por circuito',`<div class="pb-sc">${hbars(c.circs.map((ci,i)=>{const T=ts.filter(t=>t.circ===i),okp=T.reduce((a,t)=>a+prog(t.id).ok,0),tot=T.length*NM||1;return [esc(ci.name),okp,tot,cc(i),Math.round(okp/tot*100)+'%']}))}</div>`],
+    ['Alertas',`<div class="al">${R.map(([e,t])=>`<span class="${/⛔|⚠️|🚨/.test(e)?'bad':''}">${e} ${esc(t)}</span>`).join('')||'<span>✅ Todo en orden</span>'}</div>`]];
+  const k=((UI.car||0)%slides.length+slides.length)%slides.length;
+  return `<div class="pres-map">${map}</div><div class="car"><div class="car-trk" style="transform:translateX(-${k*100}%)">${slides.map(([t,b])=>`<div class="car-s"><div class="tt"><span>${t}</span></div>${b}</div>`).join('')}</div>
+    <div class="car-dots">${slides.map((_,i)=>`<button class="${i===k?'on':''}" data-act="car" data-v="${i}" aria-label="Tarjeta ${i+1}"></button>`).join('')}</div></div>`}
 function presOn(){UI.pres=true;UI.le=false;try{const e=document.documentElement;if(e.requestFullscreen&&!document.fullscreenElement)e.requestFullscreen().catch(()=>{})}catch(e){}render();setTimeout(fitAll,120)}
 function presOff(){UI.pres=false;try{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch(e){}render();setTimeout(fitAll,120)}
 addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.pres&&!UI.ov&&!document.fullscreenElement)presOff()});
 document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&UI.pres&&!presOff.k){}});
 setInterval(()=>{if(UI.pres&&!drag&&!UI.ov)render()},60e3);
+try{UI.plMob=localStorage.getItem('wtg-plmob')||'car'}catch(e){}
+function carGo(){const t=document.querySelector('.car-trk');if(!t)return;const n=t.children.length,k=((UI.car||0)%n+n)%n;UI.car=k;t.style.transform=`translateX(-${k*100}%)`;document.querySelectorAll('.car-dots button').forEach((b,i)=>b.classList.toggle('on',i===k))}
+setInterval(()=>{if(UI.pres&&!document.hidden&&document.querySelector('.car-trk')&&!carHold){UI.car=(UI.car||0)+1;carGo()}},8000);
+let carHold=false,carX=null;
+document.addEventListener('touchstart',e=>{const c=e.target.closest('.car');if(!c)return;carX=e.touches[0].clientX;carHold=true},{passive:true});
+document.addEventListener('touchend',e=>{if(carX==null)return;const dx=e.changedTouches[0].clientX-carX;carX=null;setTimeout(()=>carHold=false,4000);if(Math.abs(dx)>40){UI.car=(UI.car||0)+(dx<0?1:-1);carGo()}},{passive:true});
+addEventListener('resize',()=>{if(UI.pres&&!drag)render()});
 
 /* ===== resumen ===== */
 const tile=(cls,title,body,act)=>`<div class="tile ${cls}" ${act?`data-act="tab2" data-v="${act}" style="cursor:pointer"`:''}><div class="tt"><span>${title}</span></div><div class="tc">${body}</div></div>`;
@@ -1291,6 +1330,8 @@ document.addEventListener('click',e=>{
    case 'tab2':UI.tab=v;render();window.scrollTo(0,0);break;
    case 'pres':presOn();break;
    case 'presx':presOff();break;
+   case 'plmob':UI.plMob=(UI.plMob||'car')==='car'?'flo':'car';try{localStorage.setItem('wtg-plmob',UI.plMob)}catch(_){};render();setTimeout(fitAll,80);break;
+   case 'car':UI.car=+v;carGo();break;
    case 'tsz':setTs(UI.ts*(+v));break;
    case 'lock':c.locked=!c.locked;saveCfg(true);break;
    case 'mm':UI.moveMode=v;render();break;
