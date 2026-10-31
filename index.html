@@ -188,6 +188,17 @@ main.wide{max-width:1840px}
 .phrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}.phrow img.phx{width:96px;height:96px;object-fit:cover;border-radius:10px;border:1px solid var(--bd);cursor:pointer}
 .thb{position:relative;display:inline-flex;align-items:center;justify-content:center}.thb img{width:78px;height:78px;object-fit:cover;border-radius:10px;border:1px solid var(--bd)}.thb button{position:absolute;top:-6px;right:-6px;padding:0 6px;border-radius:50%;background:var(--card)}.thb.ld{width:96px;height:96px;border-radius:10px;background:var(--pe);color:var(--mu)}
 @media print{body.print-acta header,body.print-acta #banner,body.print-acta .acta-form,body.print-acta .note,body.print-acta button,body.print-acta .chips,body.print-acta #toast{display:none!important}body.print-acta .card{border:0;box-shadow:none}body.print-acta::before{display:none}}
+.pres-wrap{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;background:var(--bg)}
+body.pres header{display:none}body.pres main{padding:0;max-width:none}body.pres #banner{display:none}
+.pres-top{display:flex;align-items:center;gap:10px;padding:8px 14px;background:color-mix(in srgb,var(--card) 85%,transparent);border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.pt-t{font-size:18px;background:linear-gradient(90deg,var(--g1),var(--g2));-webkit-background-clip:text;background-clip:text;color:transparent}.pt-k{font-weight:800;color:var(--ok)}
+.pres-map{flex:1;min-height:0;background:var(--mapbg);touch-action:none}.pres-map svg{width:100%;height:100%;display:block}
+.pres-bot{height:min(31vh,300px);display:grid;grid-template-columns:minmax(150px,190px) minmax(240px,1fr) minmax(220px,1fr) minmax(320px,1.5fr);gap:10px;padding:10px;border-top:1px solid var(--bd);background:color-mix(in srgb,var(--card) 70%,var(--bg))}
+.pb{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:8px 10px;min-width:0;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+.pb .tt{margin-bottom:4px;gap:6px}.pb-sim #simslot{flex:1;min-height:0;display:flex;justify-content:center}.pb-sim .simsvg{height:100%;width:auto;max-height:calc(min(31vh,300px) - 70px)}.pb-sim .simcap{font-size:11px}
+.pb-row{display:flex;gap:10px;align-items:center;min-height:0}.pb-ring{width:min(42%,120px);flex:none}.kq-s{gap:6px}.kq-s b{font-size:18px}.kq-s>div{padding:5px 7px}
+.pb-sc{overflow:auto;min-height:0}.pb-wx .cmp{width:80px;height:80px}.pb-wx .big-n{font-size:28px}.pb-wx .hr{margin-top:4px}.pb-al{font-size:11px;margin-top:3px}
+@media(max-width:900px){.pres-bot{grid-template-columns:1fr 1fr;height:auto;max-height:45vh;overflow:auto}.pb-sim{display:none}}
 .locb{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px dashed var(--bd);border-radius:12px;margin:6px 0 4px}.locb a{color:var(--ac)}
 #locw .ovbar{flex-wrap:wrap}#locmap .leaflet-control-layers{color:#1a2233}
 .bn{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px;margin-bottom:12px}
@@ -244,6 +255,7 @@ main.wide{max-width:1840px}
  <h1 class="wl-h">Avances de montaje<span class="wl-v">VESTAS</span></h1>
  <p class="wl-p" id="wl-p"></p>
  <div class="wl-pk" id="wl-pk" hidden></div>
+ <div class="wl-x" id="wl-x" hidden></div>
  <div class="wl-bar"><i></i></div><div class="wl-tap">Tocá para entrar</div>
 </div></div>
 <style>
@@ -262,6 +274,7 @@ main.wide{max-width:1840px}
 .wl-v{display:block;margin-top:6px;font-size:.62em;letter-spacing:.32em;padding-left:.32em;opacity:.95}
 .wl-p{margin:14px auto 0;font-size:clamp(17px,4.6vw,22px);font-weight:700;line-height:1.35;max-width:460px;animation:wlf .8s .8s both}
 .wl-pk{display:inline-block;margin-top:14px;padding:9px 16px;border-radius:999px;background:rgba(255,255,255,.18);font-size:clamp(12px,3.4vw,15px);font-weight:600;animation:wlf .8s 1s both}
+.wl-x{margin-top:10px;font-size:14px;font-weight:600;opacity:.9;animation:wlf .8s 1.05s both}.wl-x[hidden]{display:none}
 .wl-bar{margin:26px auto 0;width:min(70%,260px);height:4px;border-radius:2px;background:rgba(255,255,255,.25);overflow:hidden;animation:wlf .5s 1.1s both}.wl-bar i{display:block;height:100%;background:#fff;width:0;animation:wlb 3.4s 1.1s linear forwards}
 @keyframes wlb{to{width:100%}}.wl-tap{margin-top:10px;font-size:13px;opacity:.7;animation:wlf .5s 1.3s both}
 @keyframes wlf{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -276,14 +289,19 @@ main.wide{max-width:1840px}
 </style>
 <script>(function(){
 var H="fcead8219610badddcc10a1666ecf82d8537fbca354eb98b0112a8db75894ce0",g=document.getElementById("gate"),w=document.getElementById("welcome");
-function fill(){try{var i=JSON.parse(localStorage.getItem("wtg-pinfo")||"null");if(!i)return;
- document.getElementById("wl-p").textContent=i.nombre||"";
+var TPL=w.outerHTML;
+function fillEl(el,i,x){if(!el||!i)return;var q=function(id){return el.querySelector("#"+id)};
+ q("wl-p").textContent=i.nombre||"";
  var pk=[];if(i.n)pk.push(i.n+" aerogeneradores");if(i.modelo)pk.push(i.modelo);if(i.potencia){pk.push(String(i.potencia).replace(".",",")+" MW c/u");if(i.n)pk.push((Math.round(i.n*i.potencia*10)/10).toString().replace(".",",")+" MW")}
- if(pk.length){var e=document.getElementById("wl-pk");e.textContent=pk.join(" · ");e.hidden=false}}catch(x){}}
+ var e=q("wl-pk");if(pk.length){e.textContent=pk.join(" · ");e.hidden=false}else e.hidden=true;
+ var xx=q("wl-x");if(x){xx.textContent=x;xx.hidden=false}else xx.hidden=true}
+function bind(el){var done=false;function close(){if(done)return;done=true;el.classList.add("out");setTimeout(function(){el.remove()},700)}
+ el.addEventListener("click",close);el.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key==="Escape"||e.key===" ")close()});setTimeout(close,5200)}
+window.wlFill=function(i,x){var e=document.getElementById("welcome");if(e&&!e.hidden&&!e.classList.contains("out"))fillEl(e,i,x)};
+window.showWelcome=function(i,x){var o=document.getElementById("welcome");if(o)o.remove();document.body.insertAdjacentHTML("afterbegin",TPL);var e=document.getElementById("welcome");fillEl(e,i,x);e.hidden=false;bind(e)};
 function welcome(force){
  try{var dk=new Date().toDateString();if(!force&&(sessionStorage.getItem("wl-mon")||localStorage.getItem("wl-mon-day")===dk)){w.remove();return}sessionStorage.setItem("wl-mon","1");localStorage.setItem("wl-mon-day",dk)}catch(e){}
- fill();w.hidden=false;var done=false;function close(){if(done)return;done=true;w.classList.add("out");setTimeout(function(){w.remove()},700)}
- w.addEventListener("click",close);w.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key==="Escape"||e.key===" ")close()});setTimeout(close,5200)}
+ try{fillEl(w,JSON.parse(localStorage.getItem("wtg-pinfo")||"null"))}catch(e){}w.hidden=false;bind(w)}
 function sha(t){return crypto.subtle.digest("SHA-256",new TextEncoder().encode(t)).then(function(b){return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,"0")}).join("")})}
 var ok=false;try{ok=localStorage.getItem("wtg-auth")===H}catch(e){}
 if(ok){g.remove();welcome(false);return}
@@ -369,7 +387,8 @@ const cName=i=>(S.cfg.circs[i]&&S.cfg.circs[i].name)||('Circuito '+(i+1));
 
 /* ===== persistencia: varios parques, base compartida (db) o local ===== */
 const PP=()=>'parques/'+UI.pid;
-function bindCfg(){const p=S.parks[UI.pid];S.cfg=p?p.cfg:null;S.info=p?p.info:null;if(S.info){try{localStorage.setItem('wtg-pinfo',JSON.stringify(S.info))}catch(e){}}}
+function bindCfg(){const p=S.parks[UI.pid];S.cfg=p?p.cfg:null;S.info=p?p.info:null;if(S.info){try{localStorage.setItem('wtg-pinfo',JSON.stringify(S.info))}catch(e){}if(window.wlFill)window.wlFill(S.info,wlExtra())}}
+function wlExtra(){if(!S.cfg||!S.cfg.turbs.length)return '';const ts=S.cfg.turbs,pz=ts.reduce((a,t)=>a+prog(t.id).ok,0),full=ts.filter(t=>prog(t.id).ok===NM).length,run=ts.filter(t=>prog(t.id).run).length;return pz?`Avance del montaje ${Math.round(pz/(ts.length*NM)*100)}% · ${full} WTG montadas${run?' · '+run+' en RUN':''}`:'Montaje por iniciar'}
 const LSK='wtg-montaje-v2';
 function lsAll(){try{const v=JSON.parse(localStorage.getItem(LSK)||'null');if(v)return v}catch(e){}return{parks:{},data:{}}}
 function lsSave(){const a=lsAll();a.parks=S.parks;if(UI.pid)a.data[UI.pid]={turb:S.turb,alarms:S.alarms,acta:S.acta,fotos:(a.data[UI.pid]||{}).fotos||{}};try{localStorage.setItem(LSK,JSON.stringify(a))}catch(e){toast('No hay espacio en este navegador para guardar')}}
@@ -390,11 +409,11 @@ let unT=null,unA=null,unC=null;
 function subPark(){if(unT)unT();if(unA)unA();if(unC)unC();unT=unA=unC=null;S.turb={};S.alarms={};S.acta={};PH={};S.subPid=UI.pid;if(!UI.pid)return;
   if(MODE!=='db'){const d=lsAll().data[UI.pid]||{};S.turb=d.turb||{};S.alarms=d.alarms||{};S.acta=d.acta||{};return}
   const pp=PP(),pid=UI.pid;
-  unT=db.collection(pp+'/turbinas').onSnapshot(q=>{if(S.subPid!==pid)return;const t={};q.docs.forEach(d=>t[d.id]=clone(d.data()));S.turb=t;render()},permErr);
+  unT=db.collection(pp+'/turbinas').onSnapshot(q=>{if(S.subPid!==pid)return;const t={};q.docs.forEach(d=>t[d.id]=clone(d.data()));S.turb=t;if(window.wlFill)window.wlFill(S.info,wlExtra());render()},permErr);
   unA=db.collection(pp+'/alarmas').onSnapshot(q=>{if(S.subPid!==pid)return;const a={};q.docs.forEach(d=>a[d.id]=clone(d.data()));S.alarms=a;render()},permErr);
   unC=db.collection(pp+'/acta').onSnapshot(q=>{if(S.subPid!==pid)return;const a={};q.docs.forEach(d=>a[d.id]=clone(d.data()));S.acta=a;render()},permErr)}
 function permErr(e){NOTE=e&&e.code==='invalid_argument'?'Firebase rechazó el acceso. Hay que actualizar las reglas de Firestore (permiso para las colecciones montaje_*).':'Error de base de datos: '+((e&&e.message)||e);render()}
-function selectPark(pid){if(pid===UI.pid)return;UI.pid=pid;try{localStorage.setItem('wtg-pid',pid)}catch(e){}UI.sel=null;UI.ov=false;UI.le=false;bindCfg();subPark();render();setTimeout(fitAll,50)}
+function selectPark(pid){if(pid===UI.pid)return;UI.pid=pid;try{localStorage.setItem('wtg-pid',pid)}catch(e){}UI.sel=null;UI.ov=false;UI.le=false;bindCfg();subPark();render();setTimeout(fitAll,50);if(window.showWelcome&&S.info)window.showWelcome(S.info,'')}
 function newPid(){return 'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,5)}
 function migrate(){if(migrate.on)return;migrate.on=true;
   const un=db.doc('parque/config').onSnapshot(s=>{if(s.metadata.fromCache&&!s.exists)return;un();if(!s.exists)return;
@@ -484,6 +503,11 @@ function render(){
   if(UI.tab==='config'){UI.tab='mapa';UI.cfgOpen=true}
   renderBanner();renderHeader();
   const m=$('#main');m.classList.toggle('wide',UI.tab==='mapa'&&!!S.cfg);
+  document.body.classList.toggle('pres',!!(UI.pres&&S.cfg));
+  if(UI.pres&&S.cfg){const sc0=document.querySelector('#ov .ovscroll'),y0=sc0?sc0.scrollTop:0;
+    m.innerHTML=presView()+(UI.ov&&S.cfg.turbs.find(t=>t.id===UI.sel)?ovView():'');document.body.classList.toggle('modal-open',!!UI.ov);
+    const a0=document.querySelector('#ov .ovscroll');if(a0)a0.scrollTop=y0;
+    const slot=document.getElementById('simslot');if(slot){if(!simEl)simBuild();slot.appendChild(simEl)}if(S.info&&WXpid!==UI.pid)setTimeout(()=>loadWx(),0);return}
   if(MODE==='loading'){m.innerHTML='<div class="card">Conectando con la base de datos…</div>';return}
   if(!S.cfg){m.innerHTML=(NOTE?`<div class="note">${esc(NOTE)}</div>`:'')+setupView();return}
   let h=NOTE?`<div class="note">${esc(NOTE)}</div>`:'';
@@ -573,7 +597,7 @@ function readPark(pre){const g=k=>document.getElementById(pre+k);const nombre=g(
   const L=UI.loc[pre];if(!L){toast('Marcá la ubicación del parque en el mapa');return null}
   return{lat:L.lat,lon:L.lon,alt:L.alt,nombre,n:Math.max(1,Math.min(300,+g('n').value||1)),circs:Math.max(1,Math.min(20,+g('c').value||1)),modelo:g('mod').value.trim(),potencia:Math.max(0,+String(g('pot').value).replace(',','.')||0)}}
 function createPark(i){const pid=newPid();const info={...i,creado:nowI()};const cfg=newCfg(i.n,i.circs);
-  S.parks[pid]={info,cfg};UI.pid=pid;try{localStorage.setItem('wtg-pid',pid)}catch(e){}bindCfg();subPark();UI.tab='mapa';saveCfg(true);setTimeout(fitAll,60);
+  S.parks[pid]={info,cfg};UI.pid=pid;try{localStorage.setItem('wtg-pid',pid)}catch(e){}bindCfg();if(window.showWelcome)window.showWelcome(info,'Parque creado · montaje por iniciar');subPark();UI.tab='mapa';saveCfg(true);setTimeout(fitAll,60);
   setTimeout(()=>modal(`<h2>💾 Crear respaldo</h2><p>Parque <b>${esc(info.nombre)}</b> creado. ¿Querés crear el primer respaldo ahora? Se descarga un archivo y queda una copia en la nube.</p><p class="mut" style="font-size:12px">Te lo voy a recordar una vez por día mientras haya cambios.</p>`,doBackup,'Crear respaldo'),400)}
 function setupView(){
   if(!S.loaded)return '<div class="card">Cargando parques…</div>';
@@ -591,7 +615,7 @@ function mapView(){
   return `<div class="maplay"><aside class="simp">${simPanel()}</aside><div class="mapc"><div class="card nofx"><div class="row" style="margin-bottom:8px">
    ${c.locked?'<button data-act="lock">🔓 Editar posiciones</button>':'<button class="pri" data-act="savelock">💾 Guardar y bloquear posiciones</button>'}
    <span class="mut">Zoom</span><button class="sm" data-act="zoom" data-v="0.77">＋</button><button class="sm" data-act="zoom" data-v="1.3">－</button><button class="sm" data-act="zreset" title="Ver todo">⤢ Ver todo</button>
-   <span class="grow"></span><button data-act="cfg">⚙️ Configuración</button></div>
+   <span class="grow"></span><button class="pri" data-act="pres">🖥️ Presentación</button><button data-act="cfg">⚙️ Configuración</button></div>
    <div class="row" style="margin-bottom:8px">
    <span class="mut">Aero</span><button class="sm" data-act="msz" data-v="0.87">－</button><input type="range" id="msr" min="0.1" max="1" step="0.01" value="${UI.ms}" style="width:100px"><button class="sm" data-act="msz" data-v="1.15">＋</button>
    <span class="mut">Texto</span><button class="sm" data-act="tsz" data-v="0.87">－</button><input type="range" id="tsr" min="0.4" max="3" step="0.05" value="${UI.ts}" style="width:100px"><button class="sm" data-act="tsz" data-v="1.15">＋</button>
@@ -703,15 +727,16 @@ function mapSvg(){
   return s;
 }
 let drag=null;const ptrs=new Map();
-function vbStr(){const v=UI.vb;return `${v.x.toFixed(1)} ${v.y.toFixed(1)} ${v.w.toFixed(1)} ${(v.w*.7).toFixed(1)}`}
+let AR_=.7;function AR(){if(!UI.pres)return .7;const m=document.querySelector('.pres-map');if(m&&m.clientWidth)AR_=Math.max(.2,Math.min(2,m.clientHeight/m.clientWidth));return AR_}
+function vbStr(){const v=UI.vb;return `${v.x.toFixed(1)} ${v.y.toFixed(1)} ${v.w.toFixed(1)} ${(v.w*AR()).toFixed(1)}`}
 function setVB(v){v.w=Math.max(60,Math.min(15000,v.w));UI.vb=v;const m=document.getElementById('map');if(m)m.setAttribute('viewBox',vbStr());clearTimeout(setVB.t);setVB.t=setTimeout(()=>{try{localStorage.setItem('wtg-vb',JSON.stringify(UI.vb))}catch(_){}},400)}
 function zoomAt(f,cx,cy){const m=document.getElementById('map');if(!m)return;const r=m.getBoundingClientRect(),v=UI.vb;
   if(cx==null){cx=r.left+r.width/2;cy=r.top+r.height/2}
-  const sx=v.x+(cx-r.left)/r.width*v.w,sy=v.y+(cy-r.top)/r.height*v.w*.7,w=Math.max(60,Math.min(15000,v.w*f));
-  setVB({x:sx-(cx-r.left)/r.width*w,y:sy-(cy-r.top)/r.height*w*.7,w})}
+  const sx=v.x+(cx-r.left)/r.width*v.w,sy=v.y+(cy-r.top)/r.height*v.w*AR(),w=Math.max(60,Math.min(15000,v.w*f));
+  setVB({x:sx-(cx-r.left)/r.width*w,y:sy-(cy-r.top)/r.height*w*AR(),w})}
 function fitAll(){const c=S.cfg;const k=UI.ms;const pts=[c.set,...c.turbs];
   let x0=Math.min(...pts.map(p=>p.x))-180*k-40,x1=Math.max(...pts.map(p=>p.x))+180*k+40,y0=Math.min(...pts.map(p=>p.y))-470*k-20,y1=Math.max(...pts.map(p=>p.y))+120*k+40;
-  let w=Math.max(x1-x0,(y1-y0)/.7,300);setVB({x:(x0+x1)/2-w/2,y:(y0+y1)/2-w*.35,w})}
+  let w=Math.max(x1-x0,(y1-y0)/AR(),300);setVB({x:(x0+x1)/2-w/2,y:(y0+y1)/2-w*AR()/2,w})}
 function svgPt(svg,e){const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())}
 document.addEventListener('wheel',e=>{if(!e.target.closest('#map'))return;e.preventDefault();zoomAt(Math.pow(1.0015,e.deltaY),e.clientX,e.clientY)},{passive:false});
 document.addEventListener('pointerdown',e=>{
@@ -733,12 +758,12 @@ document.addEventListener('pointermove',e=>{
   if(!drag||!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
   const r=drag.svg.getBoundingClientRect();
   if(drag.pinch){if(ptrs.size<2)return;const [a,b]=[...ptrs.values()];const d=Math.hypot(a.x-b.x,a.y-b.y)||1,c={x:(a.x+b.x)/2,y:(a.y+b.y)/2},v0=drag.vb0;
-    const sx=v0.x+(drag.c0.x-r.left)/r.width*v0.w,sy=v0.y+(drag.c0.y-r.top)/r.height*v0.w*.7,w=Math.max(60,Math.min(15000,v0.w*drag.d0/d));
-    setVB({x:sx-(c.x-r.left)/r.width*w,y:sy-(c.y-r.top)/r.height*w*.7,w});return}
+    const sx=v0.x+(drag.c0.x-r.left)/r.width*v0.w,sy=v0.y+(drag.c0.y-r.top)/r.height*v0.w*AR(),w=Math.max(60,Math.min(15000,v0.w*drag.d0/d));
+    setVB({x:sx-(c.x-r.left)/r.width*w,y:sy-(c.y-r.top)/r.height*w*AR(),w});return}
   const dcx=e.clientX-drag.c0.x,dcy=e.clientY-drag.c0.y;
   if(Math.hypot(dcx,dcy)>6)drag.moved=true;if(!drag.moved)return;
   if(drag.vtx){const p=svgPt(drag.svg,e);const arr=S.cfg.circs[UI.ec].route[drag.seg];arr[drag.i]={x:Math.round(p.x),y:Math.round(p.y)};UI.selV={seg:drag.seg,i:drag.i};drag.svg.innerHTML=mapSvg();return}
-  if(drag.pan||S.cfg.locked){drag.pan=true;const v0=drag.vb0;setVB({x:v0.x-dcx/r.width*v0.w,y:v0.y-dcy/r.height*v0.w*.7,w:v0.w});return}
+  if(drag.pan||S.cfg.locked){drag.pan=true;const v0=drag.vb0;setVB({x:v0.x-dcx/r.width*v0.w,y:v0.y-dcy/r.height*v0.w*AR(),w:v0.w});return}
   const p=svgPt(drag.svg,e);const dx=p.x-drag.start.x,dy=p.y-drag.start.y;
   const cl=v=>Math.round(v);
   if(drag.set){S.cfg.set={x:cl(drag.orig.s.x+dx),y:cl(drag.orig.s.y+dy)}}
@@ -991,6 +1016,31 @@ function recos(){const R=[];
   if(needBk())R.push(['💾','Hay cambios sin respaldo: creá uno desde ⚙️ Configuración.']);
   return R}
 
+/* ===== modo presentación ===== */
+function presView(){
+  const c=S.cfg,ts=c.turbs,n=ts.length||1,TT=n*NM,pz=ts.reduce((a,t)=>a+prog(t.id).ok,0),p=pz/TT*100,I=S.info||{};
+  const full=ts.filter(t=>prog(t.id).ok===NM).length,ener=ts.filter(t=>prog(t.id).ener).length,run=ts.filter(t=>prog(t.id).run).length,cur=ts.reduce((a,t)=>a+prog(t.id).cur,0);
+  const r=50,C=2*Math.PI*r,nw=WX?wxNow():null,l=nw?wxLvl(nw.v,nw.g,nw.code,nw.cape):0,R=recos().slice(0,3);
+  const now=new Date().toLocaleString('es-AR',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+  const al=actAlarms();
+  return `<div class="pres-wrap">${al.map(a=>`<div class="alarmb" data-act="goAlarm" data-v="${esc(a.turb)}">🚨 ALARMA · ${esc(tName(a.turb))} · ${esc(a.motivo)} · desde ${fmt(a.inicio)} · ⏱ <span data-since="${a.inicio}">${durS(aDur(a))}</span></div>`).join('')}${wxBanner()}
+   <div class="pres-top"><b class="pt-t">${esc(I.nombre||'')}</b><span class="mut">${esc([I.modelo,`${n} WTG`,totMW(I)].filter(Boolean).join(' · '))}</span><span class="grow"></span>
+    <span class="pt-k">${p.toFixed(1)}% montado</span><span class="mut">${now}</span><button class="sm" data-act="zreset" title="Ver todo el parque">⤢</button><button class="sm" data-act="presx">✕ Salir</button></div>
+   <div class="pres-map"><svg id="map" class="map" viewBox="${vbStr()}" preserveAspectRatio="xMidYMid meet">${mapSvg()}</svg></div>
+   <div class="pres-bot">
+    <div class="pb pb-sim"><div class="tt"><span>Secuencia de montaje</span></div><div id="simslot"></div></div>
+    <div class="pb"><div class="tt"><span>Avance del parque</span></div><div class="pb-row"><svg viewBox="0 0 120 120" class="pb-ring"><defs><linearGradient id="gpr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--g1)"/><stop offset="1" stop-color="var(--g2)"/></linearGradient></defs><circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--pe)" stroke-width="12"/>${p>0?`<circle cx="60" cy="60" r="${r}" fill="none" stroke="${p>=100?'var(--ok)':'url(#gpr)'}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C*p/100} ${C}" transform="rotate(-90 60 60)"/>`:''}<text x="60" y="64" text-anchor="middle" font-size="22" font-weight="800" fill="var(--tx)">${Math.round(p)}%</text><text x="60" y="80" text-anchor="middle" font-size="8" fill="var(--mu)">${pz}/${TT} piezas</text></svg>
+     <div class="kq kq-s"><div><b style="color:var(--g1)">${full}<small>/${n}</small></b><span>montadas</span></div><div><b style="color:#facc15">${ener}</b><span>⚡ energiz.</span></div><div><b style="color:var(--ok)">${run}</b><span>▶ RUN</span></div><div><b style="color:var(--nt)">${cur}</b><span>izando</span></div></div></div></div>
+    <div class="pb"><div class="tt"><span>Avance por circuito</span></div><div class="pb-sc">${hbars(c.circs.map((ci,i)=>{const T=ts.filter(t=>t.circ===i),okp=T.reduce((a,t)=>a+prog(t.id).ok,0),tot=T.length*NM||1;return [esc(ci.name),okp,tot,cc(i),Math.round(okp/tot*100)+'%']}))}</div></div>
+    <div class="pb pb-wx"><div class="tt"><span>Clima · viento a 100 m</span>${nw?`<span class="lv" style="background:${LV[l][1]}">${['OK','Precaución','ALARMA'][l]}</span>`:''}</div>
+     ${I.lat==null?'<p class="mut" style="font-size:12px">Sin ubicación del parque.</p>':nw?`<div class="pb-row"><div>${wxCompass(nw.d)}</div><div><div class="big-n">${nw.v.toFixed(1)}<small> m/s</small></div><div class="mut" style="font-size:12px">del ${dirName(nw.d)} · ráfagas ${nw.g.toFixed(0)} · ${wxIcon(nw.code)} ${Math.round(nw.t)}°</div>${R.map(([e,t])=>`<div class="pb-al">${e} ${esc(t)}</div>`).join('')}</div></div>${wxHourly()}`:`<p class="mut" style="font-size:12px">${esc(WXerr||'Cargando clima…')}</p>`}</div>
+   </div></div>`}
+function presOn(){UI.pres=true;UI.le=false;try{const e=document.documentElement;if(e.requestFullscreen&&!document.fullscreenElement)e.requestFullscreen().catch(()=>{})}catch(e){}render();setTimeout(fitAll,120)}
+function presOff(){UI.pres=false;try{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch(e){}render();setTimeout(fitAll,120)}
+addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.pres&&!UI.ov&&!document.fullscreenElement)presOff()});
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&UI.pres&&!presOff.k){}});
+setInterval(()=>{if(UI.pres&&!drag&&!UI.ov)render()},60e3);
+
 /* ===== resumen ===== */
 const tile=(cls,title,body,act)=>`<div class="tile ${cls}" ${act?`data-act="tab2" data-v="${act}" style="cursor:pointer"`:''}><div class="tt"><span>${title}</span></div><div class="tc">${body}</div></div>`;
 function hbars(rows){return rows.map(([l,v,mx,c,t])=>`<div class="hbr"><span class="hl">${l}</span><div class="bar"><i style="width:${mx?Math.min(100,v/mx*100):0}%;background:${c}"></i></div><b>${t}</b></div>`).join('')}
@@ -1239,6 +1289,8 @@ document.addEventListener('click',e=>{
    case 'locpick':pickLoc(v);break;
    case 'wxre':loadWx(true);break;
    case 'tab2':UI.tab=v;render();window.scrollTo(0,0);break;
+   case 'pres':presOn();break;
+   case 'presx':presOff();break;
    case 'tsz':setTs(UI.ts*(+v));break;
    case 'lock':c.locked=!c.locked;saveCfg(true);break;
    case 'mm':UI.moveMode=v;render();break;
