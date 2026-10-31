@@ -162,7 +162,12 @@ main.wide{max-width:1840px}
 .simsvg .hook{opacity:0}.simsvg .hook.go{animation:shook 1.3s ease both}
 @keyframes shook{0%{opacity:0}15%{opacity:.8}75%{opacity:.8}100%{opacity:0}}
 .simsvg .srotor{transform-origin:272px 147px;transform-box:view-box}
-.simsvg.done .srotor{animation:spin 6s linear infinite}
+.simsvg.done .srotor,.simsvg.run .srotor{animation:spin 6s linear infinite}
+.simsvg .sp.pop{animation:spop .7s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes spop{from{opacity:0;transform:scale(.4);transform-origin:262px 412px}to{opacity:1;transform:none}}
+.simsvg .sp[data-k=ener].on .m-bolt{filter:drop-shadow(0 0 8px #facc15);animation:boltf 1.2s ease-in-out infinite}
+@keyframes boltf{50%{filter:drop-shadow(0 0 2px #facc15)}}
+.simsvg.ener .crane{opacity:0;transition:opacity .8s}
 @keyframes spin{to{transform:rotate(360deg)}}
 .simsvg.fade .sp{opacity:0;transition:opacity .8s}
 .simsvg .crane{opacity:.55}
@@ -513,7 +518,7 @@ function mapView(){
    <span><i class="dot" style="background:#ffd400"></i>Izando</span></div></div></div><aside class="sump">${summary()}</aside></div>`;
 }
 /* ===== simulación de montaje (panel izquierdo) ===== */
-const SEQ=['base','t1','t2','t3','t4','t5','rad','nacelle','pt','hub','pa','pb','pc'];
+const SEQ=['base','t1','t2','t3','t4','t5','rad','nacelle','pt','hub','pa','pb','pc','ener','run'];
 const HOOK={base:[230,444],t1:[230,392],t2:[230,334],t3:[230,276],t4:[230,218],t5:[230,160],nacelle:[217,129],pt:[234,140],rad:[324,433],hub:[277,133],pa:[272,147],pb:[272,147],pc:[272,147]};
 let simEl=null,simI=0,simT=null;
 function simBuild(){
@@ -526,20 +531,23 @@ function simBuild(){
    <line class="hook" x1="0" y1="-4" x2="0" y2="0" stroke="#fcd34d" stroke-width="1.2" stroke-dasharray="3 2"/>
    <g class="gnac"><g transform="translate(140,322)">${air('nacelle')}</g></g>
    <g class="sp" data-k="rad"><g transform="translate(140,322)">${air('rad')}</g></g><g class="sp" data-k="radA">${air('rad')}</g>
-   ${SEQ.filter(k=>!['pa','pb','pc','rad'].includes(k)).map(pc).join('')}<g class="srotor">${pc('pa')}${pc('pb')}${pc('pc')}</g>${pc('hub')}</svg>
+   ${SEQ.filter(k=>!['pa','pb','pc','rad','hub','ener','run'].includes(k)).map(pc).join('')}<g class="srotor">${pc('pa')}${pc('pb')}${pc('pc')}</g>${pc('hub')}${pc('ener')}${pc('run')}</svg>
    <div class="simcap"><b id="simname">—</b><span id="simstep"></span></div>`;
   simI=0;simStep();
 }
 function simStep(){
   if(!simEl)return;clearTimeout(simT);const svg=simEl.querySelector('svg');
   if(matchMedia('(prefers-reduced-motion: reduce)').matches){simEl.querySelectorAll('.sp').forEach(g=>g.classList.add('on'));svg.classList.add('done');return}
-  if(simI===0){svg.classList.remove('done','fade','nacup');simEl.querySelectorAll('.sp').forEach(g=>g.classList.remove('on','drop'))}
+  if(simI===0){svg.classList.remove('done','fade','nacup','ener','run');simEl.querySelectorAll('.sp').forEach(g=>g.classList.remove('on','drop'))}
+  if(simI<SEQ.length&&PK[SEQ[simI]].x){const k=SEQ[simI],g=svg.querySelector(`.sp[data-k="${k}"]`);g.classList.add('on','pop');svg.classList.add(k);
+    const nm=simEl.querySelector('#simname'),st=simEl.querySelector('#simstep');if(nm)nm.textContent=k==='ener'?'⚡ Energización':'▶ RUN';if(st)st.textContent=k==='ener'?'Montaje 100%':'Rotor girando';
+    simI++;simT=setTimeout(simStep,k==='run'?4600:1900);return}
   if(simI<SEQ.length){const k=SEQ[simI],g=svg.querySelector(`.sp[data-k="${k}"]`);g.classList.add('on','drop');
     if(k==='nacelle'){svg.classList.add('nacup');svg.querySelector('.sp[data-k="rad"]').classList.remove('on','drop');svg.querySelector('.sp[data-k="radA"]').classList.add('on','drop')}
     const h=svg.querySelector('.hook'),[x,y]=HOOK[k];h.setAttribute('x1',x);h.setAttribute('x2',x);h.setAttribute('y2',y);h.classList.remove('go');void h.getBBox();h.classList.add('go');
-    const nm=simEl.querySelector('#simname'),st=simEl.querySelector('#simstep');if(nm)nm.textContent=k==='rad'?'Radiador (sobre la nacelle, en piso)':k==='nacelle'?'Nacelle + radiador':PK[k].n;if(st)st.textContent=`Pieza ${simI+1} de ${SEQ.length}`;
+    const nm=simEl.querySelector('#simname'),st=simEl.querySelector('#simstep');if(nm)nm.textContent=k==='rad'?'Radiador (sobre la nacelle, en piso)':k==='nacelle'?'Nacelle + radiador':PK[k].n;if(st)st.textContent=`Pieza ${simI+1} de ${NM}`;
     simI++;simT=setTimeout(simStep,1500)}
-  else if(simI===SEQ.length){svg.classList.add('done');const nm=simEl.querySelector('#simname'),st=simEl.querySelector('#simstep');if(nm)nm.textContent='Aerogenerador montado';if(st)st.textContent='';simI++;simT=setTimeout(simStep,4200)}
+  else if(simI===SEQ.length){const nm=simEl.querySelector('#simname'),st=simEl.querySelector('#simstep');if(nm)nm.textContent='Aerogenerador en servicio';if(st)st.textContent='';simI++;simT=setTimeout(simStep,4200)}
   else{svg.classList.add('fade');simI=0;simT=setTimeout(simStep,900)}
 }
 function simPanel(){
