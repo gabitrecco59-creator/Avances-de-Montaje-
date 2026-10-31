@@ -153,6 +153,7 @@ main.wide{max-width:1840px}
 .sump .sumg{grid-template-columns:1fr}
 @media(max-width:1280px){.maplay{grid-template-columns:minmax(0,1fr) 280px}.simp{grid-column:1/-1;order:3;position:static;max-height:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.simp .card{margin:0}}
 @media(max-width:900px){.maplay{grid-template-columns:minmax(0,1fr)}.sump{position:static;max-height:none}.simcard{display:none}}
+@media(min-width:901px) and (orientation:portrait){.maplay{grid-template-columns:minmax(0,1fr)}.sump{order:2;position:static;max-height:none}.simp{order:3}.sump .kpi{grid-template-columns:repeat(5,minmax(0,1fr))}.sump .sumg{grid-template-columns:1fr 1fr 1fr}}
 .simcard{padding:10px}.simbox{opacity:.92}
 .simsvg{width:100%;height:auto;display:block;border-radius:12px}
 .simsvg .sp{opacity:0}
@@ -849,7 +850,9 @@ function setVB(v){v.w=Math.max(60,Math.min(15000,v.w));UI.vb=v;const m=document.
 /* mapa más alto cuando la pantalla es vertical (Android en modo escritorio): ocupa el alto sobrante */
 function fitMap(){const m=document.getElementById('map'),lay=document.querySelector('.maplay');let t=.7;
   if(m&&lay&&!UI.pres&&UI.tab==='mapa'&&innerWidth>900&&innerHeight>innerWidth*1.1){const r=m.getBoundingClientRect();
-    const slack=innerHeight-(lay.getBoundingClientRect().bottom+16);t=Math.max(.7,Math.min(1.9,(r.height+slack)/r.width))}
+    const box=m.closest('.card')||lay,slack=innerHeight-(box.getBoundingClientRect().bottom+scrollY+14),scr=Math.max(.6,Math.min(1.9,(r.height+slack)/r.width));
+    let pa=scr;try{const c=S.cfg,k=UI.ms,pts=[c.set,...c.turbs];const x0=Math.min(...pts.map(p=>p.x))-180*k-40,x1=Math.max(...pts.map(p=>p.x))+180*k+40,y0=Math.min(...pts.map(p=>p.y))-470*k-20,y1=Math.max(...pts.map(p=>p.y))+120*k+40;pa=(y1-y0)/(x1-x0)*1.04}catch(_){}
+    t=Math.max(.6,Math.min(scr,pa));if(Math.abs(t-MAR)>=.01){MAR=t;fitAll()}return}
   if(Math.abs(t-MAR)<.01)return;const v=UI.vb;if(v){v.y+=v.w*(MAR-t)/2}MAR=t;if(m&&v)setVB(v)}
 function zoomAt(f,cx,cy){const m=document.getElementById('map');if(!m)return;const r=m.getBoundingClientRect(),v=UI.vb;
   if(cx==null){cx=r.left+r.width/2;cy=r.top+r.height/2}
