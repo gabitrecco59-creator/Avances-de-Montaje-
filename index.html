@@ -805,6 +805,18 @@ function summary(){
    return `<div><div class="lab"><span><i class="dot" style="background:${p.c}"></i>${p.n}</span><b>${ok}/${ts.length}${cu?` <span style="color:var(--cur)">+${cu}</span>`:''}</b></div><div class="bar"><i style="width:${ok/n*100}%;background:${p.c}"></i></div></div>`}).join('')}</div></div>`;
 }
 const SPIN=`<animateTransform attributeName="transform" type="rotate" from="0 ${272} ${147}" to="360 ${272} ${147}" dur="5s" repeatCount="indefinite"/>`;
+/* grúa en el mapa: se para junto a la turbina en montaje y pasa a la siguiente al terminar */
+function craneTid(){const c=S.cfg;if(!c||!c.turbs)return null;let best=null,bt='';
+  c.turbs.forEach(t=>{const ps=parts(t.id);MECH.forEach(p=>{const v=ps[p.k];if(v&&v.inicio&&!v.fin&&v.inicio>bt){bt=v.inicio;best=t.id}})});if(best)return best;
+  c.turbs.forEach(t=>{const ps=parts(t.id),n=MECH.filter(p=>ps[p.k]&&ps[p.k].fin).length;if(n>0&&n<NM){const l=MECH.reduce((a,p)=>ps[p.k]&&ps[p.k].fin>a?ps[p.k].fin:a,'')||'0';if(l>bt){bt=l;best=t.id}}});if(best)return best;
+  const nx=c.turbs.find(t=>{const ps=parts(t.id);return !MECH.some(p=>ps[p.k]&&(ps[p.k].inicio||ps[p.k].fin))});return nx?nx.id:null}
+function mapCrane(id){const ps=parts(id),dn=k=>ps[k]&&ps[k].fin;let top=GND;['t1','t2','t3','t4','t5'].forEach((k,i)=>{if(dn(k))top=GND-(i+1)*SEC});if(dn('nacelle'))top=120;
+  const tx=262,ty=34,hy=Math.max(ty+30,top-38);
+  return `<g class="mcrane" pointer-events="none">
+   <rect x="300" y="447" width="86" height="12" rx="6" fill="#2b2f36"/><rect x="310" y="425" width="62" height="22" rx="3" fill="#e8a317"/><rect x="298" y="428" width="16" height="17" rx="2" fill="#e8a317"/><rect x="300" y="431" width="11" height="7" fill="#9cc7e8"/><rect x="364" y="420" width="20" height="25" rx="2" fill="#3f4650"/>
+   <line x1="370" y1="420" x2="${tx}" y2="${ty}" stroke="#9aa3ad" stroke-width="1.5"/>
+   <path d="M324,434 L${tx-4},${ty} M342,434 L${tx+4},${ty}" stroke="#f0ad1c" stroke-width="9" stroke-linecap="round"/>
+   <line x1="${tx}" y1="${ty}" x2="${tx}" y2="${hy}" stroke="#d1d5db" stroke-width="3"/><rect x="${tx-8}" y="${hy}" width="16" height="14" rx="2" fill="#e8a317"/></g>`}
 function miniTurb(id){
   const nacG=pState(id,'nacelle')==='none',spin=pState(id,'run')==='ok';
   const one=k=>{const st=pState(id,k);if(st==='none'&&(!UI.f.ghost||PK[k].x))return '';if(k==='rad'&&nacG&&st!=='none')return '';return `<g class="mp ${st}">${air(k)}</g>`};
@@ -823,6 +835,7 @@ function mapSvg(){
     const a=pts[0],b=pts[1];if(b&&!UI.le)s+=`<text class="mt" x="${(a.x+b.x)/2}" y="${(a.y+b.y)/2-8}" fill="${col}" font-size="${Math.round(20*UI.ts)}" font-weight="700" text-anchor="middle">${esc(ci.name)}</text>`});
   s+=`<g data-set="1" class="tn" transform="translate(${c.set.x},${c.set.y})"><rect x="-26" y="-18" width="52" height="36" rx="5" fill="#2b3440" stroke="#fff" stroke-width="2"/><text y="5" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">SET</text></g>`;
   const k=UI.ms;
+  const crT=craneTid();
   c.turbs.forEach(t=>{const p=prog(t.id);const col=cc(t.circ);const al=tAlarms(t.id).length;const done=p.ok===NM;
     const fs=Math.max(6,Math.round(16*UI.ts));const pc=done?'#2ecc71':p.ok||p.cur?'#ffd400':'#93a0b0';
     const lines=[];if(f.name)lines.push([esc(t.name)+(al?' 🚨':''),f.box?'#fff':col,fs,800]);if(f.circ)lines.push([esc(cName(t.circ)),col,Math.round(fs*.8),600]);if(f.pct)lines.push([p.pct+'%',pc,Math.round(fs*.85),700]);
@@ -833,7 +846,7 @@ function mapSvg(){
      ${f.box?`<rect class="card-t" x="${x0}" y="${y0}" width="${w}" height="${h}" rx="8" stroke="${col}"/><rect x="${x0+4}" y="${y0+4}" width="${(w-8)*p.ok/NM}" height="4" fill="#2ecc71"/>`:`<rect class="hitb" x="${x0}" y="${y0}" width="${w}" height="${h}" rx="8"/>`}
      <ellipse cx="${14*k}" cy="${6*k}" rx="${80*k}" ry="${10*k}" fill="#000" opacity=".45"/>
      <rect x="${-46*k}" y="${-2*k}" width="${92*k}" height="${12*k}" rx="${3*k}" fill="${col}" opacity=".6"/>
-     <g transform="translate(${-230*k},${-464*k}) scale(${k})">${miniTurb(t.id)}</g>
+     <g transform="translate(${-230*k},${-464*k}) scale(${k})">${miniTurb(t.id)}${t.id===crT?mapCrane(t.id):''}</g>
      ${lines.map(l=>{yy+=l[2];const r=`<text class="mt" y="${yy}" fill="${l[1]}" font-size="${l[2]}" font-weight="${l[3]}" text-anchor="middle">${l[0]}</text>`;yy+=3;return r}).join('')}</g>`});
   if(UI.le&&c.circs[UI.ec]){const i=UI.ec,n=cNodes(i),r=c.circs[i].route||{},hs=UI.vb.w/80;
     n.forEach((a,j)=>{if(j>=n.length-1)return;const b=n[j+1],key=a.id+'>'+b.id,rp=r[key]||[],full=[a,...rp,b];
