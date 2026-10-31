@@ -192,7 +192,7 @@ main.wide{max-width:1840px}
 body.pres header{display:none}body.pres main{padding:0;max-width:none}body.pres #banner{display:none}
 .pres-top{display:flex;align-items:center;gap:10px;padding:8px 14px;background:color-mix(in srgb,var(--card) 85%,transparent);border-bottom:1px solid var(--bd);flex-wrap:wrap}
 .pt-t{font-size:18px;background:linear-gradient(90deg,var(--g1),var(--g2));-webkit-background-clip:text;background-clip:text;color:transparent}.pt-k{font-weight:800;color:var(--ok)}
-.pres-map{flex:1;min-height:0;background:var(--mapbg);touch-action:none}.pres-map svg{width:100%;height:100%;display:block}
+.pres-map{flex:1;min-height:0;background:var(--mapbg);touch-action:none}.pres-map>svg.map{width:100%;height:100%;display:block}
 .pres-bot{height:min(31vh,300px);display:grid;grid-template-columns:minmax(150px,190px) minmax(240px,1fr) minmax(220px,1fr) minmax(320px,1.5fr);gap:10px;padding:10px;border-top:1px solid var(--bd);background:color-mix(in srgb,var(--card) 70%,var(--bg))}
 .pb{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:8px 10px;min-width:0;min-height:0;overflow:hidden;display:flex;flex-direction:column}
 .pb .tt{margin-bottom:4px;gap:6px}.pb-sim #simslot{flex:1;min-height:0;display:flex;justify-content:center}.pb-sim .simsvg{height:100%;width:auto;max-height:calc(min(31vh,300px) - 70px)}.pb-sim .simcap{font-size:11px}
@@ -205,14 +205,35 @@ body.pres header{display:none}body.pres main{padding:0;max-width:none}body.pres 
 .car-s .cmp{width:84px;height:84px}.car-s .big-n{font-size:30px}
 .car-sim{flex:1;min-height:0;display:flex;justify-content:center}.car-sim .simbox{height:100%;display:flex;flex-direction:column;align-items:center}.car-sim .simsvg{height:calc(100% - 22px);width:auto}
 .car-dots{display:flex;justify-content:center;gap:6px;padding-top:4px}.car-dots button{width:8px;height:8px;border-radius:50%;padding:0;border:0;background:var(--bd)}.car-dots button.on{background:var(--g1);width:20px;border-radius:4px}
-.pm-flo{position:relative}
+.pm-flo{position:relative;overflow:hidden}
 @media(max-width:700px){.pres-top{gap:6px;padding:6px 10px}.pres-top>.mut{display:none}.pt-t{font-size:15px}.pt-k{font-size:13px}body.pres .alarmb{font-size:13px;padding:7px 10px}}
-.fo{position:absolute;background:color-mix(in srgb,var(--card) 78%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--bd);border-radius:12px;padding:6px 9px;font-size:12px;line-height:1.35;box-shadow:0 6px 18px -8px rgba(0,0,0,.5)}
-.fo-tl{top:8px;left:8px;display:flex;gap:8px;align-items:center}.fo-tr{top:8px;right:8px;text-align:right;display:flex;flex-direction:column;align-items:flex-end}
-.fo-v{font-size:22px;font-weight:800;line-height:1}.fo-v small{font-size:11px;color:var(--mu)}
-.fo-bl{left:8px;bottom:48px;width:92px;height:150px;padding:4px}.fo-bl #simslot,.fo-bl .simbox{height:100%}.fo-bl .simsvg{height:calc(100% - 20px);width:auto;margin:0 auto}.fo-bl .simcap{font-size:10px;display:block;text-align:center}.fo-bl .simcap span{display:none}
-.fo-tk{left:8px;right:8px;bottom:8px;white-space:nowrap;overflow:hidden;padding:7px 0}.fo-tk span{display:inline-block;padding-left:100%;animation:tick 22s linear infinite;margin-right:-60%}
-@keyframes tick{to{transform:translateX(-100%)}}
+button.ic{width:34px;height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+.fo{position:absolute;background:color-mix(in srgb,var(--card) 72%,transparent);backdrop-filter:blur(14px) saturate(1.3);-webkit-backdrop-filter:blur(14px) saturate(1.3);border:1px solid color-mix(in srgb,var(--tx) 12%,transparent);border-radius:16px;padding:8px 10px;font-size:12px;line-height:1.3;box-shadow:0 10px 30px -12px rgba(0,0,0,.65),inset 0 1px 0 color-mix(in srgb,#fff 8%,transparent)}
+.fo-first .fo-tl{animation:foL .7s cubic-bezier(.2,.8,.2,1) both}.fo-first .fo-tr{animation:foR .7s .1s cubic-bezier(.2,.8,.2,1) both}.fo-first .fo-bl{animation:foU .7s .2s cubic-bezier(.2,.8,.2,1) both}
+@keyframes foL{from{opacity:0;transform:translateX(-24px)}}@keyframes foR{from{opacity:0;transform:translateX(24px)}}@keyframes foU{from{opacity:0;transform:translateY(24px)}}
+.fo-h{display:flex;align-items:center;gap:6px;font-size:9.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--mu);margin-bottom:5px}
+.fo-dot{width:7px;height:7px;border-radius:50%;box-shadow:0 0 0 0 currentColor;animation:foP 2s infinite}
+@keyframes foP{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--g1) 55%,transparent)}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.fo-row{display:flex;align-items:center;gap:8px}
+.fo-tl{top:10px;left:10px}.fo-tr{top:10px;right:10px;min-width:128px}
+.fo-st{display:grid;grid-template-columns:auto auto;gap:3px 12px}.fo-st b{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}.fo-st small{color:var(--mu);font-size:10px}.fo-st span{display:block;font-size:9.5px;color:var(--mu);margin-top:-2px}
+.fo-ar{width:38px;height:38px;flex:none}.fo-ar g{transition:transform 1.2s cubic-bezier(.3,1.4,.5,1)}
+.fo-v{font-size:22px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}.fo-v small{font-size:10px;color:var(--mu);margin-left:2px;font-weight:600}.fo-m{font-size:11px;color:var(--mu);margin-top:2px}
+.fo-lv{display:inline-flex;align-items:center;gap:5px;margin-top:6px;font-size:10.5px;font-weight:800;color:var(--c);background:color-mix(in srgb,var(--c) 16%,transparent);border:1px solid color-mix(in srgb,var(--c) 45%,transparent);border-radius:20px;padding:2px 8px}
+.fo-lv::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--c)}
+.fo-tr.lv1 .fo-lv::before,.fo-tr.lv2 .fo-lv::before{animation:blk 1s infinite}.fo-tr.lv2{border-color:color-mix(in srgb,var(--er) 60%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--er) 30%,transparent),0 10px 30px -12px rgba(220,38,38,.6)}
+@keyframes blk{50%{opacity:.2}}
+.fo-bl{left:10px;bottom:96px;width:96px;height:168px;padding:6px 6px 4px;display:flex;flex-direction:column}.fo-bl #simslot{flex:1;min-height:0}.fo-bl .simbox{height:100%}.fo-bl .simsvg{height:calc(100% - 16px);width:auto;margin:0 auto;border-radius:8px}.fo-bl .simcap{font-size:9.5px;display:block;text-align:center;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fo-bl .simcap span{display:none}
+.fo-nt{position:absolute;left:10px;right:10px;bottom:10px;height:74px}
+.nt{position:absolute;inset:0;display:flex;align-items:center;gap:10px;padding:10px 12px 12px;border-radius:16px;overflow:hidden;background:color-mix(in srgb,var(--card) 78%,transparent);backdrop-filter:blur(14px) saturate(1.3);-webkit-backdrop-filter:blur(14px) saturate(1.3);border:1px solid color-mix(in srgb,var(--c) 40%,transparent);box-shadow:0 12px 32px -14px rgba(0,0,0,.7),inset 3px 0 0 var(--c)}
+.nt-in{animation:ntIn .55s cubic-bezier(.2,.9,.25,1.15) both}.nt-out{animation:ntOut .45s ease-in both}
+@keyframes ntIn{from{opacity:0;transform:translateY(22px) scale(.96)}}@keyframes ntOut{to{opacity:0;transform:translateY(-16px) scale(.97)}}
+.nt-ic{width:38px;height:38px;flex:none;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;background:color-mix(in srgb,var(--c) 18%,transparent);animation:ntIc 2.4s ease-in-out infinite}
+@keyframes ntIc{50%{transform:scale(1.08)}}
+.nt-b{min-width:0;flex:1}.nt-t{display:flex;justify-content:space-between;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--c)}.nt-t span{color:var(--mu);font-weight:600;letter-spacing:0}
+.nt-x{font-size:12.5px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.nt-p{position:absolute;left:0;bottom:0;height:3px;background:var(--c);opacity:.8;animation:ntP 6s linear both}@keyframes ntP{from{width:0}to{width:100%}}
+@media (prefers-reduced-motion:reduce){.nt-in,.nt-out,.nt-ic,.nt-p,.fo-dot,.fo-first .fo{animation:none}}
 .locb{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px dashed var(--bd);border-radius:12px;margin:6px 0 4px}.locb a{color:var(--ac)}
 #locw .ovbar{flex-wrap:wrap}#locmap .leaflet-control-layers{color:#1a2233}
 .bn{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px;margin-bottom:12px}
@@ -1035,11 +1056,11 @@ function presView(){
   const c=S.cfg,ts=c.turbs,n=ts.length||1,TT=n*NM,pz=ts.reduce((a,t)=>a+prog(t.id).ok,0),p=pz/TT*100,I=S.info||{};
   const full=ts.filter(t=>prog(t.id).ok===NM).length,ener=ts.filter(t=>prog(t.id).ener).length,run=ts.filter(t=>prog(t.id).run).length,cur=ts.reduce((a,t)=>a+prog(t.id).cur,0);
   const r=50,C=2*Math.PI*r,nw=WX?wxNow():null,l=nw?wxLvl(nw.v,nw.g,nw.code,nw.cape):0,R=recos().slice(0,3);
-  const now=new Date().toLocaleString('es-AR',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}),mob=innerWidth<700&&innerWidth<innerHeight,lay=UI.plMob||'car';
+  const now=new Date().toLocaleString('es-AR',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}),mob=innerWidth<700&&innerWidth<innerHeight,lay=UI.plMob||'flo';
   const al=actAlarms();
   return `<div class="pres-wrap">${al.map(a=>`<div class="alarmb" data-act="goAlarm" data-v="${esc(a.turb)}">🚨 ALARMA · ${esc(tName(a.turb))} · ${esc(a.motivo)} · desde ${fmt(a.inicio)} · ⏱ <span data-since="${a.inicio}">${durS(aDur(a))}</span></div>`).join('')}${wxBanner()}
    <div class="pres-top"><b class="pt-t">${esc(I.nombre||'')}</b><span class="mut">${esc([I.modelo,`${n} WTG`,totMW(I)].filter(Boolean).join(' · '))}</span><span class="grow"></span>
-    <span class="pt-k">${p.toFixed(1)}% montado</span>${mob?`<button class="sm" data-act="plmob" title="Cambiar diseño">${lay==='car'?'▦ Flotante':'▤ Carrusel'}</button>`:`<span class="mut">${now}</span>`}<button class="sm" data-act="zreset" title="Ver todo el parque">⤢</button><button class="sm" data-act="presx">✕ Salir</button></div>
+    <span class="pt-k">${p.toFixed(1)}% montado</span>${mob?`<button class="sm ic" data-act="plmob" title="${lay==='car'?'Diseño flotante':'Diseño carrusel'}">${lay==='car'?'▦':'▤'}</button>`:`<span class="mut">${now}</span>`}<button class="sm ic" data-act="zreset" title="Ver todo el parque">⤢</button><button class="sm ${mob?'ic':''}" data-act="presx" title="Salir">${mob?'✕':'✕ Salir'}</button></div>
    ${mob?presMob(lay,{p,pz,TT,n,full,ener,run,cur,nw,l,R,I,r,C}):`<div class="pres-map"><svg id="map" class="map" viewBox="${vbStr()}" preserveAspectRatio="xMidYMid meet">${mapSvg()}</svg></div>
    <div class="pres-bot">
     <div class="pb pb-sim"><div class="tt"><span>Secuencia de montaje</span></div><div id="simslot"></div></div>
@@ -1049,15 +1070,25 @@ function presView(){
     <div class="pb pb-wx"><div class="tt"><span>Clima · viento a 100 m</span>${nw?`<span class="lv" style="background:${LV[l][1]}">${['OK','Precaución','ALARMA'][l]}</span>`:''}</div>
      ${I.lat==null?'<p class="mut" style="font-size:12px">Sin ubicación del parque.</p>':nw?`<div class="pb-row"><div>${wxCompass(nw.d)}</div><div><div class="big-n">${nw.v.toFixed(1)}<small> m/s</small></div><div class="mut" style="font-size:12px">del ${dirName(nw.d)} · ráfagas ${nw.g.toFixed(0)} · ${wxIcon(nw.code)} ${Math.round(nw.t)}°</div>${R.map(([e,t])=>`<div class="pb-al">${e} ${esc(t)}</div>`).join('')}</div></div>${wxHourly()}`:`<p class="mut" style="font-size:12px">${esc(WXerr||'Cargando clima…')}</p>`}</div>
    </div>`}</div>`}
+const NT_SEV=e=>/⛔|🚨/.test(e)?['var(--er)','Alerta']:/⚠️|💨|⛈|🌧️/.test(e)?['#f59e0b','Precaución']:/✅|🕒/.test(e)?['var(--ok)','Info']:['var(--ac)','Aviso'];
+function ntList(){const R=recos();return R.length?R:[['✅','Sin alertas: todo en orden en el parque.']]}
+function ntHtml(i,anim){const L=ntList(),k=((i%L.length)+L.length)%L.length,[e,t]=L[k],[c,lab]=NT_SEV(e);
+  return `<div class="nt ${anim?'nt-in':''}" style="--c:${c}"><span class="nt-ic">${e}</span><div class="nt-b"><div class="nt-t">${lab}<span>${k+1}/${L.length}</span></div><div class="nt-x">${esc(t)}</div></div><i class="nt-p"></i></div>`}
+let ntI=0;
+setInterval(()=>{const box=document.getElementById('fo-nt');if(!box||document.hidden)return;ntI++;const old=box.firstElementChild;if(old){old.classList.remove('nt-in');old.classList.add('nt-out');setTimeout(()=>old.remove(),450)}box.insertAdjacentHTML('beforeend',ntHtml(ntI,true))},6000);
 function presMob(lay,d){const {p,pz,TT,n,full,ener,run,cur,nw,l,R,I,r,C}=d,c=S.cfg,ts=c.turbs;
   const map=`<svg id="map" class="map" viewBox="${vbStr()}" preserveAspectRatio="xMidYMid meet">${mapSvg()}</svg>`;
   const ring=sz=>`<svg viewBox="0 0 120 120" style="width:${sz}px;height:${sz}px;flex:none"><defs><linearGradient id="gpm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--g1)"/><stop offset="1" stop-color="var(--g2)"/></linearGradient></defs><circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--pe)" stroke-width="12"/>${p>0?`<circle cx="60" cy="60" r="${r}" fill="none" stroke="${p>=100?'var(--ok)':'url(#gpm)'}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C*p/100} ${C}" transform="rotate(-90 60 60)"/>`:''}<text x="60" y="66" text-anchor="middle" font-size="24" font-weight="800" fill="var(--tx)">${Math.round(p)}%</text></svg>`;
   if(lay==='flo'){
-    return `<div class="pres-map pm-flo">${map}
-      <div class="fo fo-tl">${ring(54)}<div><b>${full}/${n}</b> montadas<br><span style="color:#facc15">⚡${ener}</span> · <span style="color:var(--ok)">▶${run}</span>${cur?` · <span style="color:var(--nt)">⏳${cur}</span>`:''}</div></div>
-      <div class="fo fo-tr">${nw?`<div class="fo-v">${nw.v.toFixed(1)}<small> m/s</small></div><div>${dirName(nw.d)} · ${wxIcon(nw.code)} ${Math.round(nw.t)}°</div><span class="lv" style="background:${LV[l][1]};margin:3px 0 0">${['OK','Precaución','ALARMA'][l]}</span>`:`<div class="mut">${I.lat==null?'Sin ubicación':'Sin clima'}</div>`}</div>
-      <div class="fo fo-bl"><div id="simslot"></div></div>
-      <div class="fo fo-tk">${R.length?R.map(([e,t])=>`<span>${e} ${esc(t)}</span>`).join(''):'<span>✅ Sin alertas</span>'}</div></div>`}
+    const first=!UI.foShown;UI.foShown=true;
+    const lvC=['var(--ok)','#f59e0b','var(--er)'][l];
+    return `<div class="pres-map pm-flo ${first?'fo-first':''}">${map}
+      <div class="fo fo-tl"><div class="fo-h"><span class="fo-dot" style="background:var(--ok)"></span>Avance del parque</div>
+        <div class="fo-row">${ring(58)}<div class="fo-st"><div><b>${full}</b><small>/${n}</small><span>montadas</span></div><div><b style="color:#facc15">${ener}</b><span>⚡ energiz.</span></div><div><b style="color:var(--ok)">${run}</b><span>▶ RUN</span></div><div><b style="color:var(--nt)">${cur}</b><span>izando</span></div></div></div></div>
+      <div class="fo fo-tr lv${l}"><div class="fo-h"><span class="fo-dot" style="background:${lvC}"></span>Viento 100 m</div>
+        ${nw?`<div class="fo-row"><svg viewBox="0 0 40 40" class="fo-ar"><circle cx="20" cy="20" r="18" fill="none" stroke="var(--bd)" stroke-width="1.5"/><g style="transform:rotate(${(nw.d+180)%360}deg);transform-origin:20px 20px"><path d="M20 6 L26 24 L20 20 L14 24Z" fill="var(--ac)"/></g></svg><div><div class="fo-v">${nw.v.toFixed(1)}<small>m/s</small></div><div class="fo-m">${dirName(nw.d)} · ${wxIcon(nw.code)} ${Math.round(nw.t)}°</div></div></div><span class="fo-lv" style="--c:${lvC}">${['Condiciones OK','Precaución','Suspender altura'][l]}</span>`:`<div class="fo-m">${I.lat==null?'Sin ubicación':'Sin datos de clima'}</div>`}</div>
+      <div class="fo fo-bl"><div class="fo-h"><span class="fo-dot" style="background:var(--g1)"></span>Secuencia</div><div id="simslot"></div></div>
+      <div class="fo-nt" id="fo-nt">${ntHtml(0,false)}</div></div>`}
   const slides=[
     ['Avance del parque',`<div class="pb-row">${ring(96)}<div class="kq kq-s" style="flex:1"><div><b style="color:var(--g1)">${full}<small>/${n}</small></b><span>montadas</span></div><div><b style="color:#facc15">${ener}</b><span>⚡ energiz.</span></div><div><b style="color:var(--ok)">${run}</b><span>▶ RUN</span></div><div><b style="color:var(--nt)">${cur}</b><span>izando</span></div></div></div>`],
     ['Clima · viento a 100 m',I.lat==null?'<p class="mut">Sin ubicación del parque.</p>':nw?`<div class="pb-row"><div style="flex:none">${wxCompass(nw.d)}</div><div><div class="big-n">${nw.v.toFixed(1)}<small> m/s</small></div><div class="mut" style="font-size:12px">del ${dirName(nw.d)} · ráfagas ${nw.g.toFixed(0)} · ${wxIcon(nw.code)} ${Math.round(nw.t)}°</div><span class="lv" style="background:${LV[l][1]}">${['OK','Precaución','ALARMA'][l]}</span></div></div>${wxHourly()}`:`<p class="mut">${esc(WXerr||'Cargando clima…')}</p>`],
@@ -1067,12 +1098,12 @@ function presMob(lay,d){const {p,pz,TT,n,full,ener,run,cur,nw,l,R,I,r,C}=d,c=S.c
   const k=((UI.car||0)%slides.length+slides.length)%slides.length;
   return `<div class="pres-map">${map}</div><div class="car"><div class="car-trk" style="transform:translateX(-${k*100}%)">${slides.map(([t,b])=>`<div class="car-s"><div class="tt"><span>${t}</span></div>${b}</div>`).join('')}</div>
     <div class="car-dots">${slides.map((_,i)=>`<button class="${i===k?'on':''}" data-act="car" data-v="${i}" aria-label="Tarjeta ${i+1}"></button>`).join('')}</div></div>`}
-function presOn(){UI.pres=true;UI.le=false;try{const e=document.documentElement;if(e.requestFullscreen&&!document.fullscreenElement)e.requestFullscreen().catch(()=>{})}catch(e){}render();setTimeout(fitAll,120)}
+function presOn(){UI.pres=true;UI.foShown=false;UI.le=false;try{const e=document.documentElement;if(e.requestFullscreen&&!document.fullscreenElement)e.requestFullscreen().catch(()=>{})}catch(e){}render();setTimeout(fitAll,120)}
 function presOff(){UI.pres=false;try{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch(e){}render();setTimeout(fitAll,120)}
 addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.pres&&!UI.ov&&!document.fullscreenElement)presOff()});
 document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&UI.pres&&!presOff.k){}});
 setInterval(()=>{if(UI.pres&&!drag&&!UI.ov)render()},60e3);
-try{UI.plMob=localStorage.getItem('wtg-plmob')||'car'}catch(e){}
+try{UI.plMob=localStorage.getItem('wtg-plmob')||'flo'}catch(e){UI.plMob='flo'}
 function carGo(){const t=document.querySelector('.car-trk');if(!t)return;const n=t.children.length,k=((UI.car||0)%n+n)%n;UI.car=k;t.style.transform=`translateX(-${k*100}%)`;document.querySelectorAll('.car-dots button').forEach((b,i)=>b.classList.toggle('on',i===k))}
 setInterval(()=>{if(UI.pres&&!document.hidden&&document.querySelector('.car-trk')&&!carHold){UI.car=(UI.car||0)+1;carGo()}},8000);
 let carHold=false,carX=null;
@@ -1330,7 +1361,7 @@ document.addEventListener('click',e=>{
    case 'tab2':UI.tab=v;render();window.scrollTo(0,0);break;
    case 'pres':presOn();break;
    case 'presx':presOff();break;
-   case 'plmob':UI.plMob=(UI.plMob||'car')==='car'?'flo':'car';try{localStorage.setItem('wtg-plmob',UI.plMob)}catch(_){};render();setTimeout(fitAll,80);break;
+   case 'plmob':UI.plMob=(UI.plMob||'flo')==='car'?'flo':'car';UI.foShown=false;try{localStorage.setItem('wtg-plmob',UI.plMob)}catch(_){};render();setTimeout(fitAll,80);break;
    case 'car':UI.car=+v;carGo();break;
    case 'tsz':setTs(UI.ts*(+v));break;
    case 'lock':c.locked=!c.locked;saveCfg(true);break;
