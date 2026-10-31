@@ -195,7 +195,7 @@ body.pres header{display:none}body.pres main{padding:0;max-width:none}body.pres 
 .pres-map{flex:1;min-height:0;background:var(--mapbg);touch-action:none}.pres-map>svg.map{width:100%;height:100%;display:block}
 .pres-bot{height:min(31vh,300px);display:grid;grid-template-columns:minmax(150px,190px) minmax(240px,1fr) minmax(220px,1fr) minmax(320px,1.5fr);gap:10px;padding:10px;border-top:1px solid var(--bd);background:color-mix(in srgb,var(--card) 70%,var(--bg))}
 .pb{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:8px 10px;min-width:0;min-height:0;overflow:hidden;display:flex;flex-direction:column}
-.pb .tt{margin-bottom:4px;gap:6px}.pb-sim #simslot{flex:1;min-height:0;display:flex;justify-content:center}.pb-sim .simsvg{height:100%;width:auto;max-height:calc(min(31vh,300px) - 70px)}.pb-sim .simcap{font-size:11px}
+.pb .tt{margin-bottom:4px;gap:6px}.pb-sim #simslot{flex:1;min-height:0;display:flex;justify-content:center}.pb-sim .simbox{width:100%;display:flex;flex-direction:column}.pb-sim .simsvg{width:100%;height:calc(min(31vh,300px) - 74px)}.pb-sim .simcap{white-space:nowrap;overflow:hidden}.pb-sim .simcap{font-size:11px}
 .pb-row{display:flex;gap:10px;align-items:center;min-height:0}.pb-ring{width:min(42%,120px);flex:none}.kq-s{gap:6px}.kq-s b{font-size:18px}.kq-s>div{padding:5px 7px}
 .pb-sc{overflow:auto;min-height:0}.pb-wx .cmp{width:80px;height:80px}.pb-wx .big-n{font-size:28px}.pb-wx .hr{margin-top:4px}.pb-al{font-size:11px;margin-top:3px}
 @media(max-width:900px){.pres-bot{grid-template-columns:1fr 1fr;height:auto;max-height:45vh;overflow:auto}.pb-sim{display:none}}
@@ -203,7 +203,7 @@ body.pres header{display:none}body.pres main{padding:0;max-width:none}body.pres 
 .car-trk{flex:1;display:flex;transition:transform .6s cubic-bezier(.2,.7,.2,1);min-height:0}
 .car-s{flex:0 0 100%;padding:0 12px;min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden}
 .car-s .cmp{width:84px;height:84px}.car-s .big-n{font-size:30px}
-.car-sim{flex:1;min-height:0;display:flex;justify-content:center}.car-sim .simbox{height:100%;display:flex;flex-direction:column;align-items:center}.car-sim .simsvg{height:calc(100% - 22px);width:auto}
+.car-sim{flex:1;min-height:0;display:flex;justify-content:center}.car-sim .simbox{height:100%;display:flex;flex-direction:column;align-items:center}.car-sim .simbox{width:100%}.car-sim .simsvg{height:calc(100% - 22px);width:100%}
 .car-dots{display:flex;justify-content:center;gap:6px;padding-top:4px}.car-dots button{width:8px;height:8px;border-radius:50%;padding:0;border:0;background:var(--bd)}.car-dots button.on{background:var(--g1);width:20px;border-radius:4px}
 .pm-flo{position:relative;overflow:hidden}
 @media(max-width:700px){.pres-top{gap:6px;padding:6px 10px}.pres-top>.mut{display:none}.pt-t{font-size:15px}.pt-k{font-size:13px}body.pres .alarmb{font-size:13px;padding:7px 10px}}
@@ -223,7 +223,7 @@ button.ic{width:34px;height:34px;padding:0;display:inline-flex;align-items:cente
 .fo-lv::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--c)}
 .fo-tr.lv1 .fo-lv::before,.fo-tr.lv2 .fo-lv::before{animation:blk 1s infinite}.fo-tr.lv2{border-color:color-mix(in srgb,var(--er) 60%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--er) 30%,transparent),0 10px 30px -12px rgba(220,38,38,.6)}
 @keyframes blk{50%{opacity:.2}}
-.fo-bl{left:10px;bottom:96px;width:96px;height:168px;padding:6px 6px 4px;display:flex;flex-direction:column}.fo-bl #simslot{flex:1;min-height:0}.fo-bl .simbox{height:100%}.fo-bl .simsvg{height:calc(100% - 16px);width:auto;margin:0 auto;border-radius:8px}.fo-bl .simcap{font-size:9.5px;display:block;text-align:center;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fo-bl .simcap span{display:none}
+.fo-bl{left:10px;bottom:96px;width:150px;height:158px;padding:6px 6px 4px;display:flex;flex-direction:column}.fo-bl #simslot{flex:1;min-height:0}.fo-bl .simbox{height:100%}.fo-bl .simsvg{height:calc(100% - 16px);width:100%;margin:0 auto;border-radius:8px}.fo-bl .simcap{font-size:9.5px;display:block;text-align:center;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fo-bl .simcap span{display:none}
 .fo-nt{position:absolute;left:10px;right:10px;bottom:10px;height:74px}
 .nt{position:absolute;inset:0;display:flex;align-items:center;gap:10px;padding:10px 12px 12px;border-radius:16px;overflow:hidden;background:color-mix(in srgb,var(--card) 78%,transparent);backdrop-filter:blur(14px) saturate(1.3);-webkit-backdrop-filter:blur(14px) saturate(1.3);border:1px solid color-mix(in srgb,var(--c) 40%,transparent);box-shadow:0 12px 32px -14px rgba(0,0,0,.7),inset 3px 0 0 var(--c)}
 .nt-in{animation:ntIn .55s cubic-bezier(.2,.9,.25,1.15) both}.nt-out{animation:ntOut .45s ease-in both}
@@ -661,39 +661,119 @@ function mapView(){
    <div class="legend" style="margin-top:8px">${counts.map((ts,i)=>`<span><i class="dot" style="background:${cc(i)}"></i>${esc(cName(i))} (${ts.length} WTG · ${ts.filter(t=>prog(t.id).ok===NM).length} completas)</span>`).join('')}
    <span><i class="dot" style="background:#ffd400"></i>Izando</span></div></div></div><aside class="sump">${summary()}</aside></div>`;
 }
-/* ===== simulación de montaje (panel izquierdo) ===== */
-const SEQ=['base','t1','t2','t3','t4','t5','rad','nacelle','pt','hub','pa','pb','pc','ener','run'];
-const HOOK={base:[230,444],t1:[230,392],t2:[230,334],t3:[230,276],t4:[230,218],t5:[230,160],nacelle:[217,129],pt:[234,140],rad:[324,433],hub:[277,133],pa:[272,147],pb:[272,147],pc:[272,147]};
-let simEl=null,simI=0,simT=null;
+/* ===== simulación de montaje (panel izquierdo): grúa levantando piezas desde el acopio ===== */
+const CR={px:700,py:428,L:655,pick:300,top:-45};            // pivote de la pluma, largo, punto de toma en el piso
+const easeIO=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+const clamp01=t=>Math.max(0,Math.min(1,t));
+const lerp=(a,b,t)=>a+(b-a)*t;
+function crTip(x){const dx=CR.px-x;let y=CR.py-Math.sqrt(Math.max(0,CR.L*CR.L-dx*dx));if(y<CR.top)y=CR.top;return{x,y}}
+function crSpecs(){
+  const FR=487,slots=[285,350,415,480,545];        // fila delantera: tramos de torre acostados
+  const tower=['t1','t2','t3','t4','t5'].map((k,i)=>{const yb=GND-i*SEC,yt=yb-SEC,wb=tw(yb);
+    return{k,ax:CX,ay:yt,from:{x:slots[i]+29,y:FR-wb/2,r:90},to:{x:CX,y:yt,r:0},carry:0}});
+  const nacG={x:CR.pick,y:GND-31};
+  return[
+    {k:'base',pour:1.6},
+    ...tower,
+    {k:'rad',ax:184,ay:110,from:{x:490,y:GND-20,r:0},to:{x:184+nacG.x-217,y:110+nacG.y-129,r:0},carry:0},
+    {k:'nacelle',ax:217,ay:129,from:{x:nacG.x,y:nacG.y,r:0},to:{x:217,y:129,r:0},carry:0},
+    {k:'pt',ax:234,ay:140,from:{x:440,y:GND-15,r:0},to:{x:234,y:140,r:0},carry:0},
+    {k:'hub',ax:272,ay:133,from:{x:380,y:GND-28,r:0},to:{x:272,y:133,r:0},carry:0},
+    ...[['pa',-150,436],['pb',-30,427],['pc',90,418]].map(([k,a,y])=>({k,blade:1,from:{x:505,y,r:0},to:{x:HX,y:HY,r:a<0?a+360:a},carry:0})),
+    {k:'ener',pop:2},
+    {k:'run',pop:5}
+  ]}
+const CR_T=4.2;                                       // segundos por izaje
+function crTimeline(){let t=1.0;const L=crSpecs().map(s=>{const d=s.pour||s.pop||CR_T;const o={...s,t0:t,d};t+=d;return o});return{L,T:t+1.2}}
+let CRTL=null;
+function crSvg(){
+  const pieces=crSpecs().filter(s=>!s.pour&&!s.pop).sort((a,b)=>(b.blade||0)-(a.blade||0)).map(s=>s.blade?`<g id="cp-${s.k}" opacity="0"><path class="sh m-bl" d="${bladeD}"/></g>`:`<g id="cp-${s.k}" opacity="0">${air(s.k)}</g>`).join('');
+  return `<svg class="simsvg crsvg" viewBox="105 -75 655 600" aria-hidden="true"><defs>${DEFS}</defs>
+   <rect x="105" y="-75" width="655" height="${GND+75}" fill="url(#gSky)"/>
+   <path d="M105,418 C170,402 240,412 300,400 C360,390 420,404 470,396 C560,384 640,402 760,392 L760,${GND} L105,${GND}Z" fill="#17261f"/>
+   <rect x="105" y="${GND}" width="655" height="75" fill="url(#gEarth)"/><line x1="105" x2="760" y1="${GND}" y2="${GND}" stroke="#6b5a3a" stroke-width="1.2"/>
+   <rect x="250" y="${GND+1}" width="350" height="44" rx="3" fill="#000" opacity=".12"/>
+   <g fill="#7a5a32">${[262,327,392,457,522,317,342,407,472,537].slice(0,5).map(x=>`<rect x="${x}" y="487" width="8" height="4"/><rect x="${x+38}" y="487" width="8" height="4"/>`).join('')}</g>
+   <g fill="#7a5a32"><rect x="512" y="440" width="7" height="10"/><rect x="600" y="440" width="7" height="10"/></g>
+   <g id="cp-base" opacity="0">${air('base')}</g>
+   <g id="crane"><g transform="translate(290,0)">
+    <rect x="356" y="440" width="104" height="16" rx="8" fill="#2b2f36"/><g fill="#4b5563">${[366,380,394,408,422,436,450].map(x=>`<circle cx="${x}" cy="448" r="4.5"/>`).join('')}</g>
+    <rect x="372" y="412" width="78" height="28" rx="3" fill="#e8a317"/><rect x="438" y="406" width="26" height="30" rx="2" fill="#3f4650"/>
+    <rect x="356" y="414" width="20" height="22" rx="3" fill="#e8a317"/><rect x="359" y="417" width="14" height="10" rx="1.5" fill="#9cc7e8" opacity=".85"/>
+    <line x1="410" y1="428" x2="452" y2="366" stroke="#c9870f" stroke-width="3"/><line x1="452" y1="366" x2="456" y2="408" stroke="#c9870f" stroke-width="3"/></g>
+    <line id="cr-pend" x1="742" y1="366" x2="0" y2="0" stroke="#8b949e" stroke-width="1"/>
+    <g id="cr-boom"></g>
+    <line id="cr-rope" stroke="#cbd5e1" stroke-width="1.1"/>
+    <g id="cr-hook"><rect x="-5" y="-12" width="10" height="9" rx="2" fill="#e8a317"/><path d="M0,-3 v4 a3,3 0 1 0 3,3" stroke="#d1d5db" stroke-width="1.6" fill="none"/></g>
+   </g>
+   <g id="cr-pieces">${pieces}</g>
+   <g id="cp-ener" opacity="0">${air('ener')}</g><g id="cp-run" opacity="0">${air('run')}</g>
+   <circle id="cr-flash" cx="262" cy="410" r="10" fill="#fde047" opacity="0"/><rect id="cr-fade" x="105" y="-75" width="655" height="600" fill="#070b16" opacity="0"/>
+  </svg>`}
+function crBoom(tip){const dx=tip.x-CR.px,dy=tip.y-CR.py,len=Math.hypot(dx,dy),ux=dx/len,uy=dy/len,nx=-uy*4.5,ny=ux*4.5;
+  const A=[CR.px+nx,CR.py+ny],B=[CR.px-nx,CR.py-ny],C=[tip.x+nx*.4,tip.y+ny*.4],D=[tip.x-nx*.4,tip.y-ny*.4];let z='';
+  const n=Math.floor(len/26);for(let i=0;i<n;i++){const t0=i/n,t1=(i+1)/n,w0=1-.6*t0,w1=1-.6*t1;
+    const p0=[CR.px+dx*t0+nx*w0*(i%2?1:-1),CR.py+dy*t0+ny*w0*(i%2?1:-1)],p1=[CR.px+dx*t1+nx*w1*(i%2?-1:1),CR.py+dy*t1+ny*w1*(i%2?-1:1)];
+    z+=`M${p0[0].toFixed(1)},${p0[1].toFixed(1)}L${p1[0].toFixed(1)},${p1[1].toFixed(1)}`}
+  return `<path d="M${A[0]},${A[1]}L${C[0].toFixed(1)},${C[1].toFixed(1)}M${B[0]},${B[1]}L${D[0].toFixed(1)},${D[1].toFixed(1)}" stroke="#e8a317" stroke-width="2"/><path d="${z}" stroke="#c9870f" stroke-width=".9"/><circle cx="${tip.x.toFixed(1)}" cy="${tip.y.toFixed(1)}" r="3" fill="#4b5563"/>`}
+function crPose(s,h,r){return s.blade?`translate(${h.x.toFixed(2)},${h.y.toFixed(2)}) rotate(${r.toFixed(2)})`:`translate(${h.x.toFixed(2)},${h.y.toFixed(2)}) rotate(${r.toFixed(2)}) translate(${-s.ax},${-s.ay})`}
+function crHook(s,ph){                                // posición del gancho y giro de la pieza en una fase 0..1
+  const hi=s.hi||Math.min(s.from.y,s.to.y)-46,parkX=s.prevX,parkY=s.prevY,q=ph*CR_T;
+  const seg=[[0,.75],[.75,1.4],[1.4,2.45],[2.45,3.3],[3.3,4.2]];
+  const f=(a,b)=>easeIO(clamp01((q-a)/(b-a)));
+  let x,y,r,carry=false;
+  const cl=Math.min(parkY,s.from.y)-28;
+  if(q<seg[0][1]){const k=f(...seg[0]);x=lerp(parkX,s.from.x,k);y=lerp(parkY,cl,easeIO(clamp01(k*2.2)));r=s.from.r}
+  else if(q<seg[1][1]){x=s.from.x;y=lerp(cl,s.from.y,f(...seg[1]));r=s.from.r}
+  else if(q<seg[2][1]){x=s.from.x;y=lerp(s.from.y,hi,f(...seg[2]));r=lerp(s.from.r,s.carry,f(...seg[2]));carry=true}
+  else if(q<seg[3][1]){x=lerp(s.from.x,s.to.x,f(...seg[3]));y=hi;r=s.carry;carry=true}
+  else{const k=f(...seg[4]);x=s.to.x;y=lerp(hi,s.to.y,k);let d=s.to.r-s.carry;if(d>180)d-=360;if(d<-180)d+=360;r=s.carry+d*k;carry=true}
+  return{x,y,r,carry}}
+function crDraw(svg,t){
+  if(!CRTL)CRTL=crTimeline();const{L,T}=CRTL;t=((t%T)+T)%T;
+  const $$=id=>svg.querySelector('#'+id);let cur=null,parkX=CR.pick,parkY=60,label='',step='';
+  const runOn=L.find(s=>s.k==='run'),spin=t>runOn.t0+.6?(t-runOn.t0-.6)*70:0;
+  let nacT=null;                                     // transformación actual de la nacelle (el radiador la sigue)
+  L.forEach((s,i)=>{const g=$$('cp-'+s.k);if(!g)return;const ph=(t-s.t0)/s.d;
+    if(s.pour){const k=easeIO(clamp01(ph));g.setAttribute('opacity',k.toFixed(3));g.setAttribute('transform',`translate(0,${((1-k)*6).toFixed(2)})`);if(ph>=0&&ph<1){label='Base (fundación)';step='Hormigonado'}return}
+    if(s.pop){const k=clamp01(ph/.35);g.setAttribute('opacity',k.toFixed(3));g.setAttribute('transform',k<1?`translate(${s.k==='ener'?260:291},${s.k==='ener'?412:422}) scale(${(.4+.6*k).toFixed(3)}) translate(${s.k==='ener'?-260:-291},${s.k==='ener'?-412:-422})`:'');
+      if(ph>=0&&ph<1){label=s.k==='ener'?'⚡ Energización':'▶ RUN · puesta en marcha';step=s.k==='ener'?'Montaje 100%':'Rotor girando'}
+      if(s.k==='ener'){const fl=$$('cr-flash');const fk=ph>0&&ph<.5?Math.sin(ph/.5*Math.PI):0;fl.setAttribute('opacity',(fk*.55).toFixed(3));fl.setAttribute('r',(10+fk*26).toFixed(1))}return}
+    s.idx=i;s.prevX=parkX;s.prevY=parkY;
+    if(ph<0){g.setAttribute('opacity','1');g.setAttribute('transform',crPose(s,s.from,s.from.r));if(s.k==='nacelle')nacT=g.getAttribute('transform');return}
+    g.setAttribute('opacity','1');
+    if(ph>=1){const r=s.blade?s.to.r+spin:0;g.setAttribute('transform',s.blade?crPose(s,s.to,r):'');parkX=s.to.x;parkY=s.to.y;if(s.k==='nacelle')nacT='';return}
+    const p=crHook(s,ph);g.setAttribute('transform',p.carry?crPose(s,{x:p.x,y:p.y},p.r):crPose(s,s.from,s.from.r));if(s.k==='nacelle')nacT=g.getAttribute('transform');
+    cur={x:p.x,y:p.y};label=s.k==='rad'?'Radiador → nacelle en piso':s.k==='nacelle'?'Nacelle + radiador':PK[s.k].n;step=`Pieza ${L.filter(x=>!x.pour&&!x.pop).indexOf(s)+2} de ${NM}`});
+  const rad=L.find(s=>s.k==='rad'),radG=$$('cp-rad');            // el radiador viaja con la nacelle después de montado
+  if(radG&&t>=rad.t0+rad.d&&nacT!==null)radG.setAttribute('transform',nacT);
+  const last=L.filter(s=>!s.pour&&!s.pop).slice(-1)[0],done=t>=last.t0+last.d,ener=L.find(s=>s.k==='ener');
+  let hx,hy;if(cur){hx=cur.x;hy=cur.y}else{const k=done?easeIO(clamp01((t-last.t0-last.d)/1.2)):0;hx=lerp(done?last.to.x:CR.pick,CR.pick+60,k);hy=done?lerp(last.to.y,60,k):60}
+  const tip=crTip(hx);$$('cr-boom').innerHTML=crBoom(tip);
+  const pd=$$('cr-pend');pd.setAttribute('x2',tip.x.toFixed(1));pd.setAttribute('y2',tip.y.toFixed(1));
+  const rp=$$('cr-rope');rp.setAttribute('x1',tip.x.toFixed(1));rp.setAttribute('y1',tip.y.toFixed(1));rp.setAttribute('x2',hx.toFixed(1));rp.setAttribute('y2',(hy-12).toFixed(1));
+  $$('cr-hook').setAttribute('transform',`translate(${hx.toFixed(1)},${hy.toFixed(1)})`);
+  const cf=t>ener.t0?1-clamp01((t-ener.t0)/1):1;$$('crane').setAttribute('opacity',cf.toFixed(3));
+  const fd=Math.max(clamp01((t-(T-.6))/.6),1-clamp01(t/.5));$$('cr-fade').setAttribute('opacity',fd.toFixed(3));
+  if(!label){label=done?'Aerogenerador en servicio':'Preparando';step=''}
+  return{label,step}}
+
+let simEl=null,simRaf=0,simT0=0;
 function simBuild(){
   simEl=document.createElement('div');simEl.className='simbox';
-  const pc=k=>`<g class="sp" data-k="${k}">${air(k)}</g>`;
-  simEl.innerHTML=`<svg class="simsvg" viewBox="120 -20 300 510" aria-hidden="true"><defs>${DEFS}</defs>
-   <rect x="120" y="-20" width="300" height="${GND+20}" fill="url(#gSky)"/><path d="M120,420 C180,404 250,412 300,401 C350,392 390,404 420,396 L420,${GND} L120,${GND}Z" fill="#17261f"/>
-   <rect x="120" y="${GND}" width="300" height="40" fill="url(#gEarth)"/><ellipse cx="262" cy="458" rx="80" ry="5" fill="#000" opacity=".45"/>
-   <g class="crane"><line x1="406" y1="${GND}" x2="406" y2="-6" stroke="#f59e0b" stroke-width="3"/><line x1="406" y1="-4" x2="190" y2="-4" stroke="#f59e0b" stroke-width="3"/></g>
-   <line class="hook" x1="0" y1="-4" x2="0" y2="0" stroke="#fcd34d" stroke-width="1.2" stroke-dasharray="3 2"/>
-   <g class="gnac"><g transform="translate(140,322)">${air('nacelle')}</g></g>
-   <g class="sp" data-k="rad"><g transform="translate(140,322)">${air('rad')}</g></g><g class="sp" data-k="radA">${air('rad')}</g>
-   ${SEQ.filter(k=>!['pa','pb','pc','rad','hub','ener','run'].includes(k)).map(pc).join('')}<g class="srotor">${pc('pa')}${pc('pb')}${pc('pc')}</g>${pc('hub')}${pc('ener')}${pc('run')}</svg>
-   <div class="simcap"><b id="simname">—</b><span id="simstep"></span></div>`;
-  simI=0;simStep();
+  simEl.innerHTML=crSvg()+'<div class="simcap"><b id="simname">—</b><span id="simstep"></span></div>';
+  simT0=performance.now();cancelAnimationFrame(simRaf);simRaf=requestAnimationFrame(simStep);
 }
-function simStep(){
-  if(!simEl)return;clearTimeout(simT);const svg=simEl.querySelector('svg');
-  if(matchMedia('(prefers-reduced-motion: reduce)').matches){simEl.querySelectorAll('.sp').forEach(g=>g.classList.add('on'));svg.classList.add('done');return}
-  if(simI===0){svg.classList.remove('done','fade','nacup','ener','run');simEl.querySelectorAll('.sp').forEach(g=>g.classList.remove('on','drop','pop'))}
-  if(simI<SEQ.length&&PK[SEQ[simI]].x){const k=SEQ[simI],g=svg.querySelector(`.sp[data-k="${k}"]`);g.classList.add('on','pop');svg.classList.add(k);
-    const nm=simEl.querySelector('#simname'),st=simEl.querySelector('#simstep');if(nm)nm.textContent=k==='ener'?'⚡ Energización':'▶ RUN';if(st)st.textContent=k==='ener'?'Montaje 100%':'Rotor girando';
-    simI++;simT=setTimeout(simStep,k==='run'?4600:1900);return}
-  if(simI<SEQ.length){const k=SEQ[simI],g=svg.querySelector(`.sp[data-k="${k}"]`);g.classList.add('on','drop');
-    if(k==='nacelle'){svg.classList.add('nacup');svg.querySelector('.sp[data-k="rad"]').classList.remove('on','drop');svg.querySelector('.sp[data-k="radA"]').classList.add('on','drop')}
-    const h=svg.querySelector('.hook'),[x,y]=HOOK[k];h.setAttribute('x1',x);h.setAttribute('x2',x);h.setAttribute('y2',y);h.classList.remove('go');void h.getBBox();h.classList.add('go');
-    const nm=simEl.querySelector('#simname'),st=simEl.querySelector('#simstep');if(nm)nm.textContent=k==='rad'?'Radiador (sobre la nacelle, en piso)':k==='nacelle'?'Nacelle + radiador':PK[k].n;if(st)st.textContent=`Pieza ${simI+1} de ${NM}`;
-    simI++;simT=setTimeout(simStep,1500)}
-  else if(simI===SEQ.length){const nm=simEl.querySelector('#simname'),st=simEl.querySelector('#simstep');if(nm)nm.textContent='Aerogenerador en servicio';if(st)st.textContent='';simI++;simT=setTimeout(simStep,4200)}
-  else{svg.classList.add('fade');simI=0;simT=setTimeout(simStep,900)}
-}
+function simStep(now){
+  if(!simEl)return;const svg=simEl.querySelector('svg');
+  if(!CRTL)CRTL=crTimeline();
+  const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(simEl.isConnected&&!document.hidden){
+    const r=crDraw(svg,still?CRTL.T-1.5:(now-simT0)/1000);
+    const nm=simEl.querySelector('#simname'),st=simEl.querySelector('#simstep');
+    if(nm&&nm.textContent!==r.label)nm.textContent=r.label;if(st&&st.textContent!==r.step)st.textContent=r.step}
+  if(still&&simEl.isConnected)return;
+  simRaf=requestAnimationFrame(simStep)}
 function simPanel(){
   const ts=S.cfg.turbs,cur=[],last=[];
   ts.forEach(t=>{const ps=parts(t.id);PARTS.forEach(p=>{const v=ps[p.k];if(!v||!v.inicio)return;if(!v.fin)cur.push({t,p,v});else last.push({t,p,v})})});
