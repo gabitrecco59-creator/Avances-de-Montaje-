@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Montaje de aerogeneradores</title>
+<meta name="theme-color" content="#0b0f14">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<script>window.FB_READY=new Promise(r=>{window.__fbResolve=r});</script>
+<script type="module" src="/db-firebase.js"></script>
+<style>
+:root{--bg:#0e1217;--card:#181e26;--card2:#202833;--line:#2c3542;--tx:#e8edf3;--mut:#93a0b0;--ok:#2ecc71;--cur:#ffc400;--bad:#ff3b3b;--acc:#3fa9f5}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+button,select,input{font:inherit;color:inherit}
+button{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:7px 12px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.pri{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+button.ok{background:#1f7a45;border-color:#2ecc71}
+button.warn{background:#7a5b00;border-color:var(--cur)}
+button.danger{background:#7a1010;border-color:var(--bad)}
+button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+button.sm{padding:3px 8px;font-size:12px}
+input,select{background:#0b0f14;border:1px solid var(--line);border-radius:7px;padding:6px 8px}
+input[type=number]{width:80px}
+header{position:sticky;top:0;z-index:20;background:#0b0f14ee;backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.top{display:flex;align-items:center;gap:10px;padding:8px 12px;flex-wrap:wrap}
+.top h1{font-size:16px;margin:0;flex:1;white-space:nowrap}
+.badge{font-size:11px;padding:2px 8px;border-radius:20px;background:var(--card2);color:var(--mut);border:1px solid var(--line)}
+.tabs{display:flex;gap:4px;padding:0 8px 8px;overflow-x:auto}
+.tabs button{border-radius:20px;white-space:nowrap}
+main{padding:12px;max-width:1150px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.mut{color:var(--mut)}
+.grow{flex:1}
+h2{font-size:15px;margin:0 0 8px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+th{color:var(--mut);font-weight:600;font-size:12px}
+.tw{overflow-x:auto}
+.dot{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.chip{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;white-space:nowrap}
+.chip.none{background:#2a313b;color:var(--mut)}
+.chip.curso{background:#4d3b00;color:var(--cur)}
+.chip.ok{background:#11432a;color:var(--ok)}
+.bar{height:8px;background:#0b0f14;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#2ecc71,#7ee08f)}
+#banner{position:sticky;top:0;z-index:30}
+.alarmb{animation:flash 1s infinite;color:#fff;padding:10px 14px;font-weight:700;display:flex;gap:10px;align-items:center;cursor:pointer;border-bottom:2px solid #fff3;font-size:15px}
+@keyframes flash{0%,100%{background:#e00020}50%{background:#5c000c}}
+.alarmbox{border:3px solid var(--bad);border-radius:12px;padding:14px;animation:flash 1s infinite;color:#fff}
+.alarmbox .big{font-size:22px;font-weight:800}
+.timer{font-variant-numeric:tabular-nums;font-size:26px;font-weight:800}
+.bigbtn{font-size:18px;font-weight:800;padding:14px 18px;width:100%;background:#b0001a;border:2px solid #ff6b6b;color:#fff;border-radius:12px;letter-spacing:.5px}
+.mapwrap{background:#0b1015;border:1px solid var(--line);border-radius:12px;overflow:hidden;touch-action:none}
+svg.map{width:100%;height:auto;display:block;user-select:none}
+svg.map .tn{cursor:pointer}
+svg.map.unlocked .tn{cursor:grab}
+.tn.alarm .ring{animation:ringf 1s infinite}
+@keyframes ringf{0%,100%{stroke:#ff2020;stroke-width:9}50%{stroke:#ff202000;stroke-width:3}}
+.tsvgw{display:flex;justify-content:center}
+svg.tsvg{width:100%;max-width:520px;height:auto;max-height:72vh;user-select:none}
+.sh{stroke:#0000004d;stroke-width:.6}
+.m-tw{fill:url(#gTw)}.m-twh{fill:url(#gTwH)}.m-fl{fill:#aeb5bc}.m-nac{fill:url(#gNac)}.m-nact{fill:url(#gNacT)}.m-win{fill:#2b3b4b}
+.m-rad{fill:url(#gRad)}.m-pt{fill:url(#gPT)}.m-hub{fill:url(#gHub)}.m-hubr{fill:#b9c0c6}.m-bl{fill:url(#gBl)}
+.m-base{fill:url(#gBase)}.m-baset{fill:#9d9a92}.m-gravel{fill:#4a4234}
+.fl{stroke:#00000066;stroke-width:1}.dr{fill:#b9c0c6;stroke:#0006;stroke-width:.6}.seam{stroke:#0000002e;stroke-width:.8}.fin{stroke:#5d656d;stroke-width:1;fill:none}
+.gsh{fill:#000;opacity:.4}
+@keyframes pul{0%,100%{stroke-opacity:1}50%{stroke-opacity:.2}}
+.p{cursor:pointer}
+.p.curso{filter:drop-shadow(0 0 5px #ffd400)}
+.p.curso .sh{stroke:#ffd400;stroke-width:2;animation:pul 1s infinite}
+.p.avail .sh{stroke:#4fc3f7;stroke-width:1.4;stroke-dasharray:5 3}
+.p.avail:hover{filter:brightness(1.12) drop-shadow(0 0 4px #4fc3f7)}
+.p.lock{opacity:.45;cursor:not-allowed}
+.p.base-none .sh{fill:#ffffff0d!important;stroke:#4fc3f7;stroke-dasharray:5 4}
+.ident .sh{fill:var(--c)!important}
+.p .hit{fill:none;stroke:transparent;stroke-width:16;pointer-events:stroke}
+.glbl{font-size:9px;fill:#efe6d2;paint-order:stroke;stroke:#000b;stroke-width:2.5px}
+.mt{paint-order:stroke;stroke:#0b1015;stroke-width:4px;stroke-linejoin:round}
+.lbl{font-size:11px;fill:#c9b48a;font-weight:700;letter-spacing:1px}
+#toast{pointer-events:none;position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#000d;border:1px solid var(--line);padding:10px 16px;border-radius:10px;z-index:50;display:none;max-width:90vw}
+#modal{position:fixed;inset:0;background:#000a;z-index:60;display:none;align-items:center;justify-content:center;padding:16px}
+#modal .box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;max-width:420px;width:100%}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.legend span{margin-right:12px;white-space:nowrap}
+.kpi{display:flex;gap:10px;flex-wrap:wrap}
+.kpi div{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:8px 12px;min-width:110px}
+.kpi b{display:block;font-size:20px}
+input.dt{width:170px;font-size:12px;padding:4px 6px}
+.mp .sh,.mp .fl,.mp .seam{pointer-events:none}
+.mp.curso{filter:drop-shadow(0 0 8px #ffd400)}
+.mp.curso .sh{stroke:#ffd400;stroke-width:3;animation:pul 1s infinite}
+.mp.none{opacity:.16}
+.mp .hit{display:none}
+.hitb{fill:#ffffff01;stroke:none}
+.hnd{cursor:move}
+[data-cl]{cursor:pointer}
+.tn.alarm .hitb{animation:ringf 1s infinite}
+.card-t{fill:#0d141c;stroke-width:4}
+.tn.alarm .card-t{animation:ringf 1s infinite}
+.tn.done .card-t{fill:#0f2a1c}
+#ov{position:fixed;z-index:45;background:#121821f7;border:1px solid #3a4656;border-radius:14px;box-shadow:0 18px 50px #000c;display:flex;flex-direction:column;overflow:hidden;resize:both;min-width:300px;min-height:160px;container-type:inline-size;backdrop-filter:blur(4px)}
+#ov.min{height:auto!important;resize:none}
+#ov.min .ovscroll{display:none}
+#ov .ovbar{background:#0b0f14;border-bottom:1px solid var(--line);padding:8px 10px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;cursor:move;touch-action:none;user-select:none}
+#ov .ovbar .grip{color:var(--mut);font-size:16px;letter-spacing:-2px}
+#ov .ovscroll{flex:1;overflow:auto}
+#ov .ovbody{padding:10px;display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+#ov .ovbody>div{min-width:0}
+@container (min-width:860px){#ov .ovbody{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}}
+#ov .card{margin-bottom:10px}
+#ov svg.tsvg{max-width:none;max-height:70vh}
+.sumg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px 14px}
+.sumg .lab{display:flex;justify-content:space-between;font-size:12px}
+.note{background:#2b2200;border:1px solid #6b5600;color:#ffe08a;padding:8px 12px;border-radius:8px;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div id="banner"></div>
+<header id="hdr"></header>
+<main id="main"><div class="card">Conectando…</div></main>
+<div id="modal"></div>
+<div id="toast"></div>
+<script>
+/* ===== Definición de piezas (orden de montaje y dependencias) ===== */
+const PARTS=[
+ {k:'base',n:'Base',c:'#4b8cff',req:[]},
+ {k:'t1',n:'T1',c:'#e62828',req:['base']},
+ {k:'t2',n:'T2',c:'#ff8c00',req:['t1']},
+ {k:'t3',n:'T3',c:'#f0dc00',req:['t2']},
+ {k:'t4',n:'T4',c:'#28be3c',req:['t3']},
+ {k:'t5',n:'T5',c:'#00bec8',req:['t4']},
+ {k:'nacelle',n:'Nacelle',c:'#9646dc',req:['t5']},
+ {k:'pt',n:'Power train',c:'#ff7800',req:['nacelle']},
+ {k:'rad',n:'Radiador',c:'#ff5ac8',req:['nacelle']},
+ {k:'hub',n:'Hub',c:'#ff3c3c',req:['pt']},
+ {k:'pa',n:'Pala A',c:'#78c8ff',req:['hub']},
+ {k:'pb',n:'Pala B',c:'#aaff78',req:['hub']},
+ {k:'pc',n:'Pala C',c:'#ffc878',req:['hub']}
+];
+const PK=Object.fromEntries(PARTS.map(p=>[p.k,p]));
+const DRAW=['base','t1','t2','t3','t4','t5','nacelle','rad','pt','pa','pb','pc','hub'];
+const CCOL=['#3fa9f5','#f5a623','#7ed321','#c86bff','#f8e71c','#50e3c2','#ff6b6b','#b8e986','#ff9ecf','#9fb3ff'];
+const MOTIVOS=['Viento','Grúa / equipo de izaje','Falta de material','Seguridad','Clima (lluvia / tormenta)','Logística / acceso','Calidad / NC','Otro'];
+
+let db=null, MODE='loading', NOTE='', cfgDirty=false;
+const S={cfg:null,turb:{},alarms:{}};
+const UI={tab:'mapa',sel:null,moveMode:'turb',draft:{},ov:false,ms:.32};
+UI.vb={x:0,y:0,w:1000};
+const FILT=[['lines','Líneas de circuito'],['box','Recuadro'],['name','Nombre WTG'],['circ','Circuito'],['pct','% avance'],['ghost','Piezas pendientes']];
+UI.le=false;UI.ec=0;UI.selV=null;
+UI.f={lines:true,box:false,name:true,circ:true,pct:true,ghost:false};UI.ident=false;
+try{Object.assign(UI.f,JSON.parse(localStorage.getItem('wtg-f')||'{}'));UI.ident=localStorage.getItem('wtg-ident')==='1'}catch(e){}
+try{const m=+localStorage.getItem('wtg-ms');if(m>=.1&&m<=1)UI.ms=m;const v=JSON.parse(localStorage.getItem('wtg-vb')||'null');if(v&&isFinite(v.w))UI.vb=v}catch(e){}
+function setMs(v){UI.ms=Math.max(.1,Math.min(1,Math.round(v*100)/100));const m=document.getElementById('map');if(m)m.innerHTML=mapSvg();const r=document.getElementById('msr');if(r)r.value=UI.ms;try{localStorage.setItem('wtg-ms',UI.ms)}catch(_){}}
+try{UI.draft.sup=localStorage.getItem('wtg-sup')||''}catch(e){}
+
+/* ===== utilidades ===== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nowI=()=>new Date().toISOString();
+const pad=n=>String(n).padStart(2,'0');
+const clone=o=>JSON.parse(JSON.stringify(o));
+function fmt(iso){if(!iso)return '—';return new Date(iso).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})}
+function dur(ms){if(ms==null||isNaN(ms)||ms<0)return '—';const m=Math.floor(ms/60000),h=Math.floor(m/60),d=Math.floor(h/24);return d?`${d}d ${h%24}h ${pad(m%60)}m`:`${h}h ${pad(m%60)}m`}
+function durS(ms){const s=Math.max(0,Math.floor(ms/1000));return `${Math.floor(s/3600)}:${pad(Math.floor(s%3600/60))}:${pad(s%60)}`}
+function toInp(iso){if(!iso)return '';const d=new Date(iso);return new Date(d-d.getTimezoneOffset()*60000).toISOString().slice(0,16)}
+function fromInp(v){return v?new Date(v).toISOString():null}
+function toast(t){const el=$('#toast');el.textContent=t;el.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>el.style.display='none',3200)}
+function modal(html,onOk,okLabel='Confirmar',danger){const m=$('#modal');m.innerHTML=`<div class="box">${html}<div class="row" style="justify-content:flex-end;margin-top:14px"><button data-m="no">Cancelar</button><button class="${danger?'danger':'pri'}" data-m="ok">${okLabel}</button></div></div>`;m.style.display='flex';m.onclick=e=>{const b=e.target.closest('[data-m]');if(!b&&e.target!==m)return;m.style.display='none';if(b&&b.dataset.m==='ok')onOk()}}
+
+/* ===== estado derivado ===== */
+const parts=id=>(S.turb[id]&&S.turb[id].parts)||{};
+function pState(id,k){const p=parts(id)[k];if(!p||!p.inicio)return 'none';return p.fin?'ok':'curso'}
+const reqOk=(id,k)=>PK[k].req.every(r=>pState(id,r)==='ok');
+function prog(id){let ok=0,cur=0;PARTS.forEach(p=>{const s=pState(id,p.k);if(s==='ok')ok++;else if(s==='curso')cur++});return{ok,cur,pct:Math.round(ok/PARTS.length*100)}}
+const actAlarms=()=>Object.values(S.alarms).filter(a=>!a.fin).sort((a,b)=>a.inicio<b.inicio?-1:1);
+const tAlarms=id=>actAlarms().filter(a=>a.turb===id||a.turb==='PARQUE');
+const tName=id=>id==='PARQUE'?'Todo el parque':((S.cfg&&S.cfg.turbs.find(t=>t.id===id))||{name:id}).name;
+const aDur=a=>(a.fin?new Date(a.fin):new Date())-new Date(a.inicio);
+const cc=i=>(S.cfg&&S.cfg.circs[i]&&S.cfg.circs[i].color)||CCOL[i%CCOL.length];
+const LTYPES=[['solid','Continua'],['dash','Guiones'],['dot','Puntos'],['dashdot','Guion-punto'],['at','Alta tensión (torres)'],['double','Doble línea']];
+function cNodes(i){const c=S.cfg;return [{id:'SET',x:c.set.x,y:c.set.y},...c.turbs.filter(t=>t.circ===i)]}
+function cPath(i){const n=cNodes(i),r=(S.cfg.circs[i].route)||{};const pts=[];const wps=[];
+  n.forEach((a,j)=>{pts.push(a);if(j<n.length-1){const key=a.id+'>'+n[j+1].id;(r[key]||[]).forEach(p=>{pts.push(p);wps.push(p)})}});return{pts,wps}}
+const cName=i=>(S.cfg.circs[i]&&S.cfg.circs[i].name)||('Circuito '+(i+1));
+
+/* ===== persistencia: base compartida (db) o local ===== */
+const LSK='wtg-montaje-v1';
+function lsSave(){try{localStorage.setItem(LSK,JSON.stringify(S))}catch(e){}}
+function lsLoad(){try{const v=JSON.parse(localStorage.getItem(LSK)||'null');if(v){S.cfg=v.cfg||null;S.turb=v.turb||{};S.alarms=v.alarms||{}}}catch(e){}}
+const Q={};
+function serial(key,fn){const p=(Q[key]||Promise.resolve()).then(fn).catch(errH);Q[key]=p;return p}
+function errH(e){const c=e&&e.code;if(c==='invalid_argument')toast('No se pudo guardar: sin permiso de edición o dato inválido.');else if(c==='quota_exceeded')toast('Base de datos llena: '+(e.message||''));else if(c==='unavailable')toast('Sin conexión, el cambio no se guardó. Reintentá.');else toast('Error al guardar: '+((e&&e.message)||e))}
+let cfgT=null;
+function saveCfg(now){render();if(MODE!=='db'){lsSave();return}cfgDirty=true;clearTimeout(cfgT);cfgT=setTimeout(()=>{const d=clone(S.cfg);serial('cfg',()=>db.doc('parque/config').set(d)).finally(()=>{cfgDirty=false})},now?0:500)}
+function saveTurb(id){render();if(MODE!=='db'){lsSave();return}const d={parts:clone(parts(id))};serial('t'+id,()=>db.doc('turbinas/'+id).set(d))}
+function saveAlarm(a){S.alarms[a.id]=a;render();if(MODE!=='db'){lsSave();return}const d=clone(a);serial('a'+a.id,()=>db.doc('alarmas/'+a.id).set(d))}
+function delAlarm(id){delete S.alarms[id];render();if(MODE!=='db'){lsSave();return}serial('a'+id,()=>db.doc('alarmas/'+id).delete())}
+function setPart(id,k,val){const t=S.turb[id]?clone(S.turb[id]):{parts:{}};t.parts=t.parts||{};if(val)t.parts[k]=val;else delete t.parts[k];S.turb[id]=t;saveTurb(id)}
+
+function openOv(id){const was=UI.ov&&UI.sel===id;UI.sel=id;UI.ov=true;UI.ovMin=false;render();const o=document.querySelector('#ov .ovscroll');if(o&&!was)o.scrollTop=0}
+let wdrag=null;
+document.addEventListener('pointerdown',e=>{const bar=e.target.closest('#ov .ovbar');if(!bar||e.target.closest('button,select,input'))return;
+  const o=document.getElementById('ov');wdrag={sx:e.clientX,sy:e.clientY,x0:o.offsetLeft,y0:o.offsetTop,o};try{bar.setPointerCapture(e.pointerId)}catch(_){}e.preventDefault()});
+document.addEventListener('pointermove',e=>{if(!wdrag)return;const x=wdrag.x0+e.clientX-wdrag.sx,y=Math.max(0,wdrag.y0+e.clientY-wdrag.sy);wdrag.o.style.left=x+'px';wdrag.o.style.top=y+'px';UI.ovPos.x=x;UI.ovPos.y=y});
+document.addEventListener('pointerup',()=>{wdrag=null});
+async function flushSaves(){clearTimeout(cfgT);if(MODE==='db'&&cfgDirty){const d=clone(S.cfg);serial('cfg',()=>db.doc('parque/config').set(d)).finally(()=>{cfgDirty=false})}
+  let ok=true;try{await Promise.all(Object.values(Q).map(p=>p.then(()=>{},()=>{ok=false})))}catch(e){ok=false}return ok}
+async function init(){
+  render();
+  let c=null;try{c=await Promise.race([window.FB_READY||Promise.resolve(null),new Promise(r=>setTimeout(()=>r(null),9000))])}catch(e){c=null}
+  if(!c){MODE='local';lsLoad();render();return}
+  db=c;MODE='db';
+  const tm=setTimeout(()=>{NOTE='Todavía no se pudo leer la base de datos. Revisá la conexión; los datos pueden no estar actualizados.';render()},10000);
+  db.doc('parque/config').onSnapshot(s=>{if(!s.metadata.fromCache){clearTimeout(tm);NOTE=''}if(cfgDirty)return;S.cfg=s.exists?clone(s.data()):null;if(!S.cfgLoaded){S.cfgLoaded=true}render()},e=>{clearTimeout(tm);NOTE='Error de base de datos: '+(e.message||e.code);render()});
+  db.collection('turbinas').onSnapshot(q=>{const t={};q.docs.forEach(d=>t[d.id]=clone(d.data()));S.turb=t;render()},e=>{});
+  db.collection('alarmas').onSnapshot(q=>{const a={};q.docs.forEach(d=>a[d.id]=clone(d.data()));S.alarms=a;render()},e=>{});
+}
+
+/* ===== configuración del parque ===== */
+function autoLayout(c){
+  const nC=c.circs.length;c.set=c.set||{x:70,y:350};
+  for(let ci=0;ci<nC;ci++){
+    const ts=c.turbs.filter(t=>t.circ===ci);const y=nC===1?420:Math.round(170+ci*(460/(nC-1)));
+    ts.forEach((t,j)=>{t.x=Math.round(190+j*(720/Math.max(1,ts.length-1||1)));if(ts.length===1)t.x=400;t.y=y});
+  }
+}
+function newCfg(nT,nC){
+  const c={turbs:[],circs:[],set:{x:70,y:350},locked:false,nextId:1};
+  for(let i=0;i<nC;i++)c.circs.push({name:'Circuito '+(i+1)});
+  for(let i=0;i<nT;i++){c.turbs.push({id:'w'+c.nextId++,name:'WTG'+pad(i+1),circ:Math.min(nC-1,Math.floor(i*nC/nT)),x:0,y:0})}
+  autoLayout(c);return c;
+}
+function applyCounts(nT,nC){
+  const c=S.cfg;
+  while(c.circs.length<nC)c.circs.push({name:'Circuito '+(c.circs.length+1)});
+  c.circs.length=nC;
+  c.turbs.forEach(t=>{if(t.circ>=nC)t.circ=nC-1});
+  while(c.turbs.length<nT){const ci=nC-1;const last=c.turbs.filter(t=>t.circ===ci).slice(-1)[0];c.turbs.push({id:'w'+c.nextId++,name:'WTG'+pad(c.turbs.length+1),circ:ci,x:Math.min(940,last?last.x+90:400),y:last?last.y:350})}
+  c.turbs.length=nT;
+  if(!c.turbs.find(t=>t.id===UI.sel))UI.sel=null;
+  saveCfg(true);
+}
+
+/* ===== render general ===== */
+function render(){
+  if(drag)return;
+  renderBanner();renderHeader();
+  const m=$('#main');
+  if(MODE==='loading'){m.innerHTML='<div class="card">Conectando con la base de datos…</div>';return}
+  if(!S.cfg){m.innerHTML=(NOTE?`<div class="note">${esc(NOTE)}</div>`:'')+setupView();return}
+  let h=NOTE?`<div class="note">${esc(NOTE)}</div>`:'';
+  if(MODE==='local')h+=`<div class="note">Modo local: los datos se guardan sólo en este navegador (Firebase no está configurado o no respondió).</div>`;
+  h+=({mapa:mapView,turbina:turbView,alarmas:alarmView,registro:logView,config:cfgView}[UI.tab])();
+  if(UI.ov&&S.cfg.turbs.find(t=>t.id===UI.sel))h+=ovView();else UI.ov=false;
+  const oo=document.getElementById('ov');let sy=0;
+  if(oo){const sc=oo.querySelector('.ovscroll');sy=sc?sc.scrollTop:0;if(!UI.ovMin&&UI.ovPos){UI.ovPos.w=oo.offsetWidth;UI.ovPos.h=oo.offsetHeight}}
+  m.innerHTML=h;
+  const o=document.getElementById('ov');if(o){const sc=o.querySelector('.ovscroll');if(sc)sc.scrollTop=sy}
+}
+function renderHeader(){
+  let tot='';
+  if(S.cfg){const ts=S.cfg.turbs;const full=ts.filter(t=>prog(t.id).ok===PARTS.length).length;const pz=ts.reduce((a,t)=>a+prog(t.id).ok,0);tot=`<span class="badge">${full}/${ts.length} WTG completas · ${ts.length?Math.round(pz/(ts.length*PARTS.length)*100):0}% piezas</span>`}
+  const tabs=[['mapa','🗺️ Mapa'],['turbina','🌀 Turbina'],['alarmas','🚨 Alarmas'+(actAlarms().length?` (${actAlarms().length})`:'')],['registro','📋 Registro'],['config','⚙️ Configuración']];
+  $('#hdr').innerHTML=`<div class="top"><h1>Montaje de aerogeneradores</h1>${tot}<span class="badge">${MODE==='db'?'● compartido':MODE==='local'?'● local':'…'}</span></div>`+
+   (S.cfg?`<div class="tabs">${tabs.map(([k,l])=>`<button class="${UI.tab===k?'on':''}" data-act="tab" data-v="${k}">${l}</button>`).join('')}</div>`:'');
+}
+function renderBanner(){
+  const al=S.cfg?actAlarms():[];
+  $('#banner').innerHTML=al.map(a=>`<div class="alarmb" data-act="goAlarm" data-v="${esc(a.turb)}">🚨 ALARMA · ${esc(tName(a.turb))} · ${esc(a.motivo)} · desde ${fmt(a.inicio)} · ⏱ <span data-since="${a.inicio}">${durS(aDur(a))}</span></div>`).join('');
+}
+
+/* ===== setup inicial ===== */
+function setupView(){
+  return `<div class="card" style="max-width:520px;margin:20px auto"><h2>Crear el parque</h2>
+  <p class="mut">Elegí cuántas turbinas y cuántos circuitos tiene el parque. Después podés asignar cada turbina a su circuito y moverlas en el mapa.</p>
+  <div class="row"><label>Turbinas <input type="number" id="sT" min="1" max="200" value="5"></label>
+  <label>Circuitos <input type="number" id="sC" min="1" max="10" value="2"></label></div>
+  <p class="mut" style="font-size:12px">Se reparten en orden (ej.: 5 turbinas y 2 circuitos → 3 en el C1 y 2 en el C2). Se puede cambiar en Configuración.</p>
+  <button class="pri" data-act="create">Crear parque</button></div>`;
+}
+
+/* ===== mapa ===== */
+function mapView(){
+  const c=S.cfg;
+  const counts=c.circs.map((_,i)=>c.turbs.filter(t=>t.circ===i));
+  return `<div class="card"><div class="row" style="margin-bottom:8px">
+   ${c.locked?'<button data-act="lock">🔓 Editar posiciones</button>':'<button class="pri" data-act="savelock">💾 Guardar y bloquear posiciones</button>'}
+   <span class="mut">Zoom:</span><button class="sm" data-act="zoom" data-v="0.77">＋</button><button class="sm" data-act="zoom" data-v="1.3">－</button><button class="sm" data-act="zreset" title="Ver todo">⤢ Ver todo</button>
+   <span class="mut">Cuadro:</span><button class="sm" data-act="msz" data-v="0.87">－</button><input type="range" id="msr" min="0.1" max="1" step="0.01" value="${UI.ms}" style="width:110px"><button class="sm" data-act="msz" data-v="1.15">＋</button>
+   ${c.locked?'':`<span class="mut">Mover:</span><button class="${UI.moveMode==='turb'?'on':''}" data-act="mm" data-v="turb">Turbina</button><button class="${UI.moveMode==='circ'?'on':''}" data-act="mm" data-v="circ">Circuito completo</button>`}
+   <span class="mut grow" style="font-size:12px">${c.locked?'🔒 Posiciones guardadas. Tocá una turbina para abrirla. Arrastrá el fondo para mover el mapa; rueda o pellizco para acercar.':'Arrastrá turbinas para ubicarlas (el fondo mueve el mapa) y después tocá “Guardar y bloquear”.'}</span></div>
+   ${UI.le?lineEditor():`<div class="row" style="margin-bottom:8px"><button data-act="le">✏️ Editar líneas de circuito</button></div>`}
+   <div class="row" style="margin-bottom:8px;gap:6px"><span class="mut">Mostrar:</span>${FILT.map(([k,l])=>`<button class="sm ${UI.f[k]?'on':''}" data-act="filt" data-v="${k}">${UI.f[k]?'☑':'☐'} ${l}</button>`).join('')}</div>
+   <div class="mapwrap"><svg id="map" class="map ${c.locked?'':'unlocked'}" viewBox="${vbStr()}">${mapSvg()}</svg></div>
+   <div class="legend" style="margin-top:8px">${counts.map((ts,i)=>`<span><i class="dot" style="background:${cc(i)}"></i>${esc(cName(i))} (${ts.length} WTG · ${ts.filter(t=>prog(t.id).ok===PARTS.length).length} completas)</span>`).join('')}
+   <span><i class="dot" style="background:#ffd400"></i>Izando</span></div></div>${summary()}`;
+}
+function lineEditor(){
+  const c=S.cfg,i=Math.min(UI.ec,c.circs.length-1),ci=c.circs[i];UI.ec=i;
+  return `<div class="card" style="border-color:${cc(i)};background:#141b24"><div class="row" style="margin-bottom:8px"><b>✏️ Editando línea</b>
+   <select data-act2="ec">${c.circs.map((x,j)=>`<option value="${j}" ${j===i?'selected':''}>${esc(x.name)}</option>`).join('')}</select>
+   <label class="row" style="gap:4px">Color <input type="color" data-cst="color" value="${cc(i)}" style="width:42px;padding:2px;height:32px"></label>
+   <label class="row" style="gap:4px">Grosor <input type="range" data-cst="w" min="1" max="30" step="1" value="${ci.w||5}" style="width:110px"><b id="cwv">${ci.w||5}</b></label>
+   <label class="row" style="gap:4px">Tipo <select data-cst="type">${LTYPES.map(([k,l])=>`<option value="${k}" ${(ci.type||'solid')===k?'selected':''}>${l}</option>`).join('')}</select></label></div>
+   <div class="row"><button data-act="vdel" ${UI.selV?'':'disabled'}>🗑 Borrar vértice</button><button data-act="rreset">↺ Recorrido recto</button><span class="grow"></span><button class="pri" data-act="lsave">💾 Guardar líneas</button></div>
+   <p class="mut" style="font-size:12px;margin:8px 0 0">Arrastrá un <b>＋</b> (en el medio de cada tramo) para crear un vértice${(ci.type==='at')?' (cada vértice es una torre)':''}. Arrastrá los vértices para cambiar el recorrido. Tocá un vértice para seleccionarlo y borrarlo. Tocá otra línea para editarla.</p></div>`;
+}
+function summary(){
+  const ts=S.cfg.turbs,n=ts.length||1;
+  const full=ts.filter(t=>prog(t.id).ok===PARTS.length).length;const pz=ts.reduce((a,t)=>a+prog(t.id).ok,0);
+  const lost=Object.values(S.alarms).reduce((a,x)=>a+aDur(x),0);
+  return `<div class="card"><h2>Cuadro de montaje del parque</h2>
+  <div class="kpi" style="margin-bottom:10px"><div>WTG completas<b>${full}/${ts.length}</b></div><div>Piezas montadas<b>${pz}/${ts.length*PARTS.length}</b></div><div>Avance<b>${Math.round(pz/(n*PARTS.length)*100)}%</b></div><div>Izando ahora<b style="color:var(--cur)">${ts.reduce((a,t)=>a+prog(t.id).cur,0)}</b></div><div>Tiempo perdido<b style="color:${actAlarms().length?'var(--bad)':'inherit'}">${dur(lost)}</b></div></div>
+  <div class="sumg">${PARTS.map(p=>{const ok=ts.filter(t=>pState(t.id,p.k)==='ok').length,cu=ts.filter(t=>pState(t.id,p.k)==='curso').length;
+   return `<div><div class="lab"><span><i class="dot" style="background:${p.c}"></i>${p.n}</span><b>${ok}/${ts.length}${cu?` <span style="color:var(--cur)">+${cu}</span>`:''}</b></div><div class="bar"><i style="width:${ok/n*100}%;background:${p.c}"></i></div></div>`}).join('')}</div></div>`;
+}
+function miniTurb(id){
+  return DRAW.map(k=>{const st=pState(id,k);if(st==='none'&&!UI.f.ghost)return '';return `<g class="mp ${st}">${air(k)}</g>`}).join('');
+}
+function mapSvg(){
+  const c=S.cfg,f=UI.f;let s=`<defs>${DEFS}<pattern id="gr" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M50 0H0V50" fill="none" stroke="#1a232d" stroke-width="1"/></pattern></defs><rect x="-20000" y="-20000" width="40000" height="40000" fill="url(#gr)"/>`;
+  if(f.lines||UI.le)c.circs.forEach((ci,i)=>{const ts=c.turbs.filter(t=>t.circ===i);if(!ts.length)return;
+    const {pts,wps}=cPath(i);const P=pts.map(p=>p.x+','+p.y).join(' ');const col=cc(i),w=ci.w||5,ty=ci.type||'solid';
+    const da={solid:'',dash:`${3*w} ${2*w}`,dot:`0.1 ${2.2*w}`,dashdot:`${4*w} ${1.6*w} 0.1 ${1.6*w}`,at:'',double:''}[ty];
+    const sel=UI.le&&UI.ec===i;
+    if(sel)s+=`<polyline points="${P}" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="${w+10}" stroke-linejoin="round" stroke-linecap="round"/>`;
+    if(ty==='double'){s+=`<polyline data-cl="${i}" points="${P}" fill="none" stroke="${col}" stroke-width="${w*2.4}" stroke-linejoin="round"/><polyline points="${P}" fill="none" stroke="#0b1015" stroke-width="${w*1.1}" stroke-linejoin="round" pointer-events="none"/>`}
+    else s+=`<polyline data-cl="${i}" points="${P}" fill="none" stroke="${col}" stroke-width="${ty==='at'?Math.max(1.5,w*.5):w}" stroke-linejoin="round" stroke-linecap="${ty==='dot'||ty==='dashdot'?'round':'butt'}" ${da?`stroke-dasharray="${da}"`:''} opacity=".9"/>`;
+    if(ty==='at'){const z=Math.max(.8,w/4);wps.forEach(p=>{s+=`<g transform="translate(${p.x},${p.y}) scale(${z})" pointer-events="none"><path d="M0,-14 L-7,9 M0,-14 L7,9 M-9,-8 L9,-8 M-6,-1 L6,-1 M-4,4 L4,4 M-7,9 L7,9 M-3.5,-1 L5,4 M3.5,-1 L-5,4" stroke="#0b1015" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M0,-14 L-7,9 M0,-14 L7,9 M-9,-8 L9,-8 M-6,-1 L6,-1 M-4,4 L4,4 M-7,9 L7,9 M-3.5,-1 L5,4 M3.5,-1 L-5,4" stroke="${col}" stroke-width="1.8" fill="none" stroke-linecap="round"/></g>`})}
+    const a=pts[0],b=pts[1];if(b&&!UI.le)s+=`<text class="mt" x="${(a.x+b.x)/2}" y="${(a.y+b.y)/2-8}" fill="${col}" font-size="20" font-weight="700" text-anchor="middle">${esc(ci.name)}</text>`});
+  s+=`<g data-set="1" class="tn" transform="translate(${c.set.x},${c.set.y})"><rect x="-26" y="-18" width="52" height="36" rx="5" fill="#2b3440" stroke="#fff" stroke-width="2"/><text y="5" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">SET</text></g>`;
+  const k=UI.ms;
+  c.turbs.forEach(t=>{const p=prog(t.id);const col=cc(t.circ);const al=tAlarms(t.id).length;const done=p.ok===PARTS.length;
+    const fs=Math.max(11,Math.round(14*k/.22));const pc=done?'#2ecc71':p.ok||p.cur?'#ffd400':'#93a0b0';
+    const lines=[];if(f.name)lines.push([esc(t.name)+(al?' 🚨':''),f.box?'#fff':col,fs,800]);if(f.circ)lines.push([esc(cName(t.circ)),col,Math.round(fs*.8),600]);if(f.pct)lines.push([p.pct+'%',pc,Math.round(fs*.85),700]);
+    const th=lines.reduce((a,l)=>a+l[2]+3,0);
+    const x0=-175*k-6,y0=-(464-10)*k-6,w=350*k+12,h=454*k+12+th+12;
+    let yy=Math.max(4,14*k);
+    s+=`<g class="tn ${al?'alarm':''} ${done?'done':''}" data-tid="${t.id}" transform="translate(${t.x},${t.y})">
+     ${f.box?`<rect class="card-t" x="${x0}" y="${y0}" width="${w}" height="${h}" rx="8" stroke="${col}"/><rect x="${x0+4}" y="${y0+4}" width="${(w-8)*p.ok/PARTS.length}" height="4" fill="#2ecc71"/>`:`<rect class="hitb" x="${x0}" y="${y0}" width="${w}" height="${h}" rx="8"/>`}
+     <ellipse cx="${14*k}" cy="${6*k}" rx="${80*k}" ry="${10*k}" fill="#000" opacity=".45"/>
+     <rect x="${-46*k}" y="${-2*k}" width="${92*k}" height="${12*k}" rx="${3*k}" fill="${col}" opacity=".6"/>
+     <g transform="translate(${-230*k},${-464*k}) scale(${k})">${miniTurb(t.id)}</g>
+     ${lines.map(l=>{yy+=l[2];const r=`<text class="mt" y="${yy}" fill="${l[1]}" font-size="${l[2]}" font-weight="${l[3]}" text-anchor="middle">${l[0]}</text>`;yy+=3;return r}).join('')}</g>`});
+  if(UI.le&&c.circs[UI.ec]){const i=UI.ec,n=cNodes(i),r=c.circs[i].route||{},hs=UI.vb.w/80;
+    n.forEach((a,j)=>{if(j>=n.length-1)return;const b=n[j+1],key=a.id+'>'+b.id,rp=r[key]||[],full=[a,...rp,b];
+      for(let q=0;q<full.length-1;q++){const m={x:(full[q].x+full[q+1].x)/2,y:(full[q].y+full[q+1].y)/2};
+        s+=`<g data-mid="1" data-seg="${key}" data-i="${q}" transform="translate(${m.x},${m.y})" class="hnd"><circle r="${hs*.8}" fill="#0b1015cc" stroke="#fff" stroke-width="${hs*.15}" stroke-dasharray="${hs*.3} ${hs*.2}"/><path d="M${-hs*.4},0H${hs*.4}M0,${-hs*.4}V${hs*.4}" stroke="#fff" stroke-width="${hs*.18}"/></g>`}
+      rp.forEach((p,q)=>{const sl=UI.selV&&UI.selV.seg===key&&UI.selV.i===q;
+        s+=`<circle data-vtx="1" data-seg="${key}" data-i="${q}" class="hnd" cx="${p.x}" cy="${p.y}" r="${hs}" fill="${sl?'#ff3b3b':cc(i)}" stroke="#fff" stroke-width="${hs*.25}"/>`})})}
+  return s;
+}
+let drag=null;const ptrs=new Map();
+function vbStr(){const v=UI.vb;return `${v.x.toFixed(1)} ${v.y.toFixed(1)} ${v.w.toFixed(1)} ${(v.w*.7).toFixed(1)}`}
+function setVB(v){v.w=Math.max(60,Math.min(15000,v.w));UI.vb=v;const m=document.getElementById('map');if(m)m.setAttribute('viewBox',vbStr());clearTimeout(setVB.t);setVB.t=setTimeout(()=>{try{localStorage.setItem('wtg-vb',JSON.stringify(UI.vb))}catch(_){}},400)}
+function zoomAt(f,cx,cy){const m=document.getElementById('map');if(!m)return;const r=m.getBoundingClientRect(),v=UI.vb;
+  if(cx==null){cx=r.left+r.width/2;cy=r.top+r.height/2}
+  const sx=v.x+(cx-r.left)/r.width*v.w,sy=v.y+(cy-r.top)/r.height*v.w*.7,w=Math.max(60,Math.min(15000,v.w*f));
+  setVB({x:sx-(cx-r.left)/r.width*w,y:sy-(cy-r.top)/r.height*w*.7,w})}
+function fitAll(){const c=S.cfg;const k=UI.ms;const pts=[c.set,...c.turbs];
+  let x0=Math.min(...pts.map(p=>p.x))-180*k-40,x1=Math.max(...pts.map(p=>p.x))+180*k+40,y0=Math.min(...pts.map(p=>p.y))-470*k-20,y1=Math.max(...pts.map(p=>p.y))+120*k+40;
+  let w=Math.max(x1-x0,(y1-y0)/.7,300);setVB({x:(x0+x1)/2-w/2,y:(y0+y1)/2-w*.35,w})}
+function svgPt(svg,e){const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())}
+document.addEventListener('wheel',e=>{if(!e.target.closest('#map'))return;e.preventDefault();zoomAt(Math.pow(1.0015,e.deltaY),e.clientX,e.clientY)},{passive:false});
+document.addEventListener('pointerdown',e=>{
+  const svg=e.target.closest('#map');if(!svg)return;e.preventDefault();
+  ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});try{svg.setPointerCapture(e.pointerId)}catch(_){}
+  if(ptrs.size===2){const [a,b]=[...ptrs.values()];if(drag&&drag.moved&&!drag.pan&&!S.cfg.locked){S.cfg.turbs=drag.orig.t;S.cfg.set=drag.orig.s}
+    drag={svg,pinch:true,d0:Math.hypot(a.x-b.x,a.y-b.y)||1,c0:{x:(a.x+b.x)/2,y:(a.y+b.y)/2},vb0:{...UI.vb},moved:true};svg.innerHTML=mapSvg();return}
+  if(ptrs.size>2)return;
+  if(UI.le){const h=e.target.closest('[data-vtx],[data-mid]');const cl=e.target.closest('[data-cl]');
+    if(h){const ci=S.cfg.circs[UI.ec];ci.route=ci.route||{};const seg=h.dataset.seg;let i=+h.dataset.i;const arr=ci.route[seg]=ci.route[seg]||[];
+      if(h.dataset.mid){const p=svgPt(svg,e);arr.splice(i,0,{x:Math.round(p.x),y:Math.round(p.y)});UI.selV={seg,i};svg.innerHTML=mapSvg()}
+      drag={svg,vtx:true,ins:!!h.dataset.mid,seg,i,c0:{x:e.clientX,y:e.clientY},vb0:{...UI.vb},moved:!!h.dataset.mid};return}
+    if(cl&&+cl.dataset.cl!==UI.ec){UI.ec=+cl.dataset.cl;UI.selV=null;render();return}
+    drag={svg,pan:true,c0:{x:e.clientX,y:e.clientY},vb0:{...UI.vb},moved:false};return}
+  const g=e.target.closest('[data-tid],[data-set]');
+  drag={svg,tid:g&&g.dataset.tid,set:!!(g&&g.dataset.set),pan:!g,start:svgPt(svg,e),c0:{x:e.clientX,y:e.clientY},vb0:{...UI.vb},moved:false,orig:clone({t:S.cfg.turbs,s:S.cfg.set,r:S.cfg.circs.map(c=>c.route||{})})};
+});
+document.addEventListener('pointermove',e=>{
+  if(!drag||!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  const r=drag.svg.getBoundingClientRect();
+  if(drag.pinch){if(ptrs.size<2)return;const [a,b]=[...ptrs.values()];const d=Math.hypot(a.x-b.x,a.y-b.y)||1,c={x:(a.x+b.x)/2,y:(a.y+b.y)/2},v0=drag.vb0;
+    const sx=v0.x+(drag.c0.x-r.left)/r.width*v0.w,sy=v0.y+(drag.c0.y-r.top)/r.height*v0.w*.7,w=Math.max(60,Math.min(15000,v0.w*drag.d0/d));
+    setVB({x:sx-(c.x-r.left)/r.width*w,y:sy-(c.y-r.top)/r.height*w*.7,w});return}
+  const dcx=e.clientX-drag.c0.x,dcy=e.clientY-drag.c0.y;
+  if(Math.hypot(dcx,dcy)>6)drag.moved=true;if(!drag.moved)return;
+  if(drag.vtx){const p=svgPt(drag.svg,e);const arr=S.cfg.circs[UI.ec].route[drag.seg];arr[drag.i]={x:Math.round(p.x),y:Math.round(p.y)};UI.selV={seg:drag.seg,i:drag.i};drag.svg.innerHTML=mapSvg();return}
+  if(drag.pan||S.cfg.locked){drag.pan=true;const v0=drag.vb0;setVB({x:v0.x-dcx/r.width*v0.w,y:v0.y-dcy/r.height*v0.w*.7,w:v0.w});return}
+  const p=svgPt(drag.svg,e);const dx=p.x-drag.start.x,dy=p.y-drag.start.y;
+  const cl=v=>Math.round(v);
+  if(drag.set){S.cfg.set={x:cl(drag.orig.s.x+dx),y:cl(drag.orig.s.y+dy)}}
+  else{const t0=drag.orig.t.find(t=>t.id===drag.tid);const ids=UI.moveMode==='circ'?drag.orig.t.filter(t=>t.circ===t0.circ).map(t=>t.id):[drag.tid];
+    S.cfg.turbs.forEach(t=>{if(ids.includes(t.id)){const o=drag.orig.t.find(x=>x.id===t.id);t.x=cl(o.x+dx);t.y=cl(o.y+dy)}});
+    if(UI.moveMode==='circ'){const ro=drag.orig.r[t0.circ];const rn={};Object.keys(ro).forEach(k=>{if(k.startsWith('SET>'))rn[k]=ro[k];else rn[k]=ro[k].map(p=>({x:cl(p.x+dx),y:cl(p.y+dy)}))});S.cfg.circs[t0.circ].route=rn}}
+  drag.svg.innerHTML=mapSvg();
+});
+function endPtr(e){
+  ptrs.delete(e.pointerId);if(!drag)return;const d=drag;
+  if(d.pinch){if(ptrs.size===0){drag=null;render()}return}
+  drag=null;
+  if(e.type==='pointercancel'){render();return}
+  if(d.vtx){if(!d.moved)UI.selV={seg:d.seg,i:d.i};saveCfg(true);return}
+  if(d.pan){render();return}
+  if(d.moved&&!S.cfg.locked){saveCfg(true)}
+  else if(!d.moved&&d.tid&&!UI.le){openOv(d.tid)}
+  else render();
+}
+document.addEventListener('pointerup',endPtr);
+document.addEventListener('pointercancel',endPtr);
+
+/* ===== vista turbina ===== */
+const GND=450,CX=230,SEC=58,HX=272,HY=147;
+const tw=y=>30+(16-30)*((GND-y)/(SEC*5));
+const poly=(pts,c='')=>`<polygon class="sh ${c}" points="${pts.map(p=>p.map(v=>v.toFixed(1)).join(',')).join(' ')}"/>`;
+const bladeD='M0,-4 C6,-9 16,-11 30,-9.5 C62,-6.5 100,-3.2 130,-0.6 L130,0.8 C100,2.2 62,4 32,5 C16,5.6 6,5.4 0,4 Z';
+const DEFS=`<linearGradient id="gTw" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#6f7780"/><stop offset=".22" stop-color="#cfd5da"/><stop offset=".42" stop-color="#fbfcfd"/><stop offset=".62" stop-color="#e2e6e9"/><stop offset="1" stop-color="#7f878f"/></linearGradient>
+<linearGradient id="gTwH" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset=".35" stop-color="#ffffff"/><stop offset=".7" stop-color="#c5cbd0"/><stop offset="1" stop-color="#6f7780"/></linearGradient>
+<linearGradient id="gNac" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#e3e7ea"/><stop offset="1" stop-color="#959ea6"/></linearGradient>
+<linearGradient id="gNacT" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#eef1f3"/></linearGradient>
+<radialGradient id="gHub" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#e2e6e9"/><stop offset="1" stop-color="#868e96"/></radialGradient>
+<linearGradient id="gBl" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#eef1f3"/><stop offset="1" stop-color="#a6aeb5"/></linearGradient>
+<linearGradient id="gBase" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#bdb9b0"/><stop offset=".6" stop-color="#8b877f"/><stop offset="1" stop-color="#5a5852"/></linearGradient>
+<linearGradient id="gRad" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#8d959d"/><stop offset=".5" stop-color="#dfe3e6"/><stop offset="1" stop-color="#8d959d"/></linearGradient>
+<linearGradient id="gPT" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#b8c6d3"/><stop offset=".5" stop-color="#7d8fa1"/><stop offset="1" stop-color="#4a5868"/></linearGradient>
+<linearGradient id="gSky" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#0a1626"/><stop offset=".7" stop-color="#1b3350"/><stop offset="1" stop-color="#3b5a78"/></linearGradient>
+<linearGradient id="gEarth" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#4a4030"/><stop offset="1" stop-color="#241f16"/></linearGradient>
+<filter id="fSh" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>`;
+function air(k){
+  const ti=['t1','t2','t3','t4','t5'].indexOf(k);
+  if(ti>=0){const yb=GND-ti*SEC,yt=yb-SEC,wb=tw(yb),wt=tw(yt);
+    return poly([[CX-wb/2,yb],[CX+wb/2,yb],[CX+wt/2,yt],[CX-wt/2,yt]],'m-tw')+`<line class="fl" x1="${CX-wt/2}" x2="${CX+wt/2}" y1="${yt+.5}" y2="${yt+.5}"/>`+(ti===0?`<rect class="dr" x="${CX-4}" y="${yb-17}" width="8" height="13" rx="3"/>`:'')}
+  switch(k){
+   case 'base':return `<ellipse class="sh m-gravel" cx="230" cy="459" rx="64" ry="7"/>`+poly([[198,GND],[262,GND],[277,GND+12],[183,GND+12]],'m-base')+`<rect class="sh m-baset" x="209" y="444" width="42" height="7" rx="2"/>`;
+   case 'nacelle':return `<path class="sh m-nact" d="M178,135 L183,129 L257,129 L262,135 Z"/><rect class="sh m-nac" x="172" y="135" width="90" height="25" rx="5"/><line class="seam" x1="200" y1="136" x2="200" y2="159"/><line class="seam" x1="231" y1="136" x2="231" y2="159"/><rect class="m-win" x="241" y="139" width="13" height="4" rx="1"/>`;
+   case 'pt':return `<rect class="sh m-pt" x="212" y="140" width="19" height="15" rx="3"/><rect class="sh m-pt" x="231" y="142" width="26" height="11" rx="2"/><line class="seam" x1="244" y1="142" x2="244" y2="153"/>`;
+   case 'rad':return `<rect class="sh m-rad" x="176" y="110" width="17" height="20" rx="1"/><path class="fin" d="M179,112V128M182.5,112V128M186,112V128M189.5,112V128"/>`;
+   case 'hub':return `<path class="sh m-hub" d="M259,133 C275,132 290,140 295,147 C290,154 275,162 259,161 Z"/><ellipse class="sh m-hubr" cx="260" cy="147" rx="3" ry="14"/>`;
+  }
+  const bi=['pa','pb','pc'].indexOf(k);
+  return `<g transform="translate(${HX},${HY}) rotate(${[-150,-30,90][bi]})"><path class="sh m-bl" d="${bladeD}"/><path class="hit" d="M0,0 L130,0"/></g>`;
+}
+const GOFF={nacelle:[-158,393,59,566],pt:[-96,392,137,566],rad:[14,416,198,566],hub:[-28,391,249,566]};
+function ground(k){
+  const ti=['t1','t2','t3','t4','t5'].indexOf(k);
+  if(ti>=0){const wb=tw(GND-ti*SEC),wt=tw(GND-(ti+1)*SEC),X=12+ti*72,yc=498;
+    return{s:`<ellipse class="gsh" cx="${X+29}" cy="${yc+wb/2+2}" rx="32" ry="3"/>`+poly([[X,yc-wb/2],[X+SEC,yc-wt/2],[X+SEC,yc+wt/2],[X,yc+wb/2]],'m-twh')+`<ellipse class="sh m-fl" cx="${X}" cy="${yc}" rx="3" ry="${wb/2}"/>`,l:[X+29,522]}}
+  if(GOFF[k]){const o=GOFF[k];return{s:`<g transform="translate(${o[0]},${o[1]})">${air(k)}</g>`,l:[o[2],o[3]]}}
+  const bi=['pa','pb','pc'].indexOf(k),y=584+bi*21;
+  return{s:`<ellipse class="gsh" cx="78" cy="${y+7}" rx="66" ry="2.5"/><g transform="translate(14,${y})"><path class="sh m-bl" d="${bladeD}"/><path class="hit" d="M0,0 L130,0"/></g>`,l:[152,y+3]};
+}
+function turbSvg(id){
+  const anyT=pState(id,'t1')!=='none';
+  let s=`<svg class="tsvg ${UI.ident?'ident':''}" id="tsvg" viewBox="0 0 460 640"><defs>${DEFS}</defs><rect width="460" height="${GND}" fill="url(#gSky)"/>
+   <path d="M0,418 C60,404 120,412 180,401 C260,388 330,407 460,394 L460,${GND} L0,${GND}Z" fill="#17261f"/>
+   <rect y="${GND}" width="460" height="190" fill="url(#gEarth)"/><line x1="0" x2="460" y1="${GND}" y2="${GND}" stroke="#6b5a3a" stroke-width="1.5"/>
+   <text x="300" y="${GND+22}" class="lbl">ACOPIO · PISO</text>
+   ${anyT?`<ellipse cx="262" cy="458" rx="90" ry="6" fill="#000" opacity=".5" filter="url(#fSh)"/>`:''}`;
+  DRAW.forEach(k=>{const p=PK[k];const st=pState(id,k);const av=reqOk(id,k);
+    const cls=st==='none'?(av?'avail':'lock'):st;
+    const g=(st!=='none'||k==='base')?{s:air(k)}:ground(k);
+    s+=`<g class="p ${cls} ${k==='base'&&st==='none'?'base-none':''}" data-part="${k}" style="--c:${p.c}">${g.s}${g.l?`<text class="glbl" x="${g.l[0]}" y="${g.l[1]}" text-anchor="${['pa','pb','pc'].includes(k)?'start':'middle'}">${p.n}</text>`:''}${k==='base'&&st==='none'?`<text class="glbl" x="230" y="440" text-anchor="middle">Base pendiente</text>`:''}</g>`});
+  return s+'</svg>';
+}
+function turbView(){
+  const c=S.cfg;if(!c.turbs.length)return '<div class="card">No hay turbinas.</div>';
+  if(!UI.sel||!c.turbs.find(t=>t.id===UI.sel))UI.sel=c.turbs[0].id;
+  const id=UI.sel,t=c.turbs.find(x=>x.id===id),p=prog(id),idx=c.turbs.indexOf(t);
+  const lost=Object.values(S.alarms).filter(a=>a.turb===id||a.turb==='PARQUE');
+  const lostMs=lost.reduce((a,x)=>a+aDur(x),0);
+  const rows=PARTS.map(pt=>{const st=pState(id,pt.k),v=parts(id)[pt.k]||{},av=reqOk(id,pt.k);
+    const d=v.inicio?dur((v.fin?new Date(v.fin):new Date())-new Date(v.inicio)):'—';
+    let act='';
+    if(st==='none')act=av?`<button class="sm warn" data-act="pstart" data-v="${pt.k}">Iniciar</button>`:`<span class="mut" style="font-size:11px">Falta: ${pt.req.filter(r=>pState(id,r)!=='ok').map(r=>PK[r].n).join(', ')}</span>`;
+    else if(st==='curso')act=`<button class="sm ok" data-act="pend" data-v="${pt.k}">Montada</button> <button class="sm" data-act="preset" data-v="${pt.k}" title="Cancelar">✕</button>`;
+    else act=`<button class="sm" data-act="preset" data-v="${pt.k}" title="Desmontar / borrar registro">↺</button>`;
+    return `<tr><td><i class="dot" style="background:${pt.c}"></i>${pt.n}</td><td><span class="chip ${st}">${st==='none'?'En piso':st==='curso'?'Izando':'Montada'}</span></td>
+     <td>${st==='none'?'—':`<input class="dt" type="datetime-local" data-ed="inicio" data-v="${pt.k}" value="${toInp(v.inicio)}">`}</td>
+     <td>${st==='none'?'—':`<input class="dt" type="datetime-local" data-ed="fin" data-v="${pt.k}" value="${toInp(v.fin)}">`}</td>
+     <td>${d}</td><td>${act}</td></tr>`}).join('');
+  return `<div class="card"><div class="row">
+   <button data-act="nav" data-v="-1" ${idx<=0?'disabled':''}>◀</button>
+   <select data-act2="selT">${c.turbs.map(x=>`<option value="${x.id}" ${x.id===id?'selected':''}>${esc(x.name)} · ${esc(cName(x.circ))}</option>`).join('')}</select>
+   <button data-act="nav" data-v="1" ${idx>=c.turbs.length-1?'disabled':''}>▶</button>
+   <div class="grow" style="min-width:160px"><div class="mut" style="font-size:12px">${p.ok}/${PARTS.length} piezas montadas${p.cur?` · ${p.cur} izando`:''} · ${p.pct}%</div><div class="bar"><i style="width:${p.pct}%"></i></div></div></div></div>
+  <div class="grid2"><div>
+   ${alarmBox(id)}
+   <div class="card"><div class="row" style="justify-content:flex-end;margin-bottom:6px"><button class="sm ${UI.ident?'on':''}" data-act="ident">🎨 Colores por pieza</button></div><div class="tsvgw">${turbSvg(id)}</div>
+   <p class="mut" style="font-size:12px;margin:6px 0 0">Tocá una pieza del acopio para <b style="color:var(--cur)">iniciar el izaje</b> (registra fecha y hora de inicio). Tocála otra vez para marcarla <b style="color:var(--ok)">montada</b> (registra el final). Las piezas grises oscuras todavía no se pueden montar.</p></div>
+  </div><div>
+   <div class="card"><h2>Registro de montaje · ${esc(t.name)}</h2><div class="tw"><table><tr><th>Pieza</th><th>Estado</th><th>Inicio</th><th>Fin</th><th>Duración</th><th></th></tr>${rows}</table></div></div>
+   <div class="card"><h2>Tiempo perdido · ${esc(t.name)}: ${dur(lostMs)}</h2>${lost.length?`<div class="tw"><table><tr><th>Motivo</th><th>Inicio</th><th>Fin</th><th>Duración</th></tr>${lost.sort((a,b)=>a.inicio<b.inicio?1:-1).map(a=>`<tr><td>${esc(a.motivo)}${a.turb==='PARQUE'?' <span class="badge">parque</span>':''}<div class="mut" style="font-size:11px">${esc(a.detalle)} · ${esc(a.sup)}</div></td><td>${fmt(a.inicio)}</td><td>${a.fin?fmt(a.fin):'<b style="color:var(--bad)">ACTIVA</b>'}</td><td>${dur(aDur(a))}</td></tr>`).join('')}</table></div>`:'<p class="mut">Sin alarmas registradas.</p>'}</div>
+  </div></div>`;
+}
+function ovPos(){
+  const W=innerWidth,H=innerHeight;let P=UI.ovPos;
+  if(!P){P=W<700?{x:6,y:Math.round(H*.3),w:W-12,h:Math.round(H*.68)}:{w:Math.min(640,W-24),h:H-90,x:0,y:72};if(W>=700)P.x=W-P.w-14;UI.ovPos=P}
+  P.w=Math.min(P.w,W-8);P.h=Math.min(P.h,H-8);P.x=Math.max(-P.w+120,Math.min(W-120,P.x));P.y=Math.max(0,Math.min(H-48,P.y));return P}
+function ovView(){
+  const c=S.cfg,id=UI.sel,t=c.turbs.find(x=>x.id===id),p=prog(id),idx=c.turbs.indexOf(t);
+  const full=turbView(),i1=full.indexOf('<div class="grid2">');
+  const body=full.slice(i1+'<div class="grid2">'.length,full.lastIndexOf('</div>'));
+  const al=actAlarms();
+  const P=ovPos();
+  return `<div id="ov" class="${UI.ovMin?'min':''}" style="left:${P.x}px;top:${P.y}px;width:${P.w}px;height:${P.h}px">
+   <div class="ovbar"><span class="grip" title="Arrastrá para mover">⋮⋮</span><button class="sm" data-act="ovnav" data-v="-1" ${idx<=0?'disabled':''}>◀</button>
+   <div><b style="font-size:16px">${esc(t.name)}</b> <span class="mut" style="font-size:12px">· ${esc(cName(t.circ))}</span><div class="mut" style="font-size:12px">${p.ok}/${PARTS.length} piezas${p.cur?` · ${p.cur} izando`:''} · ${p.pct}%</div></div>
+   <button class="sm" data-act="ovnav" data-v="1" ${idx>=c.turbs.length-1?'disabled':''}>▶</button>
+   <div class="grow" style="min-width:50px"><div class="bar"><i style="width:${p.pct}%"></i></div></div>
+   <button class="sm" data-act="ovmin" title="${UI.ovMin?'Expandir':'Minimizar'}">${UI.ovMin?'▢':'—'}</button>
+   <button class="pri sm" data-act="ovclose" style="font-weight:700;padding:6px 10px">💾 Guardar y cerrar</button></div>
+   <div class="ovscroll">${al.map(a=>`<div class="alarmb" data-act="goAlarm" data-v="${esc(a.turb)}">🚨 ALARMA · ${esc(tName(a.turb))} · ${esc(a.motivo)} · ⏱ <span data-since="${a.inicio}">${durS(aDur(a))}</span></div>`).join('')}
+   <div class="ovbody">${body}</div></div></div>`;
+}
+function alarmBox(id){
+  const act=tAlarms(id);
+  if(act.length)return act.map(a=>`<div class="alarmbox card"><div class="big">🚨 ALARMA ACTIVA${a.turb==='PARQUE'?' · TODO EL PARQUE':''}</div>
+    <div style="margin:4px 0">${esc(a.motivo)}${a.detalle?' — '+esc(a.detalle):''}</div>
+    <div style="font-size:12px">Activada por ${esc(a.sup)} · ${fmt(a.inicio)}</div>
+    <div class="row" style="margin-top:8px"><div class="grow">Tiempo perdido<div class="timer" data-since="${a.inicio}">${durS(aDur(a))}</div></div>
+    <button class="ok" style="font-weight:700;padding:12px 16px" data-act="aend" data-v="${a.id}">✔ Finalizar alarma</button></div></div>`).join('');
+  return `<div class="card"><h2>Alarma del supervisor de campo</h2>${alarmForm()}<button class="bigbtn" data-act="aon" data-v="${id}">🚨 ACTIVAR ALARMA</button></div>`;
+}
+function alarmForm(withTarget){
+  const d=UI.draft;
+  return `<div class="row" style="margin-bottom:8px">
+   ${withTarget?`<select data-draft="target"><option value="PARQUE">Todo el parque</option>${S.cfg.turbs.map(t=>`<option value="${t.id}" ${d.target===t.id?'selected':''}>${esc(t.name)}</option>`).join('')}</select>`:''}
+   <select data-draft="motivo">${MOTIVOS.map(m=>`<option ${d.motivo===m?'selected':''}>${m}</option>`).join('')}</select>
+   <input data-draft="sup" placeholder="Supervisor" value="${esc(d.sup||'')}" style="width:130px">
+   <input data-draft="detalle" class="grow" placeholder="Detalle (ej.: viento 18 m/s en góndola)" value="${esc(d.detalle||'')}"></div>`;
+}
+
+/* ===== vista alarmas ===== */
+function alarmView(){
+  const all=Object.values(S.alarms).sort((a,b)=>a.inicio<b.inicio?1:-1);
+  const tot=all.reduce((a,x)=>a+aDur(x),0);
+  const byM={};all.forEach(a=>byM[a.motivo]=(byM[a.motivo]||0)+aDur(a));
+  const byT={};all.forEach(a=>byT[a.turb]=(byT[a.turb]||0)+aDur(a));
+  return `<div class="card"><h2>Nueva alarma</h2>${alarmForm(true)}<button class="bigbtn" data-act="aon2">🚨 ACTIVAR ALARMA</button></div>
+  <div class="card"><div class="kpi"><div>Activas<b style="color:${actAlarms().length?'var(--bad)':'inherit'}">${actAlarms().length}</b></div><div>Registradas<b>${all.length}</b></div><div>Tiempo perdido total<b>${dur(tot)}</b></div></div>
+  <div class="grid2" style="margin-top:10px"><div><h2>Por motivo</h2><table>${Object.entries(byM).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${dur(v)}</td></tr>`).join('')||'<tr><td class="mut">—</td></tr>'}</table></div>
+  <div><h2>Por turbina</h2><table>${Object.entries(byT).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(tName(k))}</td><td>${dur(v)}</td></tr>`).join('')||'<tr><td class="mut">—</td></tr>'}</table></div></div></div>
+  <div class="card"><h2>Historial</h2><div class="tw"><table><tr><th>Turbina</th><th>Motivo</th><th>Supervisor</th><th>Inicio</th><th>Fin</th><th>Tiempo perdido</th><th></th></tr>
+  ${all.map(a=>`<tr><td>${esc(tName(a.turb))}</td><td>${esc(a.motivo)}<div class="mut" style="font-size:11px">${esc(a.detalle)}</div></td><td>${esc(a.sup)}</td>
+   <td><input class="dt" type="datetime-local" data-aed="inicio" data-v="${a.id}" value="${toInp(a.inicio)}"></td>
+   <td>${a.fin?`<input class="dt" type="datetime-local" data-aed="fin" data-v="${a.id}" value="${toInp(a.fin)}">`:`<button class="sm ok" data-act="aend" data-v="${a.id}">Finalizar</button>`}</td>
+   <td>${a.fin?dur(aDur(a)):`<b style="color:var(--bad)" data-since="${a.inicio}">${durS(aDur(a))}</b>`}</td>
+   <td><button class="sm" data-act="adel" data-v="${a.id}">🗑</button></td></tr>`).join('')||'<tr><td colspan="7" class="mut">Sin alarmas.</td></tr>'}</table></div></div>`;
+}
+
+/* ===== vista registro ===== */
+function logView(){
+  const c=S.cfg;
+  const head=`<tr><th>Turbina</th><th>Circuito</th>${PARTS.map(p=>`<th title="${p.n}"><i class="dot" style="background:${p.c}"></i>${p.n.replace('Power train','PT').replace('Radiador','Rad').replace('Nacelle','Nac')}</th>`).join('')}<th>%</th></tr>`;
+  const body=c.turbs.map(t=>`<tr><td><a href="#" data-act="openT" data-v="${t.id}" style="color:var(--acc)">${esc(t.name)}</a></td><td>${esc(cName(t.circ))}</td>${PARTS.map(p=>{const s=pState(t.id,p.k);return `<td title="${s!=='none'?fmt(parts(t.id)[p.k].inicio)+' → '+fmt(parts(t.id)[p.k].fin):''}" style="text-align:center">${s==='ok'?'✅':s==='curso'?'⏳':'·'}</td>`}).join('')}<td>${prog(t.id).pct}%</td></tr>`).join('');
+  const ev=[];c.turbs.forEach(t=>{const ps=parts(t.id);PARTS.forEach(p=>{const v=ps[p.k];if(!v)return;if(v.inicio)ev.push({t:v.inicio,txt:`${t.name} · ${p.n} · inicio de izaje`});if(v.fin)ev.push({t:v.fin,txt:`${t.name} · ${p.n} · montada (${dur(new Date(v.fin)-new Date(v.inicio))})`})})});
+  Object.values(S.alarms).forEach(a=>{ev.push({t:a.inicio,txt:`🚨 ${tName(a.turb)} · alarma: ${a.motivo}`,al:1});if(a.fin)ev.push({t:a.fin,txt:`${tName(a.turb)} · fin de alarma (${dur(aDur(a))} perdidos)`})});
+  ev.sort((a,b)=>a.t<b.t?1:-1);
+  return `<div class="card"><div class="row" style="margin-bottom:8px"><h2 class="grow" style="margin:0">Avance por turbina</h2><button data-act="csv">📋 Copiar CSV</button></div><div class="tw"><table>${head}${body}</table></div></div>
+  <div class="card"><h2>Bitácora</h2><table>${ev.slice(0,300).map(e=>`<tr><td style="white-space:nowrap;width:1%">${fmt(e.t)}</td><td ${e.al?'style="color:#ff8080"':''}>${esc(e.txt)}</td></tr>`).join('')||'<tr><td class="mut">Sin registros todavía.</td></tr>'}</table></div>`;
+}
+function csv(){
+  const L=[['Turbina','Circuito','Pieza','Inicio','Fin','Duracion_min'].join(';')];
+  S.cfg.turbs.forEach(t=>PARTS.forEach(p=>{const v=parts(t.id)[p.k]||{};L.push([t.name,cName(t.circ),p.n,v.inicio?fmt(v.inicio):'',v.fin?fmt(v.fin):'',v.inicio&&v.fin?Math.round((new Date(v.fin)-new Date(v.inicio))/60000):''].join(';'))}));
+  L.push('');L.push(['Alarma_turbina','Motivo','Detalle','Supervisor','Inicio','Fin','Perdido_min'].join(';'));
+  Object.values(S.alarms).forEach(a=>L.push([tName(a.turb),a.motivo,(a.detalle||'').replace(/;/g,','),a.sup,fmt(a.inicio),a.fin?fmt(a.fin):'ACTIVA',Math.round(aDur(a)/60000)].join(';')));
+  return L.join('\n');
+}
+
+/* ===== vista configuración ===== */
+function cfgView(){
+  const c=S.cfg;
+  return `<div class="card"><h2>Tamaño del parque</h2><div class="row">
+   <label>Turbinas <input type="number" id="cT" min="1" max="200" value="${c.turbs.length}"></label>
+   <label>Circuitos <input type="number" id="cC" min="1" max="10" value="${c.circs.length}"></label>
+   <button class="pri" data-act="apply">Aplicar</button></div>
+   <p class="mut" style="font-size:12px">Si reducís la cantidad, se quitan las últimas turbinas de la lista (sus registros quedan guardados por si las volvés a agregar).</p></div>
+  <div class="card"><h2>Circuitos</h2>${c.circs.map((ci,i)=>`<div class="row" style="margin-bottom:6px"><i class="dot" style="background:${cc(i)}"></i><input data-cname="${i}" value="${esc(ci.name)}"><span class="mut">${c.turbs.filter(t=>t.circ===i).length} turbinas</span></div>`).join('')}</div>
+  <div class="card"><div class="row" style="margin-bottom:8px"><h2 class="grow" style="margin:0">Turbinas y ubicación</h2>
+   <button data-act="lock">${c.locked?'🔒 Bloqueadas':'🔓 Libres'}</button><button data-act="relayout" ${c.locked?'disabled':''}>Ordenar automáticamente</button></div>
+   <p class="mut" style="font-size:12px">Coordenadas libres del mapa (X hacia la derecha, Y hacia abajo). El orden de la lista define cómo se conecta la línea de cada circuito desde la SET.</p>
+   <div class="tw"><table><tr><th>#</th><th>Nombre</th><th>Circuito</th><th>X</th><th>Y</th><th>Orden</th></tr>
+   ${c.turbs.map((t,i)=>`<tr><td>${i+1}</td><td><input data-ted="name" data-v="${t.id}" value="${esc(t.name)}" style="width:110px"></td>
+    <td><select data-ted="circ" data-v="${t.id}">${c.circs.map((ci,j)=>`<option value="${j}" ${t.circ===j?'selected':''}>${esc(ci.name)}</option>`).join('')}</select></td>
+    <td><input type="number" data-ted="x" data-v="${t.id}" value="${t.x}" ${c.locked?'disabled':''}></td>
+    <td><input type="number" data-ted="y" data-v="${t.id}" value="${t.y}" ${c.locked?'disabled':''}></td>
+    <td><button class="sm" data-act="up" data-v="${i}" ${i===0?'disabled':''}>▲</button> <button class="sm" data-act="down" data-v="${i}" ${i===c.turbs.length-1?'disabled':''}>▼</button></td></tr>`).join('')}</table></div></div>
+  <div class="card"><h2>Zona de riesgo</h2><button class="danger" data-act="wipe">Borrar todos los registros de montaje y alarmas</button></div>`;
+}
+
+/* ===== acciones ===== */
+function partClick(id,k){
+  const st=pState(id,k);
+  if(st==='none'){if(!reqOk(id,k)){toast('Primero hay que montar: '+PK[k].req.filter(r=>pState(id,r)!=='ok').map(r=>PK[r].n).join(', '));return}
+    setPart(id,k,{inicio:nowI(),fin:null});toast(PK[k].n+': inicio de izaje registrado')}
+  else if(st==='curso'){setPart(id,k,{...parts(id)[k],fin:nowI()});toast(PK[k].n+' montada ✔')}
+  else{const v=parts(id)[k];toast(`${PK[k].n}: ${fmt(v.inicio)} → ${fmt(v.fin)}`)}
+}
+function startAlarm(target){
+  const d=UI.draft;const sup=(d.sup||'').trim();if(!sup){toast('Ingresá el nombre del supervisor');return}
+  try{localStorage.setItem('wtg-sup',sup)}catch(e){}
+  const a={id:'a'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),turb:target,motivo:d.motivo||MOTIVOS[0],detalle:(d.detalle||'').trim(),sup,inicio:nowI(),fin:null};
+  d.detalle='';saveAlarm(a);
+}
+document.addEventListener('click',e=>{
+  const pg=e.target.closest('#tsvg [data-part]');if(pg){partClick(UI.sel,pg.dataset.part);return}
+  const b=e.target.closest('[data-act]');if(!b)return;const v=b.dataset.v,c=S.cfg;
+  switch(b.dataset.act){
+   case 'tab':UI.tab=v;render();break;
+   case 'goAlarm':if(v==='PARQUE'){UI.ov=false;UI.tab='alarmas';render()}else openOv(v);break;
+   case 'create':{const nT=Math.max(1,Math.min(200,+$('#sT').value||1)),nC=Math.max(1,Math.min(10,+$('#sC').value||1));S.cfg=newCfg(nT,nC);UI.tab='mapa';saveCfg(true);break}
+   case 'lock':c.locked=!c.locked;saveCfg(true);break;
+   case 'mm':UI.moveMode=v;render();break;
+   case 'zoom':zoomAt(+v);break;
+   case 'zreset':fitAll();break;
+   case 'msz':setMs(UI.ms*(+v));break;
+   case 'le':UI.le=true;UI.ec=UI.ec||0;UI.selV=null;render();break;
+   case 'lsave':UI.le=false;UI.selV=null;flushSaves().then(ok=>{render();toast(ok?'Líneas guardadas ✔':'Error al guardar las líneas')});break;
+   case 'vdel':{const ci=c.circs[UI.ec];if(UI.selV&&ci.route&&ci.route[UI.selV.seg]){ci.route[UI.selV.seg].splice(UI.selV.i,1);UI.selV=null;saveCfg(true)}break}
+   case 'rreset':modal(`<p>¿Dejar recto el recorrido de <b>${esc(cName(UI.ec))}</b>? Se borran todos sus vértices.</p>`,()=>{c.circs[UI.ec].route={};UI.selV=null;saveCfg(true)},'Dejar recto',true);break;
+   case 'filt':UI.f[v]=!UI.f[v];try{localStorage.setItem('wtg-f',JSON.stringify(UI.f))}catch(_){};render();break;
+   case 'ident':UI.ident=!UI.ident;try{localStorage.setItem('wtg-ident',UI.ident?'1':'0')}catch(_){};render();break;
+   case 'savelock':c.locked=true;saveCfg(true);flushSaves().then(ok=>toast(ok?'Posiciones guardadas y bloqueadas 🔒':'Bloqueado, pero hubo un error al guardar'));break;
+   case 'ovmin':UI.ovMin=!UI.ovMin;render();break;
+   case 'ovclose':flushSaves().then(ok=>{UI.ov=false;render();toast(ok?'Montaje guardado ✔':'Revisá: hubo un error al guardar')});break;
+   case 'ovnav':{const i=c.turbs.findIndex(t=>t.id===UI.sel)+(+v);if(c.turbs[i])openOv(c.turbs[i].id);break}
+   case 'nav':{const i=c.turbs.findIndex(t=>t.id===UI.sel)+(+v);if(c.turbs[i]){UI.sel=c.turbs[i].id;render()}break}
+   case 'openT':e.preventDefault();openOv(v);break;
+   case 'pstart':case 'pend':partClick(UI.sel,v);break;
+   case 'preset':modal(`<h2>${PK[v].n}</h2><p>¿Borrar el registro de esta pieza en ${esc(tName(UI.sel))}? La pieza vuelve al acopio.</p>`,()=>{
+       const dep=PARTS.filter(p=>p.req.includes(v)&&pState(UI.sel,p.k)!=='none');if(dep.length){toast('Primero desmontá: '+dep.map(p=>p.n).join(', '));return}setPart(UI.sel,v,null)},'Borrar',true);break;
+   case 'aon':startAlarm(v);break;
+   case 'aon2':startAlarm(UI.draft.target||'PARQUE');break;
+   case 'aend':{const a=S.alarms[v];if(a)saveAlarm({...a,fin:nowI()});break}
+   case 'adel':modal('<p>¿Eliminar esta alarma del historial?</p>',()=>delAlarm(v),'Eliminar',true);break;
+   case 'csv':{const t=csv();navigator.clipboard.writeText(t).then(()=>toast('CSV copiado. Pegalo en Excel o Sheets.'),()=>{modal(`<h2>CSV</h2><textarea style="width:100%;height:220px;background:#0b0f14;color:#e8edf3">${esc(t)}</textarea>`,()=>{},'Cerrar')});break}
+   case 'apply':{const nT=Math.max(1,Math.min(200,+$('#cT').value||1)),nC=Math.max(1,Math.min(10,+$('#cC').value||1));
+     if(nT<c.turbs.length||nC<c.circs.length)modal(`<p>Vas a reducir el parque a <b>${nT}</b> turbinas y <b>${nC}</b> circuitos. Se quitan las últimas de la lista.</p>`,()=>applyCounts(nT,nC),'Aplicar');else applyCounts(nT,nC);break}
+   case 'relayout':autoLayout(c);saveCfg(true);toast('Posiciones reordenadas por circuito');break;
+   case 'up':case 'down':{const i=+v,j=b.dataset.act==='up'?i-1:i+1;[c.turbs[i],c.turbs[j]]=[c.turbs[j],c.turbs[i]];saveCfg();break}
+   case 'wipe':modal('<p><b>Se borran todos los registros de montaje y todas las alarmas.</b> La configuración y las posiciones se mantienen. No se puede deshacer.</p>',()=>{
+       Object.keys(S.turb).forEach(id=>{S.turb[id]={parts:{}};saveTurb(id)});Object.keys(S.alarms).forEach(delAlarm);toast('Registros borrados')},'Borrar todo',true);break;
+  }
+});
+document.addEventListener('input',e=>{if(e.target.dataset.cst){const ci=S.cfg.circs[UI.ec],f=e.target.dataset.cst;ci[f]=f==='w'?+e.target.value:e.target.value;const w=document.getElementById('cwv');if(w&&f==='w')w.textContent=ci.w;const m=document.getElementById('map');if(m)m.innerHTML=mapSvg();return}if(e.target.id==='msr'){setMs(+e.target.value);return}const d=e.target.dataset.draft;if(d)UI.draft[d]=e.target.value});
+document.addEventListener('change',e=>{
+  const el=e.target,c=S.cfg;
+  if(el.dataset.draft){UI.draft[el.dataset.draft]=el.value;return}
+  if(el.dataset.cst){saveCfg();return}
+  if(el.dataset.act2==='ec'){UI.ec=+el.value;UI.selV=null;render();return}
+  if(el.dataset.act2==='selT'){UI.sel=el.value;render();return}
+  if(el.dataset.ed){const k=el.dataset.v,f=el.dataset.ed,cur={...(parts(UI.sel)[k]||{})};const val=fromInp(el.value);
+    if(f==='inicio'&&!val){toast('El inicio no puede quedar vacío');render();return}
+    cur[f]=val;if(cur.fin&&cur.inicio&&cur.fin<cur.inicio){toast('El fin no puede ser anterior al inicio');render();return}
+    if(f==='fin'&&val&&!reqOk(UI.sel,k)){toast('Faltan piezas previas');render();return}
+    setPart(UI.sel,k,cur);return}
+  if(el.dataset.aed){const a={...S.alarms[el.dataset.v]};const val=fromInp(el.value);if(!val){render();return}a[el.dataset.aed]=val;if(a.fin&&a.fin<a.inicio){toast('El fin no puede ser anterior al inicio');render();return}saveAlarm(a);return}
+  if(el.dataset.cname!=null){c.circs[+el.dataset.cname].name=el.value.trim()||('Circuito '+(+el.dataset.cname+1));saveCfg();return}
+  if(el.dataset.ted){const t=c.turbs.find(x=>x.id===el.dataset.v);const f=el.dataset.ted;
+    if(f==='name')t.name=el.value.trim()||t.name;else if(f==='circ')t.circ=+el.value;else{const n=Math.round(+el.value);t[f]=isNaN(n)?t[f]:n}
+    saveCfg();return}
+});
+setInterval(()=>{document.querySelectorAll('[data-since]').forEach(el=>el.textContent=durS(Date.now()-new Date(el.dataset.since)))},1000);
+init();
+</script>
+</body>
+</html>

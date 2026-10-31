@@ -1,0 +1,11 @@
+{
+  "name": "wtg-montaje",
+  "version": "1.0.0",
+  "private": true,
+  "description": "App de seguimiento de montaje de aerogeneradores (mapa, piezas, alarmas y tiempo perdido).",
+  "scripts": {
+    "dev": "npx --yes serve public -l 5173",
+    "deploy:rules": "npx --yes firebase-tools deploy --only firestore:rules",
+    "deploy:firebase": "npx --yes firebase-tools deploy --only hosting,firestore:rules"
+  }
+}
