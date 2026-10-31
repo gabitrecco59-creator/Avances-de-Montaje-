@@ -92,6 +92,11 @@ svg.tsvg{width:100%;max-width:520px;height:auto;max-height:72vh;user-select:none
 .m-base{fill:url(#gBase)}.m-baset{fill:#9d9a92}.m-gravel{fill:#4a4234}
 .fl{stroke:#00000066;stroke-width:1}.dr{fill:#b9c0c6;stroke:#0006;stroke-width:.6}.seam{stroke:#0000002e;stroke-width:.8}.fin{stroke:#5d656d;stroke-width:1;fill:none}
 .gsh{fill:#000;opacity:.4}
+.m-bolt{fill:#facc15;stroke:#a16207!important}.p.ok .m-bolt,.mp.ok .m-bolt{filter:drop-shadow(0 0 6px #facc15)}
+.m-run{fill:#16a34a}.m-runt{font:800 10px system-ui,sans-serif;fill:#fff;pointer-events:none}
+.p.avail .m-bolt,.p.lock .m-bolt,.mp.none .m-bolt{fill:#6b7280}.p.avail .m-run,.p.lock .m-run,.mp.none .m-run{fill:#4b5563}
+.simsvg .gnac{transition:opacity .4s}.simsvg.nacup .gnac,.simsvg.nacup .sp[data-k="rad"]{opacity:0}
+.simsvg .sp[data-k="radA"]{opacity:0}.simsvg .sp[data-k="radA"].on{opacity:1}
 @keyframes pul{0%,100%{stroke-opacity:1}50%{stroke-opacity:.2}}
 .p{cursor:pointer}
 .p.curso{filter:drop-shadow(0 0 5px #ffd400)}
@@ -259,16 +264,20 @@ const PARTS=[
  {k:'t3',n:'T3',c:'#f0dc00',req:['t2']},
  {k:'t4',n:'T4',c:'#28be3c',req:['t3']},
  {k:'t5',n:'T5',c:'#00bec8',req:['t4']},
- {k:'nacelle',n:'Nacelle',c:'#9646dc',req:['t5']},
+ {k:'rad',n:'Radiador',c:'#ff5ac8',req:[]},
+ {k:'nacelle',n:'Nacelle',c:'#9646dc',req:['t5','rad']},
  {k:'pt',n:'Power train',c:'#ff7800',req:['nacelle']},
- {k:'rad',n:'Radiador',c:'#ff5ac8',req:['nacelle']},
  {k:'hub',n:'Hub',c:'#ff3c3c',req:['pt']},
  {k:'pa',n:'Pala A',c:'#78c8ff',req:['hub']},
  {k:'pb',n:'Pala B',c:'#aaff78',req:['hub']},
- {k:'pc',n:'Pala C',c:'#ffc878',req:['hub']}
+ {k:'pc',n:'Pala C',c:'#ffc878',req:['hub']},
+ {k:'ener',n:'Energizado',c:'#facc15',req:['base','t1','t2','t3','t4','t5','rad','nacelle','pt','hub','pa','pb','pc'],x:1},
+ {k:'run',n:'RUN',c:'#22c55e',req:['ener'],x:1}
 ];
+const MECH=PARTS.filter(p=>!p.x),NM=MECH.length;
 const PK=Object.fromEntries(PARTS.map(p=>[p.k,p]));
-const DRAW=['base','t1','t2','t3','t4','t5','nacelle','rad','pt','pa','pb','pc','hub'];
+const DRAW=['base','t1','t2','t3','t4','t5','nacelle','rad','pt','pa','pb','pc','hub','ener','run'];
+const BLD=['pa','pb','pc'];
 const CCOL=['#3fa9f5','#f5a623','#7ed321','#c86bff','#f8e71c','#50e3c2','#ff6b6b','#b8e986','#ff9ecf','#9fb3ff'];
 const MOTIVOS=['Viento','Grúa / equipo de izaje','Falta de material','Seguridad','Clima (lluvia / tormenta)','Logística / acceso','Calidad / NC','Otro'];
 
@@ -303,7 +312,7 @@ function modal(html,onOk,okLabel='Confirmar',danger){const m=$('#modal');m.inner
 const parts=id=>(S.turb[id]&&S.turb[id].parts)||{};
 function pState(id,k){const p=parts(id)[k];if(!p||!p.inicio)return 'none';return p.fin?'ok':'curso'}
 const reqOk=(id,k)=>PK[k].req.every(r=>pState(id,r)==='ok');
-function prog(id){let ok=0,cur=0;PARTS.forEach(p=>{const s=pState(id,p.k);if(s==='ok')ok++;else if(s==='curso')cur++});return{ok,cur,pct:Math.round(ok/PARTS.length*100)}}
+function prog(id){let ok=0,cur=0;MECH.forEach(p=>{const s=pState(id,p.k);if(s==='ok')ok++;else if(s==='curso')cur++});return{ok,cur,pct:Math.round(ok/NM*100),ener:pState(id,'ener')==='ok',run:pState(id,'run')==='ok'}}
 const actAlarms=()=>Object.values(S.alarms).filter(a=>!a.fin).sort((a,b)=>a.inicio<b.inicio?-1:1);
 const tAlarms=id=>actAlarms().filter(a=>a.turb===id||a.turb==='PARQUE');
 const tName=id=>id==='PARQUE'?'Todo el parque':((S.cfg&&S.cfg.turbs.find(t=>t.id===id))||{name:id}).name;
@@ -448,7 +457,7 @@ try{const t=localStorage.getItem('tema');if(t)document.documentElement.dataset.t
 window.toggleTheme=()=>{const n=isDark()?'light':'dark';document.documentElement.dataset.theme=n;try{localStorage.setItem('tema',n)}catch(e){}render()};
 function renderHeader(){
   let tot='';
-  if(S.cfg){const ts=S.cfg.turbs;const full=ts.filter(t=>prog(t.id).ok===PARTS.length).length;const pz=ts.reduce((a,t)=>a+prog(t.id).ok,0);tot=`<span class="badge tot">${full}/${ts.length} WTG completas · ${ts.length?Math.round(pz/(ts.length*PARTS.length)*100):0}% piezas</span>`}
+  if(S.cfg){const ts=S.cfg.turbs;const full=ts.filter(t=>prog(t.id).ok===NM).length;const pz=ts.reduce((a,t)=>a+prog(t.id).ok,0);tot=`<span class="badge tot">${full}/${ts.length} WTG completas · ${ts.length?Math.round(pz/(ts.length*NM)*100):0}% piezas</span>`}
   const tabs=[['mapa','🗺️ Mapa'],['turbina','🌀 Turbina'],['alarmas','🚨 Alarmas'+(actAlarms().length?` (${actAlarms().length})`:'')],['registro','📋 Registro']];
   const I=S.info||{};const sub=S.cfg?[I.modelo||'Vestas',`${S.cfg.turbs.length} WTG`,totMW(I),`${S.cfg.circs.length} circ.`].filter(Boolean).join(' · '):'Vestas';
   const pids=Object.keys(S.parks);const psel=pids.length?`<select class="psel" data-act2="park" title="Parque">${pids.map(id=>`<option value="${id}" ${id===UI.pid?'selected':''}>${esc((S.parks[id].info||{}).nombre||'Parque')}</option>`).join('')}<option value="__new">➕ Nuevo parque…</option></select>`:'';
@@ -500,12 +509,12 @@ function mapView(){
    ${UI.le?lineEditor():`<div class="row" style="margin-bottom:8px"><button class="sm" data-act="le">✏️ Editar líneas de circuito</button><span class="mut" style="font-size:12px">${c.locked?'🔒 Tocá una turbina para abrirla. Arrastrá el fondo para moverte; rueda o pellizco para acercar.':'Arrastrá las turbinas para ubicarlas y después tocá “Guardar y bloquear”.'}</span></div>`}
    <div class="row" style="margin-bottom:8px;gap:6px"><span class="mut">Mostrar</span>${FILT.map(([k,l])=>`<button class="sm ${UI.f[k]?'on':''}" data-act="filt" data-v="${k}">${UI.f[k]?'☑':'☐'} ${l}</button>`).join('')}</div>
    <div class="mapwrap"><svg id="map" class="map ${c.locked?'':'unlocked'}" viewBox="${vbStr()}">${mapSvg()}</svg></div>
-   <div class="legend" style="margin-top:8px">${counts.map((ts,i)=>`<span><i class="dot" style="background:${cc(i)}"></i>${esc(cName(i))} (${ts.length} WTG · ${ts.filter(t=>prog(t.id).ok===PARTS.length).length} completas)</span>`).join('')}
+   <div class="legend" style="margin-top:8px">${counts.map((ts,i)=>`<span><i class="dot" style="background:${cc(i)}"></i>${esc(cName(i))} (${ts.length} WTG · ${ts.filter(t=>prog(t.id).ok===NM).length} completas)</span>`).join('')}
    <span><i class="dot" style="background:#ffd400"></i>Izando</span></div></div></div><aside class="sump">${summary()}</aside></div>`;
 }
 /* ===== simulación de montaje (panel izquierdo) ===== */
-const SEQ=['base','t1','t2','t3','t4','t5','nacelle','pt','rad','hub','pa','pb','pc'];
-const HOOK={base:[230,444],t1:[230,392],t2:[230,334],t3:[230,276],t4:[230,218],t5:[230,160],nacelle:[217,129],pt:[234,140],rad:[184,110],hub:[277,133],pa:[272,147],pb:[272,147],pc:[272,147]};
+const SEQ=['base','t1','t2','t3','t4','t5','rad','nacelle','pt','hub','pa','pb','pc'];
+const HOOK={base:[230,444],t1:[230,392],t2:[230,334],t3:[230,276],t4:[230,218],t5:[230,160],nacelle:[217,129],pt:[234,140],rad:[324,433],hub:[277,133],pa:[272,147],pb:[272,147],pc:[272,147]};
 let simEl=null,simI=0,simT=null;
 function simBuild(){
   simEl=document.createElement('div');simEl.className='simbox';
@@ -515,17 +524,20 @@ function simBuild(){
    <rect x="120" y="${GND}" width="300" height="40" fill="url(#gEarth)"/><ellipse cx="262" cy="458" rx="80" ry="5" fill="#000" opacity=".45"/>
    <g class="crane"><line x1="406" y1="${GND}" x2="406" y2="-6" stroke="#f59e0b" stroke-width="3"/><line x1="406" y1="-4" x2="190" y2="-4" stroke="#f59e0b" stroke-width="3"/></g>
    <line class="hook" x1="0" y1="-4" x2="0" y2="0" stroke="#fcd34d" stroke-width="1.2" stroke-dasharray="3 2"/>
-   ${SEQ.filter(k=>!['pa','pb','pc'].includes(k)).map(pc).join('')}<g class="srotor">${pc('pa')}${pc('pb')}${pc('pc')}</g>${pc('hub')}</svg>
+   <g class="gnac"><g transform="translate(140,322)">${air('nacelle')}</g></g>
+   <g class="sp" data-k="rad"><g transform="translate(140,322)">${air('rad')}</g></g><g class="sp" data-k="radA">${air('rad')}</g>
+   ${SEQ.filter(k=>!['pa','pb','pc','rad'].includes(k)).map(pc).join('')}<g class="srotor">${pc('pa')}${pc('pb')}${pc('pc')}</g>${pc('hub')}</svg>
    <div class="simcap"><b id="simname">—</b><span id="simstep"></span></div>`;
   simI=0;simStep();
 }
 function simStep(){
   if(!simEl)return;clearTimeout(simT);const svg=simEl.querySelector('svg');
   if(matchMedia('(prefers-reduced-motion: reduce)').matches){simEl.querySelectorAll('.sp').forEach(g=>g.classList.add('on'));svg.classList.add('done');return}
-  if(simI===0){svg.classList.remove('done','fade');simEl.querySelectorAll('.sp').forEach(g=>g.classList.remove('on','drop'))}
+  if(simI===0){svg.classList.remove('done','fade','nacup');simEl.querySelectorAll('.sp').forEach(g=>g.classList.remove('on','drop'))}
   if(simI<SEQ.length){const k=SEQ[simI],g=svg.querySelector(`.sp[data-k="${k}"]`);g.classList.add('on','drop');
+    if(k==='nacelle'){svg.classList.add('nacup');svg.querySelector('.sp[data-k="rad"]').classList.remove('on','drop');svg.querySelector('.sp[data-k="radA"]').classList.add('on','drop')}
     const h=svg.querySelector('.hook'),[x,y]=HOOK[k];h.setAttribute('x1',x);h.setAttribute('x2',x);h.setAttribute('y2',y);h.classList.remove('go');void h.getBBox();h.classList.add('go');
-    const nm=simEl.querySelector('#simname'),st=simEl.querySelector('#simstep');if(nm)nm.textContent=PK[k].n;if(st)st.textContent=`Pieza ${simI+1} de ${SEQ.length}`;
+    const nm=simEl.querySelector('#simname'),st=simEl.querySelector('#simstep');if(nm)nm.textContent=k==='rad'?'Radiador (sobre la nacelle, en piso)':k==='nacelle'?'Nacelle + radiador':PK[k].n;if(st)st.textContent=`Pieza ${simI+1} de ${SEQ.length}`;
     simI++;simT=setTimeout(simStep,1500)}
   else if(simI===SEQ.length){svg.classList.add('done');const nm=simEl.querySelector('#simname'),st=simEl.querySelector('#simstep');if(nm)nm.textContent='Aerogenerador montado';if(st)st.textContent='';simI++;simT=setTimeout(simStep,4200)}
   else{svg.classList.add('fade');simI=0;simT=setTimeout(simStep,900)}
@@ -551,15 +563,18 @@ function lineEditor(){
 }
 function summary(){
   const ts=S.cfg.turbs,n=ts.length||1;
-  const full=ts.filter(t=>prog(t.id).ok===PARTS.length).length;const pz=ts.reduce((a,t)=>a+prog(t.id).ok,0);
+  const full=ts.filter(t=>prog(t.id).ok===NM).length;const pz=ts.reduce((a,t)=>a+prog(t.id).ok,0);
   const lost=Object.values(S.alarms).reduce((a,x)=>a+aDur(x),0);
   return `<div class="card"><h2>Cuadro de montaje del parque</h2>
-  <div class="kpi" style="margin-bottom:10px"><div>WTG completas<b>${full}/${ts.length}</b></div><div>Piezas montadas<b>${pz}/${ts.length*PARTS.length}</b></div><div>Avance<b>${Math.round(pz/(n*PARTS.length)*100)}%</b></div><div>Izando ahora<b style="color:var(--cur)">${ts.reduce((a,t)=>a+prog(t.id).cur,0)}</b></div><div>Tiempo perdido<b style="color:${actAlarms().length?'var(--bad)':'inherit'}">${dur(lost)}</b></div></div>
+  <div class="kpi" style="margin-bottom:10px"><div>WTG completas<b>${full}/${ts.length}</b></div><div>Piezas montadas<b>${pz}/${ts.length*NM}</b></div><div>Avance<b>${Math.round(pz/(n*NM)*100)}%</b></div><div>Izando ahora<b style="color:var(--cur)">${ts.reduce((a,t)=>a+prog(t.id).cur,0)}</b></div><div>Tiempo perdido<b style="color:${actAlarms().length?'var(--bad)':'inherit'}">${dur(lost)}</b></div></div>
   <div class="sumg">${PARTS.map(p=>{const ok=ts.filter(t=>pState(t.id,p.k)==='ok').length,cu=ts.filter(t=>pState(t.id,p.k)==='curso').length;
    return `<div><div class="lab"><span><i class="dot" style="background:${p.c}"></i>${p.n}</span><b>${ok}/${ts.length}${cu?` <span style="color:var(--cur)">+${cu}</span>`:''}</b></div><div class="bar"><i style="width:${ok/n*100}%;background:${p.c}"></i></div></div>`}).join('')}</div></div>`;
 }
+const SPIN=`<animateTransform attributeName="transform" type="rotate" from="0 ${272} ${147}" to="360 ${272} ${147}" dur="5s" repeatCount="indefinite"/>`;
 function miniTurb(id){
-  return DRAW.map(k=>{const st=pState(id,k);if(st==='none'&&!UI.f.ghost)return '';return `<g class="mp ${st}">${air(k)}</g>`}).join('');
+  const nacG=pState(id,'nacelle')==='none',spin=pState(id,'run')==='ok';
+  const one=k=>{const st=pState(id,k);if(st==='none'&&(!UI.f.ghost||PK[k].x))return '';if(k==='rad'&&nacG&&st!=='none')return '';return `<g class="mp ${st}">${air(k)}</g>`};
+  return DRAW.filter(k=>!BLD.includes(k)).map(k=>k==='hub'?`<g>${spin?SPIN:''}${BLD.map(one).join('')}</g>`+one(k):one(k)).join('');
 }
 function mapSvg(){
   const c=S.cfg,f=UI.f;let s=`<defs>${DEFS}<pattern id="gr" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M50 0H0V50" fill="none" style="stroke:var(--mapgr)" stroke-width="1"/></pattern></defs><rect x="-20000" y="-20000" width="40000" height="40000" fill="url(#gr)"/>`;
@@ -574,14 +589,14 @@ function mapSvg(){
     const a=pts[0],b=pts[1];if(b&&!UI.le)s+=`<text class="mt" x="${(a.x+b.x)/2}" y="${(a.y+b.y)/2-8}" fill="${col}" font-size="${Math.round(20*UI.ts)}" font-weight="700" text-anchor="middle">${esc(ci.name)}</text>`});
   s+=`<g data-set="1" class="tn" transform="translate(${c.set.x},${c.set.y})"><rect x="-26" y="-18" width="52" height="36" rx="5" fill="#2b3440" stroke="#fff" stroke-width="2"/><text y="5" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">SET</text></g>`;
   const k=UI.ms;
-  c.turbs.forEach(t=>{const p=prog(t.id);const col=cc(t.circ);const al=tAlarms(t.id).length;const done=p.ok===PARTS.length;
+  c.turbs.forEach(t=>{const p=prog(t.id);const col=cc(t.circ);const al=tAlarms(t.id).length;const done=p.ok===NM;
     const fs=Math.max(6,Math.round(16*UI.ts));const pc=done?'#2ecc71':p.ok||p.cur?'#ffd400':'#93a0b0';
     const lines=[];if(f.name)lines.push([esc(t.name)+(al?' 🚨':''),f.box?'#fff':col,fs,800]);if(f.circ)lines.push([esc(cName(t.circ)),col,Math.round(fs*.8),600]);if(f.pct)lines.push([p.pct+'%',pc,Math.round(fs*.85),700]);
     const th=lines.reduce((a,l)=>a+l[2]+3,0);
     const x0=-175*k-6,y0=-(464-10)*k-6,w=350*k+12,h=454*k+12+th+12;
     let yy=Math.max(4,14*k)+2;
     s+=`<g class="tn ${al?'alarm':''} ${done?'done':''}" data-tid="${t.id}" transform="translate(${t.x},${t.y})">
-     ${f.box?`<rect class="card-t" x="${x0}" y="${y0}" width="${w}" height="${h}" rx="8" stroke="${col}"/><rect x="${x0+4}" y="${y0+4}" width="${(w-8)*p.ok/PARTS.length}" height="4" fill="#2ecc71"/>`:`<rect class="hitb" x="${x0}" y="${y0}" width="${w}" height="${h}" rx="8"/>`}
+     ${f.box?`<rect class="card-t" x="${x0}" y="${y0}" width="${w}" height="${h}" rx="8" stroke="${col}"/><rect x="${x0+4}" y="${y0+4}" width="${(w-8)*p.ok/NM}" height="4" fill="#2ecc71"/>`:`<rect class="hitb" x="${x0}" y="${y0}" width="${w}" height="${h}" rx="8"/>`}
      <ellipse cx="${14*k}" cy="${6*k}" rx="${80*k}" ry="${10*k}" fill="#000" opacity=".45"/>
      <rect x="${-46*k}" y="${-2*k}" width="${92*k}" height="${12*k}" rx="${3*k}" fill="${col}" opacity=".6"/>
      <g transform="translate(${-230*k},${-464*k}) scale(${k})">${miniTurb(t.id)}</g>
@@ -678,6 +693,8 @@ function air(k){
    case 'base':return `<ellipse class="sh m-gravel" cx="230" cy="459" rx="64" ry="7"/>`+poly([[198,GND],[262,GND],[277,GND+12],[183,GND+12]],'m-base')+`<rect class="sh m-baset" x="209" y="444" width="42" height="7" rx="2"/>`;
    case 'nacelle':return `<path class="sh m-nact" d="M178,135 L183,129 L257,129 L262,135 Z"/><rect class="sh m-nac" x="172" y="135" width="90" height="25" rx="5"/><line class="seam" x1="200" y1="136" x2="200" y2="159"/><line class="seam" x1="231" y1="136" x2="231" y2="159"/><rect class="m-win" x="241" y="139" width="13" height="4" rx="1"/>`;
    case 'pt':return `<rect class="sh m-pt" x="212" y="140" width="19" height="15" rx="3"/><rect class="sh m-pt" x="231" y="142" width="26" height="11" rx="2"/><line class="seam" x1="244" y1="142" x2="244" y2="153"/>`;
+   case 'ener':return `<path class="sh m-bolt" d="M262,388 L248,414 L258,414 L253,436 L272,406 L262,406 L268,388 Z"/>`;
+   case 'run':return `<rect class="sh m-run" x="274" y="414" width="34" height="16" rx="4"/><text class="m-runt" x="291" y="425.5" text-anchor="middle">RUN</text>`;
    case 'rad':return `<rect class="sh m-rad" x="176" y="110" width="17" height="20" rx="1"/><path class="fin" d="M179,112V128M182.5,112V128M186,112V128M189.5,112V128"/>`;
    case 'hub':return `<path class="sh m-hub" d="M259,133 C275,132 290,140 295,147 C290,154 275,162 259,161 Z"/><ellipse class="sh m-hubr" cx="260" cy="147" rx="3" ry="14"/>`;
   }
@@ -700,10 +717,14 @@ function turbSvg(id){
    <rect y="${GND}" width="460" height="190" fill="url(#gEarth)"/><line x1="0" x2="460" y1="${GND}" y2="${GND}" stroke="#6b5a3a" stroke-width="1.5"/>
    <text x="300" y="${GND+22}" class="lbl">ACOPIO · PISO</text>
    ${anyT?`<ellipse cx="262" cy="458" rx="90" ry="6" fill="#000" opacity=".5" filter="url(#fSh)"/>`:''}`;
+  const out={};const nacOnGround=pState(id,'nacelle')==='none';
   DRAW.forEach(k=>{const p=PK[k];const st=pState(id,k);const av=reqOk(id,k);
     const cls=st==='none'?(av?'avail':'lock'):st;
-    const g=(st!=='none'||k==='base')?{s:air(k)}:ground(k);
-    s+=`<g class="p ${cls} ${k==='base'&&st==='none'?'base-none':''}" data-part="${k}" style="--c:${p.c}">${g.s}${g.l?`<text class="glbl" x="${g.l[0]}" y="${g.l[1]}" text-anchor="${['pa','pb','pc'].includes(k)?'start':'middle'}">${p.n}</text>`:''}${k==='base'&&st==='none'?`<text class="glbl" x="230" y="440" text-anchor="middle">Base pendiente</text>`:''}</g>`});
+    let g=(st!=='none'||k==='base'||p.x)?{s:air(k)}:ground(k);
+    if(k==='rad'&&st!=='none'&&nacOnGround)g={s:`<g transform="translate(${GOFF.nacelle[0]},${GOFF.nacelle[1]})">${air('rad')}</g>`};
+    out[k]=`<g class="p ${cls} ${k==='base'&&st==='none'?'base-none':''}" data-part="${k}" style="--c:${p.c}">${g.s}${g.l?`<text class="glbl" x="${g.l[0]}" y="${g.l[1]}" text-anchor="${['pa','pb','pc'].includes(k)?'start':'middle'}">${p.n}</text>`:''}${k==='base'&&st==='none'?`<text class="glbl" x="230" y="440" text-anchor="middle">Base pendiente</text>`:''}</g>`});
+  const spin=pState(id,'run')==='ok';
+  DRAW.forEach(k=>{if(BLD.includes(k)){if(k==='pa')s+=`<g>${spin?SPIN:''}${out.pa}${out.pb}${out.pc}</g>`}else s+=out[k]});
   return s+'</svg>';
 }
 function turbView(){
@@ -715,7 +736,8 @@ function turbView(){
   const rows=PARTS.map(pt=>{const st=pState(id,pt.k),v=parts(id)[pt.k]||{},av=reqOk(id,pt.k);
     const d=v.inicio?dur((v.fin?new Date(v.fin):new Date())-new Date(v.inicio)):'—';
     let act='';
-    if(st==='none')act=av?`<button class="sm warn" data-act="pstart" data-v="${pt.k}">Iniciar</button>`:`<span class="mut" style="font-size:11px">Falta: ${pt.req.filter(r=>pState(id,r)!=='ok').map(r=>PK[r].n).join(', ')}</span>`;
+    if(st==='none'&&pt.x)act=av?`<button class="sm ok" data-act="pstart" data-v="${pt.k}">${pt.k==='ener'?'⚡ Energizar':'▶ RUN'}</button>`:`<span class="mut" style="font-size:11px">${pt.k==='ener'?'Falta completar el montaje':'Falta energizar'}</span>`;
+    else if(st==='none')act=av?`<button class="sm warn" data-act="pstart" data-v="${pt.k}">Iniciar</button>`:`<span class="mut" style="font-size:11px">Falta: ${pt.req.filter(r=>pState(id,r)!=='ok').map(r=>PK[r].n).join(', ')}</span>`;
     else if(st==='curso')act=`<button class="sm ok" data-act="pend" data-v="${pt.k}">Montada</button> <button class="sm" data-act="preset" data-v="${pt.k}" title="Cancelar">✕</button>`;
     else act=`<button class="sm" data-act="preset" data-v="${pt.k}" title="Desmontar / borrar registro">↺</button>`;
     return `<tr><td><i class="dot" style="background:${pt.c}"></i>${pt.n}</td><td><span class="chip ${st}">${st==='none'?'En piso':st==='curso'?'Izando':'Montada'}</span></td>
@@ -726,7 +748,7 @@ function turbView(){
    <button data-act="nav" data-v="-1" ${idx<=0?'disabled':''}>◀</button>
    <select data-act2="selT">${c.turbs.map(x=>`<option value="${x.id}" ${x.id===id?'selected':''}>${esc(x.name)} · ${esc(cName(x.circ))}</option>`).join('')}</select>
    <button data-act="nav" data-v="1" ${idx>=c.turbs.length-1?'disabled':''}>▶</button>
-   <div class="grow" style="min-width:160px"><div class="mut" style="font-size:12px">${p.ok}/${PARTS.length} piezas montadas${p.cur?` · ${p.cur} izando`:''} · ${p.pct}%</div><div class="bar"><i style="width:${p.pct}%"></i></div></div>${p.ok<PARTS.length?`<button class="sm ok" data-act="full" title="Registrar todas las piezas que faltan como montadas">✅ Montada completa</button>`:`<span class="chip ok">✅ Completa</span>`}</div></div>
+   <div class="grow" style="min-width:160px"><div class="mut" style="font-size:12px">${p.ok}/${NM} piezas montadas${p.cur?` · ${p.cur} izando`:''} · ${p.pct}%</div><div class="bar"><i style="width:${p.pct}%"></i></div></div>${p.ok<NM?`<button class="sm ok" data-act="full" title="Registrar todas las piezas que faltan como montadas">✅ Montada completa</button>`:`<span class="chip ok">✅ Completa</span>`}</div></div>
   <div class="grid2"><div>
    ${alarmBox(id)}
    <div class="card"><div class="row" style="justify-content:flex-end;margin-bottom:6px"><button class="sm ${UI.ident?'on':''}" data-act="ident">🎨 Colores por pieza</button></div><div class="tsvgw">${turbSvg(id)}</div>
@@ -743,10 +765,10 @@ function ovView(){
   const al=actAlarms();
   return `<div class="mbg" data-act="ovclose"></div><div id="ov" class="win" role="dialog" aria-label="Avance de ${esc(t.name)}">
    <div class="ovbar"><button class="sm" data-act="ovnav" data-v="-1" ${idx<=0?'disabled':''}>◀</button>
-   <div><b style="font-size:16px">${esc(t.name)}</b> <span class="mut" style="font-size:12px">· ${esc(cName(t.circ))}</span><div class="mut" style="font-size:12px">${p.ok}/${PARTS.length} piezas${p.cur?` · ${p.cur} izando`:''} · ${p.pct}%</div></div>
+   <div><b style="font-size:16px">${esc(t.name)}</b> <span class="mut" style="font-size:12px">· ${esc(cName(t.circ))}</span><div class="mut" style="font-size:12px">${p.ok}/${NM} piezas${p.cur?` · ${p.cur} izando`:''} · ${p.pct}%</div></div>
    <button class="sm" data-act="ovnav" data-v="1" ${idx>=c.turbs.length-1?'disabled':''}>▶</button>
    <div class="grow" style="min-width:50px"><div class="bar"><i style="width:${p.pct}%"></i></div></div>
-   ${p.ok<PARTS.length?`<button class="sm ok" data-act="full" title="Registrar todas las piezas que faltan como montadas">✅ Montada completa</button>`:`<span class="chip ok">✅ Completa</span>`}
+   ${p.ok<NM?`<button class="sm ok" data-act="full" title="Registrar todas las piezas que faltan como montadas">✅ Montada completa</button>`:`<span class="chip ok">✅ Completa</span>`}
    <button class="pri sm" data-act="ovclose" style="font-weight:700;padding:6px 10px">💾 Guardar y cerrar</button></div>
    <div class="ovscroll">${al.map(a=>`<div class="alarmb" data-act="goAlarm" data-v="${esc(a.turb)}">🚨 ALARMA · ${esc(tName(a.turb))} · ${esc(a.motivo)} · ⏱ <span data-since="${a.inicio}">${durS(aDur(a))}</span></div>`).join('')}
    <div class="ovbody">${body}</div></div></div>`;
@@ -790,7 +812,7 @@ function alarmView(){
 /* ===== vista registro ===== */
 function logView(){
   const c=S.cfg;
-  const head=`<tr><th>Turbina</th><th>Circuito</th>${PARTS.map(p=>`<th title="${p.n}"><i class="dot" style="background:${p.c}"></i>${p.n.replace('Power train','PT').replace('Radiador','Rad').replace('Nacelle','Nac')}</th>`).join('')}<th>%</th></tr>`;
+  const head=`<tr><th>Turbina</th><th>Circuito</th>${PARTS.map(p=>`<th title="${p.n}"><i class="dot" style="background:${p.c}"></i>${p.n.replace('Energizado','⚡').replace('Power train','PT').replace('Radiador','Rad').replace('Nacelle','Nac')}</th>`).join('')}<th>%</th></tr>`;
   const body=c.turbs.map(t=>`<tr><td><a href="#" data-act="openT" data-v="${t.id}" style="color:var(--acc)">${esc(t.name)}</a></td><td>${esc(cName(t.circ))}</td>${PARTS.map(p=>{const s=pState(t.id,p.k);return `<td title="${s!=='none'?fmt(parts(t.id)[p.k].inicio)+' → '+fmt(parts(t.id)[p.k].fin):''}" style="text-align:center">${s==='ok'?'✅':s==='curso'?'⏳':'·'}</td>`}).join('')}<td>${prog(t.id).pct}%</td></tr>`).join('');
   const ev=[];c.turbs.forEach(t=>{const ps=parts(t.id);PARTS.forEach(p=>{const v=ps[p.k];if(!v)return;if(v.inicio)ev.push({t:v.inicio,txt:`${t.name} · ${p.n} · inicio de izaje`});if(v.fin)ev.push({t:v.fin,txt:`${t.name} · ${p.n} · montada (${dur(new Date(v.fin)-new Date(v.inicio))})`})})});
   Object.values(S.alarms).forEach(a=>{ev.push({t:a.inicio,txt:`🚨 ${tName(a.turb)} · alarma: ${a.motivo}`,al:1});if(a.fin)ev.push({t:a.fin,txt:`${tName(a.turb)} · fin de alarma (${dur(aDur(a))} perdidos)`})});
@@ -850,6 +872,8 @@ function cfgView(){
 /* ===== acciones ===== */
 function partClick(id,k){
   const st=pState(id,k);
+  if(st==='none'&&PK[k].x){if(!reqOk(id,k)){toast(k==='ener'?'Para energizar, la turbina tiene que estar 100% montada':'Primero hay que energizar');return}
+    const n=nowI();setPart(id,k,{inicio:n,fin:n});toast(k==='ener'?'⚡ '+tName(id)+' energizada':'▶ '+tName(id)+' en RUN');return}
   if(st==='none'){if(!reqOk(id,k)){toast('Primero hay que montar: '+PK[k].req.filter(r=>pState(id,r)!=='ok').map(r=>PK[r].n).join(', '));return}
     setPart(id,k,{inicio:nowI(),fin:null});toast(PK[k].n+': inicio de izaje registrado')}
   else if(st==='curso'){setPart(id,k,{...parts(id)[k],fin:nowI()});toast(PK[k].n+' montada ✔')}
@@ -878,13 +902,13 @@ document.addEventListener('click',e=>{
    case 'logout':modal('<p>¿Cerrar sesión en este dispositivo?</p>',()=>{try{localStorage.removeItem('wtg-auth')}catch(x){}location.reload()},'Cerrar sesión');break;
    case 'delpark':modal(`<p>¿Eliminar el parque <b>${esc((S.info||{}).nombre)}</b> de la lista?</p><p class="mut" style="font-size:12px">Antes se descarga un respaldo automático por las dudas.</p>`,async()=>{await doBackup();const pid=UI.pid;delete S.parks[pid];UI.cfgOpen=false;
        if(MODE==='db')serial('del',()=>db.doc('parques/'+pid).delete());else lsSave();UI.pid=null;S.subPid=null;const nx=Object.keys(S.parks)[0];if(nx)selectPark(nx);else{bindCfg();subPark();render()}},'Eliminar',true);break;
-   case 'full':{const id=UI.sel,nowL=toInp(nowI());const falt=PARTS.filter(x=>pState(id,x.k)!=='ok');
+   case 'full':{const id=UI.sel,nowL=toInp(nowI());const falt=MECH.filter(x=>pState(id,x.k)!=='ok');
      modal(`<h2>✅ Montada completa · ${esc(tName(id))}</h2><p>Se van a registrar como montadas las <b>${falt.length}</b> piezas que faltan: ${falt.map(x=>x.n).join(', ')}.</p>
       <div class="pform"><label>Inicio<input type="datetime-local" id="fullI" value="${nowL}"></label><label>Fin<input type="datetime-local" id="fullF" value="${nowL}"></label></div>
       <p class="mut" style="font-size:12px">Las piezas que ya se estaban izando conservan su hora de inicio. Si algo quedó mal, se corrige pieza por pieza en la tabla.</p>`,()=>{
       const fi=fromInp($('#fullI').value)||nowI(),ff=fromInp($('#fullF').value)||nowI();if(ff<fi){toast('El fin no puede ser anterior al inicio');return}
       const t=S.turb[id]?clone(S.turb[id]):{parts:{}};t.parts=t.parts||{};
-      PARTS.forEach(x=>{const v=t.parts[x.k];if(v&&v.inicio&&v.fin)return;t.parts[x.k]=v&&v.inicio?{...v,fin:ff<v.inicio?v.inicio:ff}:{inicio:fi,fin:ff}});
+      MECH.forEach(x=>{const v=t.parts[x.k];if(v&&v.inicio&&v.fin)return;t.parts[x.k]=v&&v.inicio?{...v,fin:ff<v.inicio?v.inicio:ff}:{inicio:fi,fin:ff}});
       S.turb[id]=t;saveTurb(id);toast(tName(id)+' registrada como montada completa ✔')},'Marcar completa');break}
    case 'tsz':setTs(UI.ts*(+v));break;
    case 'lock':c.locked=!c.locked;saveCfg(true);break;
