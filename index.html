@@ -534,6 +534,13 @@ function applyCounts(nT,nC){
 }
 
 /* ===== render general ===== */
+/* Si la misma ventana flotante sigue abierta, sólo se actualiza su contenido: no se recrean la ventana ni el fondo
+   difuminado (evita el parpadeo al montar piezas). La página de atrás se redibuja al cerrar la ventana. */
+function paintMain(m,pageFn,wins,key){
+  const ow=[...m.querySelectorAll(':scope>.win')];
+  if(wins&&ow.length&&m.dataset.pk===key){const t=document.createElement('div');t.innerHTML=wins;const nw=[...t.querySelectorAll(':scope>.win')];
+    if(nw.length===ow.length&&nw.every((x,i)=>x.id===ow[i].id)){nw.forEach((x,i)=>{ow[i].innerHTML=x.innerHTML;ow[i].setAttribute('aria-label',x.getAttribute('aria-label')||'')});return true}}
+  m.innerHTML=pageFn()+wins;m.dataset.pk=key;return false}
 function render(){
   if(drag)return;
   if(UI.tab==='config'){UI.tab='mapa';UI.cfgOpen=true}
@@ -541,7 +548,7 @@ function render(){
   const m=$('#main');m.classList.toggle('wide',UI.tab==='mapa'&&!!S.cfg);
   document.body.classList.toggle('pres',!!(UI.pres&&S.cfg));
   if(UI.pres&&S.cfg){const sc0=document.querySelector('#ov .ovscroll'),y0=sc0?sc0.scrollTop:0;
-    m.innerHTML=presView()+(UI.ov&&S.cfg.turbs.find(t=>t.id===UI.sel)?ovView():'');document.body.classList.toggle('modal-open',!!UI.ov);
+    const kept=paintMain(m,()=>presView(),UI.ov&&S.cfg.turbs.find(t=>t.id===UI.sel)?ovView():'','p'+UI.pid);document.body.classList.toggle('modal-open',!!UI.ov);
     const a0=document.querySelector('#ov .ovscroll');if(a0)a0.scrollTop=y0;
     const slot=document.getElementById('simslot');if(slot){if(!simEl)simBuild();slot.appendChild(simEl)}if(S.info&&WXpid!==UI.pid)setTimeout(()=>loadWx(),0);return}
   if(MODE==='loading'){m.innerHTML='<div class="card">Conectando con la base de datos…</div>';return}
@@ -551,11 +558,11 @@ function render(){
   if(S.info&&WXpid!==UI.pid)setTimeout(()=>loadWx(),0);
   h+=wxBanner();
   if(needBk())h+=`<div class="note row"><span class="grow">💾 ${S.info.lastBk?'Último respaldo: '+fmt(S.info.lastBk)+'.':'Todavía no hay respaldo de este parque.'} Creá uno para no perder información.</span><button class="sm pri" data-act="bk">Crear respaldo</button></div>`;
-  h+=({resumen:resumenView,mapa:mapView,turbina:turbView,alarmas:alarmView,acta:actaView,registro:logView}[UI.tab]||mapView)();
-  if(UI.ov&&S.cfg.turbs.find(t=>t.id===UI.sel))h+=ovView();else UI.ov=false;
-  if(UI.cfgOpen)h+=cfgWin();
+  const pageFn=()=>h+({resumen:resumenView,mapa:mapView,turbina:turbView,alarmas:alarmView,acta:actaView,registro:logView}[UI.tab]||mapView)();
+  let w='';if(UI.ov&&S.cfg.turbs.find(t=>t.id===UI.sel))w+=ovView();else UI.ov=false;
+  if(UI.cfgOpen)w+=cfgWin();
   const sc0=document.querySelector('#ov .ovscroll'),sc1=document.querySelector('#cfgw .ovscroll');const y0=sc0?sc0.scrollTop:0,y1=sc1?sc1.scrollTop:0;
-  m.innerHTML=h;document.body.classList.toggle('modal-open',!!(UI.ov||UI.cfgOpen));
+  const kept=paintMain(m,pageFn,w,'n'+UI.tab+UI.pid);document.body.classList.toggle('modal-open',!!(UI.ov||UI.cfgOpen));
   const a0=document.querySelector('#ov .ovscroll'),a1=document.querySelector('#cfgw .ovscroll');if(a0)a0.scrollTop=y0;if(a1)a1.scrollTop=y1;
   const slot=document.getElementById('simslot');if(slot){if(!simEl)simBuild();slot.appendChild(simEl)}
   requestAnimationFrame(fitMap);
