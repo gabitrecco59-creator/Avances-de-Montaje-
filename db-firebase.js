@@ -56,13 +56,13 @@ async function start() {
       return {
         set: (o) => soft(setDoc(ref, o)),
         delete: () => soft(deleteDoc(ref)),
-        onSnapshot: (next, error) => onSnapshot(ref, (s) => next(snap(s)), (e) => error && error(wrapErr(e))),
+        onSnapshot: (next, error) => onSnapshot(ref, { includeMetadataChanges: true }, (s) => next(snap(s)), (e) => error && error(wrapErr(e))),
       };
     },
     collection(path) {
       const ref = collection(fs, ...seg(path));
       return {
-        onSnapshot: (next, error) => onSnapshot(ref,
+        onSnapshot: (next, error) => onSnapshot(ref, { includeMetadataChanges: true },
           (q) => next({ docs: q.docs.map(snap), size: q.size, empty: q.empty, metadata: q.metadata }),
           (e) => error && error(wrapErr(e))),
       };

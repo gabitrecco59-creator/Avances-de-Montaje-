@@ -398,9 +398,9 @@ async function init(){
   let c=null;try{c=await Promise.race([window.FB_READY||Promise.resolve(null),new Promise(r=>setTimeout(()=>r(null),9000))])}catch(e){c=null}
   if(!c){MODE='local';lsLoad();render();return}
   db=c;MODE='db';
-  const tm=setTimeout(()=>{NOTE='Todavía no se pudo leer la base de datos. Revisá la conexión; los datos pueden no estar actualizados.';render()},10000);
+  const tm=setTimeout(()=>{NOTE='Sin conexión con la base de datos: se muestran los datos guardados en este dispositivo. Los cambios se suben solos cuando vuelva la conexión.';render()},15000);
   db.collection('parques').onSnapshot(q=>{
-    if(!q.metadata.fromCache){clearTimeout(tm);if(NOTE.startsWith('Todavía')||NOTE.startsWith('Firebase'))NOTE=''}
+    if(!q.metadata.fromCache){clearTimeout(tm);if(NOTE.startsWith('Sin conexión')||NOTE.startsWith('Firebase'))NOTE=''}
     const ps={};q.docs.forEach(d=>ps[d.id]=clone(d.data()));
     if(cfgDirty&&S.parks[UI.pid])ps[UI.pid]=S.parks[UI.pid];
     S.parks=ps;if(!q.metadata.fromCache)S.loaded=true;
