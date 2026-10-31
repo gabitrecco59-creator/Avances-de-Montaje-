@@ -538,7 +538,7 @@ function simBuild(){
 function simStep(){
   if(!simEl)return;clearTimeout(simT);const svg=simEl.querySelector('svg');
   if(matchMedia('(prefers-reduced-motion: reduce)').matches){simEl.querySelectorAll('.sp').forEach(g=>g.classList.add('on'));svg.classList.add('done');return}
-  if(simI===0){svg.classList.remove('done','fade','nacup','ener','run');simEl.querySelectorAll('.sp').forEach(g=>g.classList.remove('on','drop'))}
+  if(simI===0){svg.classList.remove('done','fade','nacup','ener','run');simEl.querySelectorAll('.sp').forEach(g=>g.classList.remove('on','drop','pop'))}
   if(simI<SEQ.length&&PK[SEQ[simI]].x){const k=SEQ[simI],g=svg.querySelector(`.sp[data-k="${k}"]`);g.classList.add('on','pop');svg.classList.add(k);
     const nm=simEl.querySelector('#simname'),st=simEl.querySelector('#simstep');if(nm)nm.textContent=k==='ener'?'⚡ Energización':'▶ RUN';if(st)st.textContent=k==='ener'?'Montaje 100%':'Rotor girando';
     simI++;simT=setTimeout(simStep,k==='run'?4600:1900);return}
