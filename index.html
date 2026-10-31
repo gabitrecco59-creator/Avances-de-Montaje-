@@ -106,7 +106,7 @@ svg.tsvg{width:100%;max-width:520px;height:auto;max-height:72vh;user-select:none
 .mt{paint-order:stroke;stroke:var(--mapbg);stroke-width:4px;stroke-linejoin:round}
 .lbl{font-size:11px;fill:#c9b48a;font-weight:700;letter-spacing:1px}
 #toast{pointer-events:none;position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--tx);color:var(--bg);border:0;font-weight:600;padding:10px 16px;border-radius:10px;z-index:50;display:none;max-width:90vw}
-#modal{position:fixed;inset:0;background:#000a;z-index:60;display:none;align-items:center;justify-content:center;padding:16px}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:60;display:none;align-items:center;justify-content:center;padding:16px}
 #modal .box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;max-width:420px;width:100%}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
 .legend span{margin-right:12px;white-space:nowrap}
@@ -126,17 +126,50 @@ input.dt{width:170px;font-size:12px;padding:4px 6px}
 .card-t{fill:var(--card);stroke-width:4}
 .tn.alarm .card-t{animation:ringf 1s infinite}
 .tn.done .card-t{fill:color-mix(in srgb,var(--ok) 14%,var(--card))}
-#ov{position:fixed;z-index:45;background:color-mix(in srgb,var(--bg) 94%,transparent);border:1px solid var(--bd);border-radius:16px;box-shadow:0 24px 60px -10px rgba(0,0,0,.55);display:flex;flex-direction:column;overflow:hidden;resize:both;min-width:300px;min-height:160px;container-type:inline-size;backdrop-filter:blur(4px)}
-#ov.min{height:auto!important;resize:none}
-#ov.min .ovscroll{display:none}
-#ov .ovbar{background:var(--card);border-bottom:1px solid var(--line);padding:8px 10px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;cursor:move;touch-action:none;user-select:none}
-#ov .ovbar .grip{color:var(--mut);font-size:16px;letter-spacing:-2px}
-#ov .ovscroll{flex:1;overflow:auto}
-#ov .ovbody{padding:10px;display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
-#ov .ovbody>div{min-width:0}
+.mbg{position:fixed;inset:0;z-index:44;background:color-mix(in srgb,var(--bg) 35%,rgba(0,0,0,.35));backdrop-filter:blur(7px) saturate(.9);-webkit-backdrop-filter:blur(7px) saturate(.9);animation:fadein .25s ease both}
+.win{position:fixed;z-index:45;left:50%;top:50%;transform:translate(-50%,-50%);width:min(1180px,95vw);height:min(92vh,980px);background:color-mix(in srgb,var(--bg) 96%,transparent);border:1px solid var(--bd);border-radius:18px;box-shadow:0 30px 80px -10px rgba(0,0,0,.6);display:flex;flex-direction:column;overflow:hidden;container-type:inline-size;animation:winin .35s cubic-bezier(.2,.7,.2,1) both}
+#cfgw.win{width:min(900px,95vw)}
+@keyframes winin{from{opacity:0;transform:translate(-50%,-46%) scale(.97)}to{opacity:1;transform:translate(-50%,-50%)}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+body.modal-open{overflow:hidden}
+.win .ovbar{background:var(--card);border-bottom:1px solid var(--bd);padding:10px 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.win .ovscroll{flex:1;overflow:auto;overscroll-behavior:contain}
+.win .ovbody{padding:12px;display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+#cfgw .ovbody{display:block}
+.win .ovbody>div{min-width:0}
 @container (min-width:860px){#ov .ovbody{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}}
-#ov .card{margin-bottom:10px}
-#ov svg.tsvg{max-width:none;max-height:70vh}
+.win .card{margin-bottom:12px}
+#ov svg.tsvg{max-width:none;max-height:72vh}
+@media(max-width:600px){.win{width:100vw;height:94vh;top:auto;bottom:0;transform:translateX(-50%);border-radius:18px 18px 0 0}@keyframes winin{from{opacity:0;transform:translate(-50%,30px)}to{opacity:1;transform:translateX(-50%)}}}
+main.wide{max-width:1840px}
+.maplay{display:grid;grid-template-columns:230px minmax(0,1fr) 300px;gap:14px;align-items:start}
+.simp,.sump{position:sticky;top:132px;max-height:calc(100vh - 146px);overflow:auto;scrollbar-width:thin}
+.sump .kpi{display:grid;grid-template-columns:1fr 1fr;gap:8px}.sump .kpi>div{min-width:0}
+.sump .sumg{grid-template-columns:1fr}
+@media(max-width:1280px){.maplay{grid-template-columns:minmax(0,1fr) 280px}.simp{grid-column:1/-1;order:3;position:static;max-height:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.simp .card{margin:0}}
+@media(max-width:900px){.maplay{grid-template-columns:minmax(0,1fr)}.sump{position:static;max-height:none}.simcard{display:none}}
+.simcard{padding:10px}.simbox{opacity:.92}
+.simsvg{width:100%;height:auto;display:block;border-radius:12px}
+.simsvg .sp{opacity:0}
+.simsvg .sp.on{opacity:1}
+.simsvg .sp.drop{animation:sdrop 1.15s cubic-bezier(.25,.8,.3,1) both}
+@keyframes sdrop{from{opacity:0;transform:translateY(-150px)}60%{opacity:1}to{opacity:1;transform:none}}
+.simsvg .hook{opacity:0}.simsvg .hook.go{animation:shook 1.3s ease both}
+@keyframes shook{0%{opacity:0}15%{opacity:.8}75%{opacity:.8}100%{opacity:0}}
+.simsvg .srotor{transform-origin:272px 147px;transform-box:view-box}
+.simsvg.done .srotor{animation:spin 6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.simsvg.fade .sp{opacity:0;transition:opacity .8s}
+.simsvg .crane{opacity:.55}
+.simcap{display:flex;justify-content:space-between;gap:8px;font-size:12px;margin-top:6px;color:var(--mu)}.simcap b{color:var(--tx)}
+.lst{display:flex;gap:6px;align-items:baseline;flex-wrap:wrap;font-size:13px;padding:5px 0;border-bottom:1px solid var(--bd);cursor:pointer}.lst:last-child{border:0}.lst .mut{margin-left:auto;font-size:11px}
+.pform{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}.pform label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--mu);font-weight:600}.pform .full{grid-column:1/-1}.pform input{color:var(--tx);font-weight:400}
+@media(max-width:520px){.pform{grid-template-columns:1fr}}
+.psel{max-width:180px;padding:3px 8px;font-size:12px;font-weight:700;margin-right:6px;border-radius:8px}
+.sub{display:flex;align-items:center;flex-wrap:wrap;gap:2px}
+.btnlike{display:inline-flex;align-items:center;border:1px solid var(--bd);border-radius:10px;padding:8px 12px;font-size:13px;cursor:pointer}
+#modal .box .pform input{width:100%}
+
 .sumg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px 14px}
 .sumg .lab{display:flex;justify-content:space-between;font-size:12px}
 .note{background:var(--note-bg);border:1px solid var(--note-bd);color:var(--note-tx);padding:8px 12px;border-radius:8px;margin-bottom:10px}
@@ -144,34 +177,73 @@ input.dt{width:170px;font-size:12px;padding:4px 6px}
 <link rel="stylesheet" href="/fx.css">
 </head>
 <body>
-<div id="welcome" role="dialog" aria-label="Bienvenida" tabindex="-1">
+<div id="gate" hidden>
+<svg class="wl-wind" viewBox="0 0 400 800" preserveAspectRatio="none" aria-hidden="true"><path d="M-20 140 H420"/><path d="M-20 260 H420"/><path d="M-20 520 H420"/><path d="M-20 640 H420"/><path d="M-20 720 H420"/></svg>
+<form class="g-card" id="g-form" autocomplete="on">
+ <svg class="g-t" viewBox="0 0 160 190" aria-hidden="true"><g fill="#fff"><path d="M75 80 L72 184 L88 184 L85 80Z"/><g class="wl-rot"><path d="M80 80 L73 68 L77 8 Q80 2 83 8 L87 68Z"/><path d="M80 80 L73 68 L77 8 Q80 2 83 8 L87 68Z" transform="rotate(120 80 80)"/><path d="M80 80 L73 68 L77 8 Q80 2 83 8 L87 68Z" transform="rotate(240 80 80)"/></g><circle cx="80" cy="80" r="9"/></g></svg>
+ <div class="g-h">Avances de montaje<span>VESTAS</span></div>
+ <input id="g-us" name="username" autocomplete="username" placeholder="Usuario" required>
+ <input id="g-pw" name="password" type="password" autocomplete="current-password" placeholder="Contraseña" required>
+ <div class="g-er" id="g-er"></div>
+ <button type="submit">Ingresar</button>
+</form></div>
+<div id="welcome" role="dialog" aria-label="Bienvenida" tabindex="-1" hidden>
 <svg class="wl-wind" viewBox="0 0 400 800" preserveAspectRatio="none" aria-hidden="true"><path d="M-20 140 H420"/><path d="M-20 260 H420"/><path d="M-20 520 H420"/><path d="M-20 640 H420"/><path d="M-20 720 H420"/></svg>
 <div class="wl-in">
  <svg class="wl-t" viewBox="0 0 160 190" aria-hidden="true"><g fill="#fff"><path d="M75 80 L72 184 L88 184 L85 80Z"/><rect x="58" y="182" width="44" height="6" rx="3" opacity=".7"/><g class="wl-rot"><path d="M80 80 L73 68 L77 8 Q80 2 83 8 L87 68Z"/><path d="M80 80 L73 68 L77 8 Q80 2 83 8 L87 68Z" transform="rotate(120 80 80)"/><path d="M80 80 L73 68 L77 8 Q80 2 83 8 L87 68Z" transform="rotate(240 80 80)"/></g><circle cx="80" cy="80" r="9"/><circle cx="80" cy="80" r="3.5" fill="#0e7490"/></g></svg>
+ <div class="wl-hi">¡Bienvenido!</div>
  <h1 class="wl-h">Avances de montaje<span class="wl-v">VESTAS</span></h1>
+ <p class="wl-p" id="wl-p"></p>
+ <div class="wl-pk" id="wl-pk" hidden></div>
  <div class="wl-bar"><i></i></div><div class="wl-tap">Tocá para entrar</div>
 </div></div>
 <style>
-#welcome{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;background:linear-gradient(160deg,#0e7490,#6d28d9);overflow:hidden;cursor:pointer;opacity:1;transition:opacity .6s ease,transform .6s ease;padding:24px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
-#welcome.out{opacity:0;transform:scale(1.04);pointer-events:none}
-#welcome .wl-in{max-width:520px;width:100%}
+#welcome,#gate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;background:linear-gradient(160deg,#0e7490,#6d28d9);overflow:hidden;opacity:1;transition:opacity .6s ease,transform .6s ease;padding:24px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+#welcome[hidden],#gate[hidden],.wl-pk[hidden]{display:none}
+#welcome{cursor:pointer}
+#welcome.out,#gate.out{opacity:0;transform:scale(1.04);pointer-events:none}
+#welcome .wl-in{max-width:560px;width:100%;position:relative}
 .wl-wind{position:absolute;inset:0;width:100%;height:100%;opacity:.28}.wl-wind path{stroke:#fff;stroke-width:2;fill:none;stroke-dasharray:90 310;stroke-linecap:round;animation:wlw 2.6s linear infinite}.wl-wind path:nth-child(2){animation-delay:-.6s;stroke-dasharray:60 340}.wl-wind path:nth-child(3){animation-delay:-1.2s}.wl-wind path:nth-child(4){animation-delay:-1.8s;stroke-dasharray:70 330}.wl-wind path:nth-child(5){animation-delay:-.3s}
 @keyframes wlw{from{stroke-dashoffset:400}to{stroke-dashoffset:-400}}
-.wl-t{width:min(46vw,190px);height:auto;filter:drop-shadow(0 10px 24px rgba(0,0,0,.35));animation:wlup .9s cubic-bezier(.2,.8,.2,1) both}
+.wl-t{width:min(42vw,170px);height:auto;filter:drop-shadow(0 10px 24px rgba(0,0,0,.35));animation:wlup .9s cubic-bezier(.2,.8,.2,1) both}
 .wl-rot{transform-origin:80px 80px;animation:wlr 5s linear infinite}
 @keyframes wlr{to{transform:rotate(360deg)}}@keyframes wlup{from{opacity:0;transform:translateY(30px) scale(.9)}to{opacity:1;transform:none}}
-.wl-h{margin:16px 0 0;font-size:clamp(30px,8vw,48px);line-height:1.1;font-weight:800;animation:wlf .8s .5s both}
+.wl-hi{margin-top:10px;font-size:16px;letter-spacing:2px;text-transform:uppercase;opacity:.85;font-weight:600;animation:wlf .7s .4s both}
+.wl-h{margin:6px 0 0;font-size:clamp(30px,8vw,48px);line-height:1.1;font-weight:800;animation:wlf .8s .55s both}
 .wl-v{display:block;margin-top:6px;font-size:.62em;letter-spacing:.32em;padding-left:.32em;opacity:.95}
-.wl-bar{margin:28px auto 0;width:min(70%,260px);height:4px;border-radius:2px;background:rgba(255,255,255,.25);overflow:hidden;animation:wlf .5s 1s both}.wl-bar i{display:block;height:100%;background:#fff;width:0;animation:wlb 3.2s 1s linear forwards}
+.wl-p{margin:14px auto 0;font-size:clamp(17px,4.6vw,22px);font-weight:700;line-height:1.35;max-width:460px;animation:wlf .8s .8s both}
+.wl-pk{display:inline-block;margin-top:14px;padding:9px 16px;border-radius:999px;background:rgba(255,255,255,.18);font-size:clamp(12px,3.4vw,15px);font-weight:600;animation:wlf .8s 1s both}
+.wl-bar{margin:26px auto 0;width:min(70%,260px);height:4px;border-radius:2px;background:rgba(255,255,255,.25);overflow:hidden;animation:wlf .5s 1.1s both}.wl-bar i{display:block;height:100%;background:#fff;width:0;animation:wlb 3.4s 1.1s linear forwards}
 @keyframes wlb{to{width:100%}}.wl-tap{margin-top:10px;font-size:13px;opacity:.7;animation:wlf .5s 1.3s both}
 @keyframes wlf{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.wl-rot,.wl-wind path,.wl-bar i,.wl-t,.wl-h,.wl-bar,.wl-tap{animation:none}}
+.g-card{position:relative;width:min(92vw,360px);background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:20px;padding:24px 22px;display:flex;flex-direction:column;gap:10px;box-shadow:0 24px 60px -20px rgba(0,0,0,.5);animation:wlup .8s cubic-bezier(.2,.8,.2,1) both}
+.g-t{width:84px;height:auto;margin:0 auto}
+.g-h{font-size:24px;font-weight:800;line-height:1.1;margin-bottom:6px}.g-h span{display:block;font-size:.6em;letter-spacing:.32em;padding-left:.32em;margin-top:4px}
+.g-card input{background:rgba(255,255,255,.92);color:#1a2233;border:0;border-radius:12px;padding:12px 14px;font-size:16px}
+.g-card button{background:#fff;color:#4c1d95;border:0;border-radius:12px;padding:12px;font-weight:800;font-size:16px;cursor:pointer;margin-top:4px}
+.g-er{min-height:18px;font-size:13px;font-weight:600;color:#ffe4e6}
+.shake{animation:shk .4s}@keyframes shk{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@media (prefers-reduced-motion:reduce){.wl-rot,.wl-wind path,.wl-bar i,.wl-t,.wl-h,.wl-hi,.wl-p,.wl-pk,.wl-bar,.wl-tap,.g-card{animation:none}}
 </style>
-<script>(function(){var w=document.getElementById("welcome");if(!w)return;
-try{var dk=new Date().toDateString();if(sessionStorage.getItem("wl-mon")||localStorage.getItem("wl-mon-day")===dk){w.remove();return}sessionStorage.setItem("wl-mon","1");localStorage.setItem("wl-mon-day",dk)}catch(e){}
-var done=false;function close(){if(done)return;done=true;w.classList.add("out");setTimeout(function(){w.remove()},700)}
-w.addEventListener("click",close);w.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key==="Escape"||e.key===" ")close()});
-setTimeout(close,4600);})();</script>
+<script>(function(){
+var H="fcead8219610badddcc10a1666ecf82d8537fbca354eb98b0112a8db75894ce0",g=document.getElementById("gate"),w=document.getElementById("welcome");
+function fill(){try{var i=JSON.parse(localStorage.getItem("wtg-pinfo")||"null");if(!i)return;
+ document.getElementById("wl-p").textContent=i.nombre||"";
+ var pk=[];if(i.n)pk.push(i.n+" aerogeneradores");if(i.modelo)pk.push(i.modelo);if(i.potencia){pk.push(String(i.potencia).replace(".",",")+" MW c/u");if(i.n)pk.push((Math.round(i.n*i.potencia*10)/10).toString().replace(".",",")+" MW")}
+ if(pk.length){var e=document.getElementById("wl-pk");e.textContent=pk.join(" · ");e.hidden=false}}catch(x){}}
+function welcome(force){
+ try{var dk=new Date().toDateString();if(!force&&(sessionStorage.getItem("wl-mon")||localStorage.getItem("wl-mon-day")===dk)){w.remove();return}sessionStorage.setItem("wl-mon","1");localStorage.setItem("wl-mon-day",dk)}catch(e){}
+ fill();w.hidden=false;var done=false;function close(){if(done)return;done=true;w.classList.add("out");setTimeout(function(){w.remove()},700)}
+ w.addEventListener("click",close);w.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key==="Escape"||e.key===" ")close()});setTimeout(close,5200)}
+function sha(t){return crypto.subtle.digest("SHA-256",new TextEncoder().encode(t)).then(function(b){return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,"0")}).join("")})}
+var ok=false;try{ok=localStorage.getItem("wtg-auth")===H}catch(e){}
+if(ok){g.remove();welcome(false);return}
+g.hidden=false;setTimeout(function(){document.getElementById("g-us").focus()},300);
+document.getElementById("g-form").addEventListener("submit",function(e){e.preventDefault();
+ var u=document.getElementById("g-us").value.trim().toLowerCase(),pw=document.getElementById("g-pw").value,er=document.getElementById("g-er"),c=g.querySelector(".g-card");
+ sha(pw).then(function(h){if(u!=="vestas"||h!==H){er.textContent="Usuario o contraseña incorrectos";c.classList.remove("shake");void c.offsetWidth;c.classList.add("shake");return}
+  try{localStorage.setItem("wtg-auth",H)}catch(x){}g.classList.add("out");setTimeout(function(){g.remove()},600);welcome(true)})});
+})();</script>
 <div id="banner"></div>
 <header id="hdr"></header>
 <main id="main"><div class="card">Conectando…</div></main>
@@ -200,14 +272,15 @@ const CCOL=['#3fa9f5','#f5a623','#7ed321','#c86bff','#f8e71c','#50e3c2','#ff6b6b
 const MOTIVOS=['Viento','Grúa / equipo de izaje','Falta de material','Seguridad','Clima (lluvia / tormenta)','Logística / acceso','Calidad / NC','Otro'];
 
 let db=null, MODE='loading', NOTE='', cfgDirty=false;
-const S={cfg:null,turb:{},alarms:{}};
+const S={parks:{},cfg:null,info:null,turb:{},alarms:{},loaded:false,subPid:null};
 const UI={tab:'mapa',sel:null,moveMode:'turb',draft:{},ov:false,ms:.32};
-UI.vb={x:0,y:0,w:1000};
+UI.vb={x:0,y:0,w:1000};UI.ts=1;UI.cfgOpen=false;try{UI.pid=localStorage.getItem('wtg-pid')||null;const t=+localStorage.getItem('wtg-ts');if(t>=.4&&t<=3)UI.ts=t}catch(e){UI.pid=null}
 const FILT=[['lines','Líneas de circuito'],['box','Recuadro'],['name','Nombre WTG'],['circ','Circuito'],['pct','% avance'],['ghost','Piezas pendientes']];
 UI.le=false;UI.ec=0;UI.selV=null;
 UI.f={lines:true,box:false,name:true,circ:true,pct:true,ghost:false};UI.ident=false;
 try{Object.assign(UI.f,JSON.parse(localStorage.getItem('wtg-f')||'{}'));UI.ident=localStorage.getItem('wtg-ident')==='1'}catch(e){}
 try{const m=+localStorage.getItem('wtg-ms');if(m>=.1&&m<=1)UI.ms=m;const v=JSON.parse(localStorage.getItem('wtg-vb')||'null');if(v&&isFinite(v.w))UI.vb=v}catch(e){}
+function setTs(v){UI.ts=Math.max(.4,Math.min(3,Math.round(v*100)/100));const m=document.getElementById('map');if(m)m.innerHTML=mapSvg();const r=document.getElementById('tsr');if(r)r.value=UI.ts;try{localStorage.setItem('wtg-ts',UI.ts)}catch(_){}}
 function setMs(v){UI.ms=Math.max(.1,Math.min(1,Math.round(v*100)/100));const m=document.getElementById('map');if(m)m.innerHTML=mapSvg();const r=document.getElementById('msr');if(r)r.value=UI.ms;try{localStorage.setItem('wtg-ms',UI.ms)}catch(_){}}
 try{UI.draft.sup=localStorage.getItem('wtg-sup')||''}catch(e){}
 
@@ -241,37 +314,87 @@ function cPath(i){const n=cNodes(i),r=(S.cfg.circs[i].route)||{};const pts=[];co
   n.forEach((a,j)=>{pts.push(a);if(j<n.length-1){const key=a.id+'>'+n[j+1].id;(r[key]||[]).forEach(p=>{pts.push(p);wps.push(p)})}});return{pts,wps}}
 const cName=i=>(S.cfg.circs[i]&&S.cfg.circs[i].name)||('Circuito '+(i+1));
 
-/* ===== persistencia: base compartida (db) o local ===== */
-const LSK='wtg-montaje-v1';
-function lsSave(){try{localStorage.setItem(LSK,JSON.stringify(S))}catch(e){}}
-function lsLoad(){try{const v=JSON.parse(localStorage.getItem(LSK)||'null');if(v){S.cfg=v.cfg||null;S.turb=v.turb||{};S.alarms=v.alarms||{}}}catch(e){}}
+/* ===== persistencia: varios parques, base compartida (db) o local ===== */
+const PP=()=>'parques/'+UI.pid;
+function bindCfg(){const p=S.parks[UI.pid];S.cfg=p?p.cfg:null;S.info=p?p.info:null;if(S.info){try{localStorage.setItem('wtg-pinfo',JSON.stringify(S.info))}catch(e){}}}
+const LSK='wtg-montaje-v2';
+function lsAll(){try{const v=JSON.parse(localStorage.getItem(LSK)||'null');if(v)return v}catch(e){}return{parks:{},data:{}}}
+function lsSave(){const a=lsAll();a.parks=S.parks;if(UI.pid)a.data[UI.pid]={turb:S.turb,alarms:S.alarms};try{localStorage.setItem(LSK,JSON.stringify(a))}catch(e){toast('No hay espacio en este navegador para guardar')}}
+function lsLoad(){const a=lsAll();
+  try{const o=JSON.parse(localStorage.getItem('wtg-montaje-v1')||'null');if(o&&o.cfg&&!Object.keys(a.parks).length){const pid='p'+Date.now().toString(36);a.parks[pid]={info:{nombre:'Mi parque',n:o.cfg.turbs.length,circs:o.cfg.circs.length,modelo:'',potencia:0,creado:nowI()},cfg:o.cfg};a.data[pid]={turb:o.turb||{},alarms:o.alarms||{}};UI.pid=pid;localStorage.setItem(LSK,JSON.stringify(a))}}catch(e){}
+  S.parks=a.parks||{};if(!S.parks[UI.pid])UI.pid=Object.keys(S.parks)[0]||null;S.loaded=true;bindCfg();subPark()}
 const Q={};
 function serial(key,fn){const p=(Q[key]||Promise.resolve()).then(fn).catch(errH);Q[key]=p;return p}
-function errH(e){const c=e&&e.code;if(c==='invalid_argument')toast('No se pudo guardar: sin permiso de edición o dato inválido.');else if(c==='quota_exceeded')toast('Base de datos llena: '+(e.message||''));else if(c==='unavailable')toast('Sin conexión, el cambio no se guardó. Reintentá.');else toast('Error al guardar: '+((e&&e.message)||e))}
+function errH(e){const c=e&&e.code;if(c==='invalid_argument')toast('No se pudo guardar: Firebase rechazó el permiso (revisá las reglas).');else if(c==='quota_exceeded')toast('Base de datos llena: '+(e.message||''));else if(c==='unavailable')toast('Sin conexión, el cambio no se guardó. Reintentá.');else toast('Error al guardar: '+((e&&e.message)||e))}
 let cfgT=null;
-function saveCfg(now){render();if(MODE!=='db'){lsSave();return}cfgDirty=true;clearTimeout(cfgT);cfgT=setTimeout(()=>{const d=clone(S.cfg);serial('cfg',()=>db.doc('parque/config').set(d)).finally(()=>{cfgDirty=false})},now?0:500)}
-function saveTurb(id){render();if(MODE!=='db'){lsSave();return}const d={parts:clone(parts(id))};serial('t'+id,()=>db.doc('turbinas/'+id).set(d))}
-function saveAlarm(a){S.alarms[a.id]=a;render();if(MODE!=='db'){lsSave();return}const d=clone(a);serial('a'+a.id,()=>db.doc('alarmas/'+a.id).set(d))}
-function delAlarm(id){delete S.alarms[id];render();if(MODE!=='db'){lsSave();return}serial('a'+id,()=>db.doc('alarmas/'+id).delete())}
+function writePark(){const pid=UI.pid,d=clone({info:S.info,cfg:S.cfg});return serial('cfg'+pid,()=>db.doc('parques/'+pid).set(d)).finally(()=>{cfgDirty=false})}
+function saveCfg(now){if(!UI.pid)return;S.parks[UI.pid]={info:S.info,cfg:S.cfg};render();if(MODE!=='db'){lsSave();return}cfgDirty=true;clearTimeout(cfgT);cfgT=setTimeout(writePark,now?0:500)}
+function saveTurb(id){render();if(MODE!=='db'){lsSave();return}const d={parts:clone(parts(id))},pp=PP();serial('t'+id,()=>db.doc(pp+'/turbinas/'+id).set(d))}
+function saveAlarm(a){S.alarms[a.id]=a;render();if(MODE!=='db'){lsSave();return}const d=clone(a),pp=PP();serial('a'+a.id,()=>db.doc(pp+'/alarmas/'+a.id).set(d))}
+function delAlarm(id){delete S.alarms[id];render();if(MODE!=='db'){lsSave();return}const pp=PP();serial('a'+id,()=>db.doc(pp+'/alarmas/'+id).delete())}
 function setPart(id,k,val){const t=S.turb[id]?clone(S.turb[id]):{parts:{}};t.parts=t.parts||{};if(val)t.parts[k]=val;else delete t.parts[k];S.turb[id]=t;saveTurb(id)}
+let unT=null,unA=null;
+function subPark(){if(unT)unT();if(unA)unA();unT=unA=null;S.turb={};S.alarms={};S.subPid=UI.pid;if(!UI.pid)return;
+  if(MODE!=='db'){const d=lsAll().data[UI.pid]||{};S.turb=d.turb||{};S.alarms=d.alarms||{};return}
+  const pp=PP(),pid=UI.pid;
+  unT=db.collection(pp+'/turbinas').onSnapshot(q=>{if(S.subPid!==pid)return;const t={};q.docs.forEach(d=>t[d.id]=clone(d.data()));S.turb=t;render()},permErr);
+  unA=db.collection(pp+'/alarmas').onSnapshot(q=>{if(S.subPid!==pid)return;const a={};q.docs.forEach(d=>a[d.id]=clone(d.data()));S.alarms=a;render()},permErr)}
+function permErr(e){NOTE=e&&e.code==='invalid_argument'?'Firebase rechazó el acceso. Hay que actualizar las reglas de Firestore (permiso para las colecciones montaje_*).':'Error de base de datos: '+((e&&e.message)||e);render()}
+function selectPark(pid){if(pid===UI.pid)return;UI.pid=pid;try{localStorage.setItem('wtg-pid',pid)}catch(e){}UI.sel=null;UI.ov=false;UI.le=false;bindCfg();subPark();render();setTimeout(fitAll,50)}
+function newPid(){return 'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,5)}
+function migrate(){if(migrate.on)return;migrate.on=true;
+  const un=db.doc('parque/config').onSnapshot(s=>{if(s.metadata.fromCache&&!s.exists)return;un();if(!s.exists)return;
+    const old=clone(s.data()),pid=newPid(),info={nombre:'Mi parque',n:old.turbs.length,circs:old.circs.length,modelo:'',potencia:0,creado:nowI()};
+    db.doc('parques/'+pid).set({info,cfg:old});
+    const ut=db.collection('turbinas').onSnapshot(q=>{if(q.metadata.fromCache)return;ut();q.docs.forEach(d=>db.doc('parques/'+pid+'/turbinas/'+d.id).set(clone(d.data())))},()=>{});
+    const ua=db.collection('alarmas').onSnapshot(q=>{if(q.metadata.fromCache)return;ua();q.docs.forEach(d=>db.doc('parques/'+pid+'/alarmas/'+d.id).set(clone(d.data())))},()=>{});
+    UI.pid=pid;try{localStorage.setItem('wtg-pid',pid)}catch(e){}UI.cfgOpen=true;
+    toast('Pasé tus datos anteriores a un parque nuevo. Completá su nombre, modelo y potencia.')},()=>{})}
 
-function openOv(id){const was=UI.ov&&UI.sel===id;UI.sel=id;UI.ov=true;UI.ovMin=false;render();const o=document.querySelector('#ov .ovscroll');if(o&&!was)o.scrollTop=0}
-let wdrag=null;
-document.addEventListener('pointerdown',e=>{const bar=e.target.closest('#ov .ovbar');if(!bar||e.target.closest('button,select,input'))return;
-  const o=document.getElementById('ov');wdrag={sx:e.clientX,sy:e.clientY,x0:o.offsetLeft,y0:o.offsetTop,o};try{bar.setPointerCapture(e.pointerId)}catch(_){}e.preventDefault()});
-document.addEventListener('pointermove',e=>{if(!wdrag)return;const x=wdrag.x0+e.clientX-wdrag.sx,y=Math.max(0,wdrag.y0+e.clientY-wdrag.sy);wdrag.o.style.left=x+'px';wdrag.o.style.top=y+'px';UI.ovPos.x=x;UI.ovPos.y=y});
-document.addEventListener('pointerup',()=>{wdrag=null});
-async function flushSaves(){clearTimeout(cfgT);if(MODE==='db'&&cfgDirty){const d=clone(S.cfg);serial('cfg',()=>db.doc('parque/config').set(d)).finally(()=>{cfgDirty=false})}
+/* ===== respaldos ===== */
+function bkData(){return{v:2,fecha:nowI(),pid:UI.pid,info:clone(S.info),cfg:clone(S.cfg),turb:clone(S.turb),alarms:clone(S.alarms)}}
+function slug(t){return String(t||'parque').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-|-$/g,'').toLowerCase()}
+function download(name,text){try{const u=URL.createObjectURL(new Blob([text],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);return true}catch(e){return false}}
+async function doBackup(){if(!S.cfg)return;const d=bkData(),txt=JSON.stringify(d),f=d.fecha;
+  const fn=`respaldo-${slug(S.info&&S.info.nombre)}-${f.slice(0,16).replace(/[:T]/g,'-')}.json`;download(fn,txt);
+  if(MODE==='db'){await serial('bk',()=>db.doc('respaldos/b'+Date.now().toString(36)).set({pid:UI.pid,nombre:(S.info&&S.info.nombre)||'',fecha:f,data:txt}))}
+  else{const a=lsAll();a.bk=(a.bk||[]).concat([{pid:UI.pid,nombre:S.info.nombre,fecha:f,data:txt}]).slice(-10);try{localStorage.setItem(LSK,JSON.stringify(a))}catch(e){}}
+  S.info.lastBk=f;saveCfg(true);toast('Respaldo creado ✔ (archivo descargado'+(MODE==='db'?' + copia en la nube)':')'))}
+function loadBackups(){S.bk=null;render();
+  if(MODE!=='db'){S.bk=(lsAll().bk||[]).filter(b=>b.pid===UI.pid).map((b,i)=>({id:'l'+i,...b})).reverse();render();return}
+  const un=db.collection('respaldos').onSnapshot(q=>{if(q.metadata.fromCache&&q.empty)return;un();S.bk=q.docs.map(d=>({id:d.id,...d.data()})).filter(b=>b.pid===UI.pid).sort((a,b)=>a.fecha<b.fecha?1:-1).slice(0,20);render()},e=>{S.bk=[];permErr(e)})}
+function restoreData(d){if(!d||!d.cfg){toast('El archivo no es un respaldo válido');return}
+  const keepBk=S.info&&S.info.lastBk;S.info={...(d.info||S.info),lastBk:keepBk};S.cfg=d.cfg;S.parks[UI.pid]={info:S.info,cfg:S.cfg};
+  const nt=d.turb||{},na=d.alarms||{};
+  if(MODE==='db'){const pp=PP();writePark();
+    Object.keys(S.turb).forEach(id=>{if(!nt[id])serial('t'+id,()=>db.doc(pp+'/turbinas/'+id).delete())});
+    Object.keys(nt).forEach(id=>{const v=clone(nt[id]);serial('t'+id,()=>db.doc(pp+'/turbinas/'+id).set(v))});
+    Object.keys(S.alarms).forEach(id=>{if(!na[id])serial('a'+id,()=>db.doc(pp+'/alarmas/'+id).delete())});
+    Object.keys(na).forEach(id=>{const v=clone(na[id]);serial('a'+id,()=>db.doc(pp+'/alarmas/'+id).set(v))})}
+  S.turb=clone(nt);S.alarms=clone(na);if(MODE!=='db')lsSave();render();toast('Respaldo restaurado ✔')}
+const needBk=()=>S.info&&S.cfg&&(Object.keys(S.turb).length||S.cfg.locked)&&(!S.info.lastBk||Date.now()-new Date(S.info.lastBk)>864e5);
+
+function openOv(id){const was=UI.ov&&UI.sel===id;UI.sel=id;UI.ov=true;render();const o=document.querySelector('#ov .ovscroll');if(o&&!was)o.scrollTop=0}
+async function flushSaves(){clearTimeout(cfgT);if(MODE==='db'&&cfgDirty)writePark();
   let ok=true;try{await Promise.all(Object.values(Q).map(p=>p.then(()=>{},()=>{ok=false})))}catch(e){ok=false}return ok}
 async function init(){
+  document.body.insertAdjacentHTML('afterbegin',`<svg width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true"><defs>${DEFS}</defs></svg>`);
   render();
   let c=null;try{c=await Promise.race([window.FB_READY||Promise.resolve(null),new Promise(r=>setTimeout(()=>r(null),9000))])}catch(e){c=null}
   if(!c){MODE='local';lsLoad();render();return}
   db=c;MODE='db';
   const tm=setTimeout(()=>{NOTE='Todavía no se pudo leer la base de datos. Revisá la conexión; los datos pueden no estar actualizados.';render()},10000);
-  db.doc('parque/config').onSnapshot(s=>{if(!s.metadata.fromCache){clearTimeout(tm);NOTE=''}if(cfgDirty)return;S.cfg=s.exists?clone(s.data()):null;if(!S.cfgLoaded){S.cfgLoaded=true}render()},e=>{clearTimeout(tm);NOTE='Error de base de datos: '+(e.message||e.code);render()});
-  db.collection('turbinas').onSnapshot(q=>{const t={};q.docs.forEach(d=>t[d.id]=clone(d.data()));S.turb=t;render()},e=>{});
-  db.collection('alarmas').onSnapshot(q=>{const a={};q.docs.forEach(d=>a[d.id]=clone(d.data()));S.alarms=a;render()},e=>{});
+  db.collection('parques').onSnapshot(q=>{
+    if(!q.metadata.fromCache){clearTimeout(tm);if(NOTE.startsWith('Todavía')||NOTE.startsWith('Firebase'))NOTE=''}
+    const ps={};q.docs.forEach(d=>ps[d.id]=clone(d.data()));
+    if(cfgDirty&&S.parks[UI.pid])ps[UI.pid]=S.parks[UI.pid];
+    S.parks=ps;if(!q.metadata.fromCache)S.loaded=true;
+    if(!q.metadata.fromCache&&q.empty)migrate();
+    if(UI.pid&&!S.parks[UI.pid]&&S.loaded&&!migrate.on)UI.pid=null;
+    if(!UI.pid&&Object.keys(S.parks).length){UI.pid=Object.keys(S.parks).sort((a,b)=>((S.parks[a].info||{}).creado||'')<((S.parks[b].info||{}).creado||'')?-1:1)[0];try{localStorage.setItem('wtg-pid',UI.pid)}catch(e){}}
+    bindCfg();if(S.subPid!==UI.pid&&S.parks[UI.pid])subPark();
+    if(S.cfg&&!S.fitted){S.fitted=true;setTimeout(fitAll,60)}
+    render()},e=>{clearTimeout(tm);S.loaded=true;permErr(e)});
 }
 
 /* ===== configuración del parque ===== */
@@ -296,24 +419,28 @@ function applyCounts(nT,nC){
   while(c.turbs.length<nT){const ci=nC-1;const last=c.turbs.filter(t=>t.circ===ci).slice(-1)[0];c.turbs.push({id:'w'+c.nextId++,name:'WTG'+pad(c.turbs.length+1),circ:ci,x:Math.min(940,last?last.x+90:400),y:last?last.y:350})}
   c.turbs.length=nT;
   if(!c.turbs.find(t=>t.id===UI.sel))UI.sel=null;
+  if(S.info){S.info.n=nT;S.info.circs=nC}
   saveCfg(true);
 }
 
 /* ===== render general ===== */
 function render(){
   if(drag)return;
+  if(UI.tab==='config'){UI.tab='mapa';UI.cfgOpen=true}
   renderBanner();renderHeader();
-  const m=$('#main');
+  const m=$('#main');m.classList.toggle('wide',UI.tab==='mapa'&&!!S.cfg);
   if(MODE==='loading'){m.innerHTML='<div class="card">Conectando con la base de datos…</div>';return}
   if(!S.cfg){m.innerHTML=(NOTE?`<div class="note">${esc(NOTE)}</div>`:'')+setupView();return}
   let h=NOTE?`<div class="note">${esc(NOTE)}</div>`:'';
   if(MODE==='local')h+=`<div class="note">Modo local: los datos se guardan sólo en este navegador (Firebase no está configurado o no respondió).</div>`;
-  h+=({mapa:mapView,turbina:turbView,alarmas:alarmView,registro:logView,config:cfgView}[UI.tab])();
+  if(needBk())h+=`<div class="note row"><span class="grow">💾 ${S.info.lastBk?'Último respaldo: '+fmt(S.info.lastBk)+'.':'Todavía no hay respaldo de este parque.'} Creá uno para no perder información.</span><button class="sm pri" data-act="bk">Crear respaldo</button></div>`;
+  h+=({mapa:mapView,turbina:turbView,alarmas:alarmView,registro:logView}[UI.tab]||mapView)();
   if(UI.ov&&S.cfg.turbs.find(t=>t.id===UI.sel))h+=ovView();else UI.ov=false;
-  const oo=document.getElementById('ov');let sy=0;
-  if(oo){const sc=oo.querySelector('.ovscroll');sy=sc?sc.scrollTop:0;if(!UI.ovMin&&UI.ovPos){UI.ovPos.w=oo.offsetWidth;UI.ovPos.h=oo.offsetHeight}}
-  m.innerHTML=h;
-  const o=document.getElementById('ov');if(o){const sc=o.querySelector('.ovscroll');if(sc)sc.scrollTop=sy}
+  if(UI.cfgOpen)h+=cfgWin();
+  const sc0=document.querySelector('#ov .ovscroll'),sc1=document.querySelector('#cfgw .ovscroll');const y0=sc0?sc0.scrollTop:0,y1=sc1?sc1.scrollTop:0;
+  m.innerHTML=h;document.body.classList.toggle('modal-open',!!(UI.ov||UI.cfgOpen));
+  const a0=document.querySelector('#ov .ovscroll'),a1=document.querySelector('#cfgw .ovscroll');if(a0)a0.scrollTop=y0;if(a1)a1.scrollTop=y1;
+  const slot=document.getElementById('simslot');if(slot){if(!simEl)simBuild();slot.appendChild(simEl)}
 }
 const isDark=()=>{const t=document.documentElement.dataset.theme;return t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches};
 try{const t=localStorage.getItem('tema');if(t)document.documentElement.dataset.theme=t}catch(e){}
@@ -321,10 +448,11 @@ window.toggleTheme=()=>{const n=isDark()?'light':'dark';document.documentElement
 function renderHeader(){
   let tot='';
   if(S.cfg){const ts=S.cfg.turbs;const full=ts.filter(t=>prog(t.id).ok===PARTS.length).length;const pz=ts.reduce((a,t)=>a+prog(t.id).ok,0);tot=`<span class="badge tot">${full}/${ts.length} WTG completas · ${ts.length?Math.round(pz/(ts.length*PARTS.length)*100):0}% piezas</span>`}
-  const tabs=[['mapa','🗺️ Mapa'],['turbina','🌀 Turbina'],['alarmas','🚨 Alarmas'+(actAlarms().length?` (${actAlarms().length})`:'')],['registro','📋 Registro'],['config','⚙️ Configuración']];
-  const sub=S.cfg?`Vestas · ${S.cfg.turbs.length} WTG · ${S.cfg.circs.length} circuito${S.cfg.circs.length===1?'':'s'}`:'Vestas';
+  const tabs=[['mapa','🗺️ Mapa'],['turbina','🌀 Turbina'],['alarmas','🚨 Alarmas'+(actAlarms().length?` (${actAlarms().length})`:'')],['registro','📋 Registro']];
+  const I=S.info||{};const sub=S.cfg?[I.modelo||'Vestas',`${S.cfg.turbs.length} WTG`,totMW(I),`${S.cfg.circs.length} circ.`].filter(Boolean).join(' · '):'Vestas';
+  const pids=Object.keys(S.parks);const psel=pids.length?`<select class="psel" data-act2="park" title="Parque">${pids.map(id=>`<option value="${id}" ${id===UI.pid?'selected':''}>${esc((S.parks[id].info||{}).nombre||'Parque')}</option>`).join('')}<option value="__new">➕ Nuevo parque…</option></select>`:'';
   const st=MODE==='db'?'<span class="pill ok"><i></i>Compartido</span>':MODE==='local'?'<span class="pill lo"><i></i>Local</span>':'<span class="pill"><i></i>Conectando…</span>';
-  $('#hdr').innerHTML=`<div class="top"><div class="tit"><h1><svg class="wt" viewBox="0 0 40 44" width="30" height="34" aria-hidden="true"><polygon points="19,15 21,15 22.6,42 17.4,42" fill="currentColor" opacity=".85"/><g class="rot"><path d="M20 14 L18.7 1.5 Q20 -0.3 21.3 1.5 Z" fill="var(--ac)"/><path d="M20 14 L18.7 1.5 Q20 -0.3 21.3 1.5 Z" fill="var(--ac)" transform="rotate(120 20 14)"/><path d="M20 14 L18.7 1.5 Q20 -0.3 21.3 1.5 Z" fill="var(--ac)" transform="rotate(240 20 14)"/></g><circle cx="20" cy="14" r="2.3" fill="currentColor"/></svg> Avances de montaje</h1><div class="sub">${esc(sub)}</div></div>${tot}${st}<button class="sm" id="thm" data-act="theme" title="Modo claro / nocturno">${isDark()?'☀️':'🌙'}</button></div>`+
+  $('#hdr').innerHTML=`<div class="top"><div class="tit"><h1><svg class="wt" viewBox="0 0 40 44" width="30" height="34" aria-hidden="true"><polygon points="19,15 21,15 22.6,42 17.4,42" fill="currentColor" opacity=".85"/><g class="rot"><path d="M20 14 L18.7 1.5 Q20 -0.3 21.3 1.5 Z" fill="var(--ac)"/><path d="M20 14 L18.7 1.5 Q20 -0.3 21.3 1.5 Z" fill="var(--ac)" transform="rotate(120 20 14)"/><path d="M20 14 L18.7 1.5 Q20 -0.3 21.3 1.5 Z" fill="var(--ac)" transform="rotate(240 20 14)"/></g><circle cx="20" cy="14" r="2.3" fill="currentColor"/></svg> Avances de montaje</h1><div class="sub">${psel}<span>${esc(sub)}</span></div></div>${tot}${st}${S.cfg?'<button class="sm" data-act="cfg" title="Configuración">⚙️</button>':''}<button class="sm" id="thm" data-act="theme" title="Modo claro / nocturno">${isDark()?'☀️':'🌙'}</button></div>`+
    (S.cfg?`<nav class="tabs" id="tabs">${tabs.map(([k,l])=>`<button class="${UI.tab===k?'on':''}" data-act="tab" data-v="${k}">${l}</button>`).join('')}</nav>`:'');
 }
 function renderBanner(){
@@ -332,36 +460,88 @@ function renderBanner(){
   $('#banner').innerHTML=al.map(a=>`<div class="alarmb" data-act="goAlarm" data-v="${esc(a.turb)}">🚨 ALARMA · ${esc(tName(a.turb))} · ${esc(a.motivo)} · desde ${fmt(a.inicio)} · ⏱ <span data-since="${a.inicio}">${durS(aDur(a))}</span></div>`).join('');
 }
 
-/* ===== setup inicial ===== */
+/* ===== parques: crear / datos ===== */
+const MODELOS=['V162-6.2 MW EnVentus','V162-6.4 MW EnVentus','V172-7.2 MW EnVentus','V150-4.2 MW','V150-4.5 MW','V136-4.2 MW','V126-3.45 MW','V117-4.2 MW','V110-2.0 MW'];
+function parkForm(pre,i){i=i||{};return `<div class="pform">
+  <label class="full">Nombre del parque<input id="${pre}nom" value="${esc(i.nombre||'')}" placeholder="Ej.: PE Olavarría"></label>
+  <label>Turbinas<input type="number" id="${pre}n" min="1" max="300" value="${i.n||29}"></label>
+  <label>Circuitos<input type="number" id="${pre}c" min="1" max="20" value="${i.circs||4}"></label>
+  <label class="full">Modelo de aerogenerador<input id="${pre}mod" list="modelos" value="${esc(i.modelo||'')}" placeholder="Ej.: V162-6.4 MW EnVentus"></label>
+  <label>Potencia por aerogenerador (MW)<input type="number" id="${pre}pot" min="0" step="0.01" value="${i.potencia||''}" placeholder="6.4"></label>
+  <datalist id="modelos">${MODELOS.map(m=>`<option value="${m}">`).join('')}</datalist></div>`}
+function readPark(pre){const g=k=>document.getElementById(pre+k);const nombre=g('nom').value.trim();
+  if(!nombre){toast('Poné el nombre del parque');return null}
+  return{nombre,n:Math.max(1,Math.min(300,+g('n').value||1)),circs:Math.max(1,Math.min(20,+g('c').value||1)),modelo:g('mod').value.trim(),potencia:Math.max(0,+String(g('pot').value).replace(',','.')||0)}}
+function createPark(i){const pid=newPid();const info={...i,creado:nowI()};const cfg=newCfg(i.n,i.circs);
+  S.parks[pid]={info,cfg};UI.pid=pid;try{localStorage.setItem('wtg-pid',pid)}catch(e){}bindCfg();subPark();UI.tab='mapa';saveCfg(true);setTimeout(fitAll,60);
+  setTimeout(()=>modal(`<h2>💾 Crear respaldo</h2><p>Parque <b>${esc(info.nombre)}</b> creado. ¿Querés crear el primer respaldo ahora? Se descarga un archivo y queda una copia en la nube.</p><p class="mut" style="font-size:12px">Te lo voy a recordar una vez por día mientras haya cambios.</p>`,doBackup,'Crear respaldo'),400)}
 function setupView(){
-  return `<div class="card" style="max-width:520px;margin:20px auto"><h2>Crear el parque</h2>
-  <p class="mut">Elegí cuántas turbinas y cuántos circuitos tiene el parque. Después podés asignar cada turbina a su circuito y moverlas en el mapa.</p>
-  <div class="row"><label>Turbinas <input type="number" id="sT" min="1" max="200" value="5"></label>
-  <label>Circuitos <input type="number" id="sC" min="1" max="10" value="2"></label></div>
-  <p class="mut" style="font-size:12px">Se reparten en orden (ej.: 5 turbinas y 2 circuitos → 3 en el C1 y 2 en el C2). Se puede cambiar en Configuración.</p>
+  if(!S.loaded)return '<div class="card">Cargando parques…</div>';
+  return `<div class="card" style="max-width:560px;margin:20px auto"><h2>Crear un parque</h2>
+  <p class="mut">Cargá los datos del parque. Con esto se arma el mapa y la presentación de bienvenida.</p>${parkForm('s')}
+  <p class="mut" style="font-size:12px">Las turbinas se reparten en orden entre los circuitos. Después se puede cambiar todo en ⚙️ Configuración.</p>
   <button class="pri" data-act="create">Crear parque</button></div>`;
 }
+const totMW=i=>i&&i.potencia&&i.n?(Math.round(i.n*i.potencia*10)/10).toLocaleString('es-AR')+' MW':'';
 
 /* ===== mapa ===== */
 function mapView(){
   const c=S.cfg;
   const counts=c.circs.map((_,i)=>c.turbs.filter(t=>t.circ===i));
-  return `<div class="card nofx"><div class="row" style="margin-bottom:8px">
+  return `<div class="maplay"><aside class="simp">${simPanel()}</aside><div class="mapc"><div class="card nofx"><div class="row" style="margin-bottom:8px">
    ${c.locked?'<button data-act="lock">🔓 Editar posiciones</button>':'<button class="pri" data-act="savelock">💾 Guardar y bloquear posiciones</button>'}
-   <span class="mut">Zoom:</span><button class="sm" data-act="zoom" data-v="0.77">＋</button><button class="sm" data-act="zoom" data-v="1.3">－</button><button class="sm" data-act="zreset" title="Ver todo">⤢ Ver todo</button>
-   <span class="mut">Cuadro:</span><button class="sm" data-act="msz" data-v="0.87">－</button><input type="range" id="msr" min="0.1" max="1" step="0.01" value="${UI.ms}" style="width:110px"><button class="sm" data-act="msz" data-v="1.15">＋</button>
-   ${c.locked?'':`<span class="mut">Mover:</span><button class="${UI.moveMode==='turb'?'on':''}" data-act="mm" data-v="turb">Turbina</button><button class="${UI.moveMode==='circ'?'on':''}" data-act="mm" data-v="circ">Circuito completo</button>`}
-   <span class="mut grow" style="font-size:12px">${c.locked?'🔒 Posiciones guardadas. Tocá una turbina para abrirla. Arrastrá el fondo para mover el mapa; rueda o pellizco para acercar.':'Arrastrá turbinas para ubicarlas (el fondo mueve el mapa) y después tocá “Guardar y bloquear”.'}</span></div>
-   ${UI.le?lineEditor():`<div class="row" style="margin-bottom:8px"><button data-act="le">✏️ Editar líneas de circuito</button></div>`}
-   <div class="row" style="margin-bottom:8px;gap:6px"><span class="mut">Mostrar:</span>${FILT.map(([k,l])=>`<button class="sm ${UI.f[k]?'on':''}" data-act="filt" data-v="${k}">${UI.f[k]?'☑':'☐'} ${l}</button>`).join('')}</div>
+   <span class="mut">Zoom</span><button class="sm" data-act="zoom" data-v="0.77">＋</button><button class="sm" data-act="zoom" data-v="1.3">－</button><button class="sm" data-act="zreset" title="Ver todo">⤢ Ver todo</button>
+   <span class="grow"></span><button data-act="cfg">⚙️ Configuración</button></div>
+   <div class="row" style="margin-bottom:8px">
+   <span class="mut">Aero</span><button class="sm" data-act="msz" data-v="0.87">－</button><input type="range" id="msr" min="0.1" max="1" step="0.01" value="${UI.ms}" style="width:100px"><button class="sm" data-act="msz" data-v="1.15">＋</button>
+   <span class="mut">Texto</span><button class="sm" data-act="tsz" data-v="0.87">－</button><input type="range" id="tsr" min="0.4" max="3" step="0.05" value="${UI.ts}" style="width:100px"><button class="sm" data-act="tsz" data-v="1.15">＋</button>
+   ${c.locked?'':`<span class="mut">Mover</span><button class="sm ${UI.moveMode==='turb'?'on':''}" data-act="mm" data-v="turb">Turbina</button><button class="sm ${UI.moveMode==='circ'?'on':''}" data-act="mm" data-v="circ">Circuito</button>`}</div>
+   ${UI.le?lineEditor():`<div class="row" style="margin-bottom:8px"><button class="sm" data-act="le">✏️ Editar líneas de circuito</button><span class="mut" style="font-size:12px">${c.locked?'🔒 Tocá una turbina para abrirla. Arrastrá el fondo para moverte; rueda o pellizco para acercar.':'Arrastrá las turbinas para ubicarlas y después tocá “Guardar y bloquear”.'}</span></div>`}
+   <div class="row" style="margin-bottom:8px;gap:6px"><span class="mut">Mostrar</span>${FILT.map(([k,l])=>`<button class="sm ${UI.f[k]?'on':''}" data-act="filt" data-v="${k}">${UI.f[k]?'☑':'☐'} ${l}</button>`).join('')}</div>
    <div class="mapwrap"><svg id="map" class="map ${c.locked?'':'unlocked'}" viewBox="${vbStr()}">${mapSvg()}</svg></div>
    <div class="legend" style="margin-top:8px">${counts.map((ts,i)=>`<span><i class="dot" style="background:${cc(i)}"></i>${esc(cName(i))} (${ts.length} WTG · ${ts.filter(t=>prog(t.id).ok===PARTS.length).length} completas)</span>`).join('')}
-   <span><i class="dot" style="background:#ffd400"></i>Izando</span></div></div>${summary()}`;
+   <span><i class="dot" style="background:#ffd400"></i>Izando</span></div></div></div><aside class="sump">${summary()}</aside></div>`;
+}
+/* ===== simulación de montaje (panel izquierdo) ===== */
+const SEQ=['base','t1','t2','t3','t4','t5','nacelle','pt','rad','hub','pa','pb','pc'];
+const HOOK={base:[230,444],t1:[230,392],t2:[230,334],t3:[230,276],t4:[230,218],t5:[230,160],nacelle:[217,129],pt:[234,140],rad:[184,110],hub:[277,133],pa:[272,147],pb:[272,147],pc:[272,147]};
+let simEl=null,simI=0,simT=null;
+function simBuild(){
+  simEl=document.createElement('div');simEl.className='simbox';
+  const pc=k=>`<g class="sp" data-k="${k}">${air(k)}</g>`;
+  simEl.innerHTML=`<svg class="simsvg" viewBox="120 -20 300 510" aria-hidden="true"><defs>${DEFS}</defs>
+   <rect x="120" y="-20" width="300" height="${GND+20}" fill="url(#gSky)"/><path d="M120,420 C180,404 250,412 300,401 C350,392 390,404 420,396 L420,${GND} L120,${GND}Z" fill="#17261f"/>
+   <rect x="120" y="${GND}" width="300" height="40" fill="url(#gEarth)"/><ellipse cx="262" cy="458" rx="80" ry="5" fill="#000" opacity=".45"/>
+   <g class="crane"><line x1="406" y1="${GND}" x2="406" y2="-6" stroke="#f59e0b" stroke-width="3"/><line x1="406" y1="-4" x2="190" y2="-4" stroke="#f59e0b" stroke-width="3"/></g>
+   <line class="hook" x1="0" y1="-4" x2="0" y2="0" stroke="#fcd34d" stroke-width="1.2" stroke-dasharray="3 2"/>
+   ${SEQ.filter(k=>!['pa','pb','pc'].includes(k)).map(pc).join('')}<g class="srotor">${pc('pa')}${pc('pb')}${pc('pc')}</g>${pc('hub')}</svg>
+   <div class="simcap"><b id="simname">—</b><span id="simstep"></span></div>`;
+  simI=0;simStep();
+}
+function simStep(){
+  if(!simEl)return;clearTimeout(simT);const svg=simEl.querySelector('svg');
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){simEl.querySelectorAll('.sp').forEach(g=>g.classList.add('on'));svg.classList.add('done');return}
+  if(simI===0){svg.classList.remove('done','fade');simEl.querySelectorAll('.sp').forEach(g=>g.classList.remove('on','drop'))}
+  if(simI<SEQ.length){const k=SEQ[simI],g=svg.querySelector(`.sp[data-k="${k}"]`);g.classList.add('on','drop');
+    const h=svg.querySelector('.hook'),[x,y]=HOOK[k];h.setAttribute('x1',x);h.setAttribute('x2',x);h.setAttribute('y2',y);h.classList.remove('go');void h.getBBox();h.classList.add('go');
+    const nm=simEl.querySelector('#simname'),st=simEl.querySelector('#simstep');if(nm)nm.textContent=PK[k].n;if(st)st.textContent=`Pieza ${simI+1} de ${SEQ.length}`;
+    simI++;simT=setTimeout(simStep,1500)}
+  else if(simI===SEQ.length){svg.classList.add('done');const nm=simEl.querySelector('#simname'),st=simEl.querySelector('#simstep');if(nm)nm.textContent='Aerogenerador montado';if(st)st.textContent='';simI++;simT=setTimeout(simStep,4200)}
+  else{svg.classList.add('fade');simI=0;simT=setTimeout(simStep,900)}
+}
+function simPanel(){
+  const ts=S.cfg.turbs,cur=[],last=[];
+  ts.forEach(t=>{const ps=parts(t.id);PARTS.forEach(p=>{const v=ps[p.k];if(!v||!v.inicio)return;if(!v.fin)cur.push({t,p,v});else last.push({t,p,v})})});
+  last.sort((a,b)=>a.v.fin<b.v.fin?1:-1);
+  return `<div class="card simcard"><h2>Secuencia de montaje</h2><div id="simslot"></div></div>
+   <div class="card"><h2>Izando ahora</h2>${cur.length?cur.map(x=>`<div class="lst" data-act="openT" data-v="${x.t.id}"><i class="dot" style="background:var(--nt)"></i><b>${esc(x.t.name)}</b> ${x.p.n}<span class="mut">desde ${new Date(x.v.inicio).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}</span></div>`).join(''):'<p class="mut" style="margin:0;font-size:13px">Nada izándose.</p>'}</div>
+   <div class="card"><h2>Últimas montadas</h2>${last.slice(0,6).map(x=>`<div class="lst" data-act="openT" data-v="${x.t.id}"><i class="dot" style="background:${x.p.c}"></i><b>${esc(x.t.name)}</b> ${x.p.n}<span class="mut">${fmt(x.v.fin)}</span></div>`).join('')||'<p class="mut" style="margin:0;font-size:13px">Todavía no hay piezas montadas.</p>'}</div>`;
 }
 function lineEditor(){
   const c=S.cfg,i=Math.min(UI.ec,c.circs.length-1),ci=c.circs[i];UI.ec=i;
   return `<div class="card" style="border-color:${cc(i)}"><div class="row" style="margin-bottom:8px"><b>✏️ Editando línea</b>
    <select data-act2="ec">${c.circs.map((x,j)=>`<option value="${j}" ${j===i?'selected':''}>${esc(x.name)}</option>`).join('')}</select>
+   <label class="row" style="gap:4px">Nombre <input data-cst="name" value="${esc(ci.name)}" style="width:130px"></label>
    <label class="row" style="gap:4px">Color <input type="color" data-cst="color" value="${cc(i)}" style="width:42px;padding:2px;height:32px"></label>
    <label class="row" style="gap:4px">Grosor <input type="range" data-cst="w" min="1" max="30" step="1" value="${ci.w||5}" style="width:110px"><b id="cwv">${ci.w||5}</b></label>
    <label class="row" style="gap:4px">Tipo <select data-cst="type">${LTYPES.map(([k,l])=>`<option value="${k}" ${(ci.type||'solid')===k?'selected':''}>${l}</option>`).join('')}</select></label></div>
@@ -390,15 +570,15 @@ function mapSvg(){
     if(ty==='double'){s+=`<polyline data-cl="${i}" points="${P}" fill="none" stroke="${col}" stroke-width="${w*2.4}" stroke-linejoin="round"/><polyline points="${P}" fill="none" style="stroke:var(--mapbg)" stroke-width="${w*1.1}" stroke-linejoin="round" pointer-events="none"/>`}
     else s+=`<polyline data-cl="${i}" points="${P}" fill="none" stroke="${col}" stroke-width="${ty==='at'?Math.max(1.5,w*.5):w}" stroke-linejoin="round" stroke-linecap="${ty==='dot'||ty==='dashdot'?'round':'butt'}" ${da?`stroke-dasharray="${da}"`:''} opacity=".9"/>`;
     if(ty==='at'){const z=Math.max(.8,w/4);wps.forEach(p=>{s+=`<g transform="translate(${p.x},${p.y}) scale(${z})" pointer-events="none"><path d="M0,-14 L-7,9 M0,-14 L7,9 M-9,-8 L9,-8 M-6,-1 L6,-1 M-4,4 L4,4 M-7,9 L7,9 M-3.5,-1 L5,4 M3.5,-1 L-5,4" style="stroke:var(--mapbg)" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M0,-14 L-7,9 M0,-14 L7,9 M-9,-8 L9,-8 M-6,-1 L6,-1 M-4,4 L4,4 M-7,9 L7,9 M-3.5,-1 L5,4 M3.5,-1 L-5,4" stroke="${col}" stroke-width="1.8" fill="none" stroke-linecap="round"/></g>`})}
-    const a=pts[0],b=pts[1];if(b&&!UI.le)s+=`<text class="mt" x="${(a.x+b.x)/2}" y="${(a.y+b.y)/2-8}" fill="${col}" font-size="20" font-weight="700" text-anchor="middle">${esc(ci.name)}</text>`});
+    const a=pts[0],b=pts[1];if(b&&!UI.le)s+=`<text class="mt" x="${(a.x+b.x)/2}" y="${(a.y+b.y)/2-8}" fill="${col}" font-size="${Math.round(20*UI.ts)}" font-weight="700" text-anchor="middle">${esc(ci.name)}</text>`});
   s+=`<g data-set="1" class="tn" transform="translate(${c.set.x},${c.set.y})"><rect x="-26" y="-18" width="52" height="36" rx="5" fill="#2b3440" stroke="#fff" stroke-width="2"/><text y="5" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">SET</text></g>`;
   const k=UI.ms;
   c.turbs.forEach(t=>{const p=prog(t.id);const col=cc(t.circ);const al=tAlarms(t.id).length;const done=p.ok===PARTS.length;
-    const fs=Math.max(11,Math.round(14*k/.22));const pc=done?'#2ecc71':p.ok||p.cur?'#ffd400':'#93a0b0';
+    const fs=Math.max(6,Math.round(16*UI.ts));const pc=done?'#2ecc71':p.ok||p.cur?'#ffd400':'#93a0b0';
     const lines=[];if(f.name)lines.push([esc(t.name)+(al?' 🚨':''),f.box?'#fff':col,fs,800]);if(f.circ)lines.push([esc(cName(t.circ)),col,Math.round(fs*.8),600]);if(f.pct)lines.push([p.pct+'%',pc,Math.round(fs*.85),700]);
     const th=lines.reduce((a,l)=>a+l[2]+3,0);
     const x0=-175*k-6,y0=-(464-10)*k-6,w=350*k+12,h=454*k+12+th+12;
-    let yy=Math.max(4,14*k);
+    let yy=Math.max(4,14*k)+2;
     s+=`<g class="tn ${al?'alarm':''} ${done?'done':''}" data-tid="${t.id}" transform="translate(${t.x},${t.y})">
      ${f.box?`<rect class="card-t" x="${x0}" y="${y0}" width="${w}" height="${h}" rx="8" stroke="${col}"/><rect x="${x0+4}" y="${y0+4}" width="${(w-8)*p.ok/PARTS.length}" height="4" fill="#2ecc71"/>`:`<rect class="hitb" x="${x0}" y="${y0}" width="${w}" height="${h}" rx="8"/>`}
      <ellipse cx="${14*k}" cy="${6*k}" rx="${80*k}" ry="${10*k}" fill="#000" opacity=".45"/>
@@ -555,22 +735,16 @@ function turbView(){
    <div class="card"><h2>Tiempo perdido · ${esc(t.name)}: ${dur(lostMs)}</h2>${lost.length?`<div class="tw"><table><tr><th>Motivo</th><th>Inicio</th><th>Fin</th><th>Duración</th></tr>${lost.sort((a,b)=>a.inicio<b.inicio?1:-1).map(a=>`<tr><td>${esc(a.motivo)}${a.turb==='PARQUE'?' <span class="badge">parque</span>':''}<div class="mut" style="font-size:11px">${esc(a.detalle)} · ${esc(a.sup)}</div></td><td>${fmt(a.inicio)}</td><td>${a.fin?fmt(a.fin):'<b style="color:var(--bad)">ACTIVA</b>'}</td><td>${dur(aDur(a))}</td></tr>`).join('')}</table></div>`:'<p class="mut">Sin alarmas registradas.</p>'}</div>
   </div></div>`;
 }
-function ovPos(){
-  const W=innerWidth,H=innerHeight;let P=UI.ovPos;
-  if(!P){P=W<700?{x:6,y:Math.round(H*.3),w:W-12,h:Math.round(H*.68)}:{w:Math.min(640,W-24),h:H-90,x:0,y:72};if(W>=700)P.x=W-P.w-14;UI.ovPos=P}
-  P.w=Math.min(P.w,W-8);P.h=Math.min(P.h,H-8);P.x=Math.max(-P.w+120,Math.min(W-120,P.x));P.y=Math.max(0,Math.min(H-48,P.y));return P}
 function ovView(){
   const c=S.cfg,id=UI.sel,t=c.turbs.find(x=>x.id===id),p=prog(id),idx=c.turbs.indexOf(t);
   const full=turbView(),i1=full.indexOf('<div class="grid2">');
   const body=full.slice(i1+'<div class="grid2">'.length,full.lastIndexOf('</div>'));
   const al=actAlarms();
-  const P=ovPos();
-  return `<div id="ov" class="${UI.ovMin?'min':''}" style="left:${P.x}px;top:${P.y}px;width:${P.w}px;height:${P.h}px">
-   <div class="ovbar"><span class="grip" title="Arrastrá para mover">⋮⋮</span><button class="sm" data-act="ovnav" data-v="-1" ${idx<=0?'disabled':''}>◀</button>
+  return `<div class="mbg" data-act="ovclose"></div><div id="ov" class="win" role="dialog" aria-label="Avance de ${esc(t.name)}">
+   <div class="ovbar"><button class="sm" data-act="ovnav" data-v="-1" ${idx<=0?'disabled':''}>◀</button>
    <div><b style="font-size:16px">${esc(t.name)}</b> <span class="mut" style="font-size:12px">· ${esc(cName(t.circ))}</span><div class="mut" style="font-size:12px">${p.ok}/${PARTS.length} piezas${p.cur?` · ${p.cur} izando`:''} · ${p.pct}%</div></div>
    <button class="sm" data-act="ovnav" data-v="1" ${idx>=c.turbs.length-1?'disabled':''}>▶</button>
    <div class="grow" style="min-width:50px"><div class="bar"><i style="width:${p.pct}%"></i></div></div>
-   <button class="sm" data-act="ovmin" title="${UI.ovMin?'Expandir':'Minimizar'}">${UI.ovMin?'▢':'—'}</button>
    <button class="pri sm" data-act="ovclose" style="font-weight:700;padding:6px 10px">💾 Guardar y cerrar</button></div>
    <div class="ovscroll">${al.map(a=>`<div class="alarmb" data-act="goAlarm" data-v="${esc(a.turb)}">🚨 ALARMA · ${esc(tName(a.turb))} · ${esc(a.motivo)} · ⏱ <span data-since="${a.inicio}">${durS(aDur(a))}</span></div>`).join('')}
    <div class="ovbody">${body}</div></div></div>`;
@@ -630,12 +804,32 @@ function csv(){
   return L.join('\n');
 }
 
+/* ===== ventana de configuración ===== */
+function cfgWin(){
+  const I=S.info||{};
+  const bk=S.bk===undefined?`<button class="sm" data-act="bklist">☁️ Ver respaldos en la nube</button>`:S.bk===null?'<span class="mut">Cargando respaldos…</span>':
+    (S.bk.length?`<div class="tw"><table><tr><th>Fecha</th><th>Parque</th><th></th></tr>${S.bk.map(b=>`<tr><td>${fmt(b.fecha)}</td><td>${esc(b.nombre)}</td><td><button class="sm" data-act="bkrest" data-v="${b.id}">↩ Restaurar</button></td></tr>`).join('')}</table></div>`:'<span class="mut">No hay respaldos en la nube de este parque.</span>');
+  return `<div class="mbg" data-act="cfgclose"></div><div id="cfgw" class="win" role="dialog" aria-label="Configuración">
+   <div class="ovbar"><b style="font-size:16px">⚙️ Configuración · ${esc(I.nombre||'')}</b><span class="grow"></span><button class="pri sm" data-act="cfgclose" style="font-weight:700;padding:6px 12px">💾 Guardar y cerrar</button></div>
+   <div class="ovscroll"><div class="ovbody">
+   <div class="card"><h2>Datos del parque</h2><p class="mut" style="font-size:12px;margin-top:0">Se usan en la presentación de bienvenida.</p>
+    <div class="pform"><label class="full">Nombre del parque<input data-inf="nombre" value="${esc(I.nombre||'')}"></label>
+    <label class="full">Modelo de aerogenerador<input data-inf="modelo" list="modelos" value="${esc(I.modelo||'')}"></label>
+    <label>Potencia por aerogenerador (MW)<input type="number" step="0.01" min="0" data-inf="potencia" value="${I.potencia||''}"></label>
+    <label>Potencia total<input disabled value="${totMW({...I,n:S.cfg.turbs.length})||'—'}"></label>
+    <datalist id="modelos">${MODELOS.map(m=>`<option value="${m}">`).join('')}</datalist></div></div>
+   <div class="card"><h2>💾 Respaldos</h2><p class="mut" style="font-size:12px;margin-top:0">${I.lastBk?'Último respaldo: '+fmt(I.lastBk):'Todavía no hay respaldos de este parque.'} Cada respaldo descarga un archivo y guarda una copia en la nube.</p>
+    <div class="row" style="margin-bottom:8px"><button class="pri" data-act="bk">Crear respaldo ahora</button><label class="btnlike">📂 Restaurar desde archivo<input type="file" accept=".json,application/json" id="bkfile" hidden></label></div>${bk}</div>
+   ${cfgView()}
+   <div class="card"><h2>Sesión</h2><div class="row"><button data-act="newpark">➕ Nuevo parque</button><button data-act="logout">Cerrar sesión</button><span class="grow"></span><button class="danger" data-act="delpark">Eliminar este parque</button></div></div>
+   </div></div></div>`;
+}
 /* ===== vista configuración ===== */
 function cfgView(){
   const c=S.cfg;
   return `<div class="card"><h2>Tamaño del parque</h2><div class="row">
    <label>Turbinas <input type="number" id="cT" min="1" max="200" value="${c.turbs.length}"></label>
-   <label>Circuitos <input type="number" id="cC" min="1" max="10" value="${c.circs.length}"></label>
+   <label>Circuitos <input type="number" id="cC" min="1" max="20" value="${c.circs.length}"></label>
    <button class="pri" data-act="apply">Aplicar</button></div>
    <p class="mut" style="font-size:12px">Si reducís la cantidad, se quitan las últimas turbinas de la lista (sus registros quedan guardados por si las volvés a agregar).</p></div>
   <div class="card"><h2>Circuitos</h2>${c.circs.map((ci,i)=>`<div class="row" style="margin-bottom:6px"><i class="dot" style="background:${cc(i)}"></i><input data-cname="${i}" value="${esc(ci.name)}"><span class="mut">${c.turbs.filter(t=>t.circ===i).length} turbinas</span></div>`).join('')}</div>
@@ -672,7 +866,17 @@ document.addEventListener('click',e=>{
    case 'tab':UI.tab=v;render();break;
    case 'theme':window.toggleTheme();break;
    case 'goAlarm':if(v==='PARQUE'){UI.ov=false;UI.tab='alarmas';render()}else openOv(v);break;
-   case 'create':{const nT=Math.max(1,Math.min(200,+$('#sT').value||1)),nC=Math.max(1,Math.min(10,+$('#sC').value||1));S.cfg=newCfg(nT,nC);UI.tab='mapa';saveCfg(true);break}
+   case 'create':{const i=readPark('s');if(i)createPark(i);break}
+   case 'newpark':UI.cfgOpen=false;render();modal(`<h2>➕ Nuevo parque</h2>${parkForm('m')}`,()=>{const i=readPark('m');if(i)createPark(i)},'Crear parque');break;
+   case 'cfg':UI.cfgOpen=true;S.bk=undefined;render();break;
+   case 'cfgclose':UI.cfgOpen=false;flushSaves().then(ok=>{render();toast(ok?'Configuración guardada ✔':'Revisá: hubo un error al guardar')});break;
+   case 'bk':doBackup();break;
+   case 'bklist':loadBackups();break;
+   case 'bkrest':{const b2=(S.bk||[]).find(x=>x.id===v);if(!b2)break;modal(`<p>¿Restaurar el respaldo del <b>${fmt(b2.fecha)}</b>? Reemplaza la configuración, los registros de montaje y las alarmas actuales de este parque.</p>`,()=>{try{restoreData(JSON.parse(b2.data))}catch(x){toast('Respaldo dañado')}},'Restaurar',true);break}
+   case 'logout':modal('<p>¿Cerrar sesión en este dispositivo?</p>',()=>{try{localStorage.removeItem('wtg-auth')}catch(x){}location.reload()},'Cerrar sesión');break;
+   case 'delpark':modal(`<p>¿Eliminar el parque <b>${esc((S.info||{}).nombre)}</b> de la lista?</p><p class="mut" style="font-size:12px">Antes se descarga un respaldo automático por las dudas.</p>`,async()=>{await doBackup();const pid=UI.pid;delete S.parks[pid];UI.cfgOpen=false;
+       if(MODE==='db')serial('del',()=>db.doc('parques/'+pid).delete());else lsSave();UI.pid=null;S.subPid=null;const nx=Object.keys(S.parks)[0];if(nx)selectPark(nx);else{bindCfg();subPark();render()}},'Eliminar',true);break;
+   case 'tsz':setTs(UI.ts*(+v));break;
    case 'lock':c.locked=!c.locked;saveCfg(true);break;
    case 'mm':UI.moveMode=v;render();break;
    case 'zoom':zoomAt(+v);break;
@@ -685,7 +889,6 @@ document.addEventListener('click',e=>{
    case 'filt':UI.f[v]=!UI.f[v];try{localStorage.setItem('wtg-f',JSON.stringify(UI.f))}catch(_){};render();break;
    case 'ident':UI.ident=!UI.ident;try{localStorage.setItem('wtg-ident',UI.ident?'1':'0')}catch(_){};render();break;
    case 'savelock':c.locked=true;saveCfg(true);flushSaves().then(ok=>toast(ok?'Posiciones guardadas y bloqueadas 🔒':'Bloqueado, pero hubo un error al guardar'));break;
-   case 'ovmin':UI.ovMin=!UI.ovMin;render();break;
    case 'ovclose':flushSaves().then(ok=>{UI.ov=false;render();toast(ok?'Montaje guardado ✔':'Revisá: hubo un error al guardar')});break;
    case 'ovnav':{const i=c.turbs.findIndex(t=>t.id===UI.sel)+(+v);if(c.turbs[i])openOv(c.turbs[i].id);break}
    case 'nav':{const i=c.turbs.findIndex(t=>t.id===UI.sel)+(+v);if(c.turbs[i]){UI.sel=c.turbs[i].id;render()}break}
@@ -698,7 +901,7 @@ document.addEventListener('click',e=>{
    case 'aend':{const a=S.alarms[v];if(a)saveAlarm({...a,fin:nowI()});break}
    case 'adel':modal('<p>¿Eliminar esta alarma del historial?</p>',()=>delAlarm(v),'Eliminar',true);break;
    case 'csv':{const t=csv();navigator.clipboard.writeText(t).then(()=>toast('CSV copiado. Pegalo en Excel o Sheets.'),()=>{modal(`<h2>CSV</h2><textarea style="width:100%;height:220px;background:var(--bg);color:var(--tx)">${esc(t)}</textarea>`,()=>{},'Cerrar')});break}
-   case 'apply':{const nT=Math.max(1,Math.min(200,+$('#cT').value||1)),nC=Math.max(1,Math.min(10,+$('#cC').value||1));
+   case 'apply':{const nT=Math.max(1,Math.min(200,+$('#cT').value||1)),nC=Math.max(1,Math.min(20,+$('#cC').value||1));
      if(nT<c.turbs.length||nC<c.circs.length)modal(`<p>Vas a reducir el parque a <b>${nT}</b> turbinas y <b>${nC}</b> circuitos. Se quitan las últimas de la lista.</p>`,()=>applyCounts(nT,nC),'Aplicar');else applyCounts(nT,nC);break}
    case 'relayout':autoLayout(c);saveCfg(true);toast('Posiciones reordenadas por circuito');break;
    case 'up':case 'down':{const i=+v,j=b.dataset.act==='up'?i-1:i+1;[c.turbs[i],c.turbs[j]]=[c.turbs[j],c.turbs[i]];saveCfg();break}
@@ -706,11 +909,15 @@ document.addEventListener('click',e=>{
        Object.keys(S.turb).forEach(id=>{S.turb[id]={parts:{}};saveTurb(id)});Object.keys(S.alarms).forEach(delAlarm);toast('Registros borrados')},'Borrar todo',true);break;
   }
 });
-document.addEventListener('input',e=>{if(e.target.dataset.cst){const ci=S.cfg.circs[UI.ec],f=e.target.dataset.cst;ci[f]=f==='w'?+e.target.value:e.target.value;const w=document.getElementById('cwv');if(w&&f==='w')w.textContent=ci.w;const m=document.getElementById('map');if(m)m.innerHTML=mapSvg();return}if(e.target.id==='msr'){setMs(+e.target.value);return}const d=e.target.dataset.draft;if(d)UI.draft[d]=e.target.value});
+document.addEventListener('input',e=>{if(e.target.dataset.cst){const ci=S.cfg.circs[UI.ec],f=e.target.dataset.cst;ci[f]=f==='w'?+e.target.value:e.target.value;if(f==='name'&&!ci.name.trim())ci.name='Circuito '+(UI.ec+1);const w=document.getElementById('cwv');if(w&&f==='w')w.textContent=ci.w;const m=document.getElementById('map');if(m)m.innerHTML=mapSvg();return}if(e.target.id==='msr'){setMs(+e.target.value);return}if(e.target.id==='tsr'){setTs(+e.target.value);return}const d=e.target.dataset.draft;if(d)UI.draft[d]=e.target.value});
 document.addEventListener('change',e=>{
   const el=e.target,c=S.cfg;
   if(el.dataset.draft){UI.draft[el.dataset.draft]=el.value;return}
   if(el.dataset.cst){saveCfg();return}
+  if(el.id==='bkfile'&&el.files&&el.files[0]){const f=el.files[0];f.text().then(t=>{let d;try{d=JSON.parse(t)}catch(x){toast('Archivo inválido');return}
+     modal(`<p>¿Restaurar el respaldo <b>${esc(f.name)}</b>${d.fecha?' del '+fmt(d.fecha):''}? Reemplaza los datos actuales de este parque.</p>`,()=>restoreData(d),'Restaurar',true)});el.value='';return}
+  if(el.dataset.inf){const f=el.dataset.inf;S.info[f]=f==='potencia'?Math.max(0,+String(el.value).replace(',','.')||0):el.value.trim();if(f==='nombre'&&!S.info.nombre)S.info.nombre='Parque';S.info.n=S.cfg.turbs.length;S.info.circs=S.cfg.circs.length;saveCfg();return}
+  if(el.dataset.act2==='park'){if(el.value==='__new'){el.value=UI.pid;modal(`<h2>➕ Nuevo parque</h2>${parkForm('m')}`,()=>{const i=readPark('m');if(i)createPark(i)},'Crear parque')}else selectPark(el.value);return}
   if(el.dataset.act2==='ec'){UI.ec=+el.value;UI.selV=null;render();return}
   if(el.dataset.act2==='selT'){UI.sel=el.value;render();return}
   if(el.dataset.ed){const k=el.dataset.v,f=el.dataset.ed,cur={...(parts(UI.sel)[k]||{})};const val=fromInp(el.value);
