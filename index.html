@@ -168,7 +168,8 @@ main.wide{max-width:1840px}
 .psel{max-width:180px;padding:3px 8px;font-size:12px;font-weight:700;margin-right:6px;border-radius:8px}
 .sub{display:flex;align-items:center;flex-wrap:wrap;gap:2px}
 .btnlike{display:inline-flex;align-items:center;border:1px solid var(--bd);border-radius:10px;padding:8px 12px;font-size:13px;cursor:pointer}
-#modal .box .pform input{width:100%}
+#modal .box .pform input{width:100%;min-width:0}
+#modal .box{max-width:480px!important}
 
 .sumg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px 14px}
 .sumg .lab{display:flex;justify-content:space-between;font-size:12px}
@@ -725,7 +726,7 @@ function turbView(){
    <button data-act="nav" data-v="-1" ${idx<=0?'disabled':''}>◀</button>
    <select data-act2="selT">${c.turbs.map(x=>`<option value="${x.id}" ${x.id===id?'selected':''}>${esc(x.name)} · ${esc(cName(x.circ))}</option>`).join('')}</select>
    <button data-act="nav" data-v="1" ${idx>=c.turbs.length-1?'disabled':''}>▶</button>
-   <div class="grow" style="min-width:160px"><div class="mut" style="font-size:12px">${p.ok}/${PARTS.length} piezas montadas${p.cur?` · ${p.cur} izando`:''} · ${p.pct}%</div><div class="bar"><i style="width:${p.pct}%"></i></div></div></div></div>
+   <div class="grow" style="min-width:160px"><div class="mut" style="font-size:12px">${p.ok}/${PARTS.length} piezas montadas${p.cur?` · ${p.cur} izando`:''} · ${p.pct}%</div><div class="bar"><i style="width:${p.pct}%"></i></div></div>${p.ok<PARTS.length?`<button class="sm ok" data-act="full" title="Registrar todas las piezas que faltan como montadas">✅ Montada completa</button>`:`<span class="chip ok">✅ Completa</span>`}</div></div>
   <div class="grid2"><div>
    ${alarmBox(id)}
    <div class="card"><div class="row" style="justify-content:flex-end;margin-bottom:6px"><button class="sm ${UI.ident?'on':''}" data-act="ident">🎨 Colores por pieza</button></div><div class="tsvgw">${turbSvg(id)}</div>
@@ -745,6 +746,7 @@ function ovView(){
    <div><b style="font-size:16px">${esc(t.name)}</b> <span class="mut" style="font-size:12px">· ${esc(cName(t.circ))}</span><div class="mut" style="font-size:12px">${p.ok}/${PARTS.length} piezas${p.cur?` · ${p.cur} izando`:''} · ${p.pct}%</div></div>
    <button class="sm" data-act="ovnav" data-v="1" ${idx>=c.turbs.length-1?'disabled':''}>▶</button>
    <div class="grow" style="min-width:50px"><div class="bar"><i style="width:${p.pct}%"></i></div></div>
+   ${p.ok<PARTS.length?`<button class="sm ok" data-act="full" title="Registrar todas las piezas que faltan como montadas">✅ Montada completa</button>`:`<span class="chip ok">✅ Completa</span>`}
    <button class="pri sm" data-act="ovclose" style="font-weight:700;padding:6px 10px">💾 Guardar y cerrar</button></div>
    <div class="ovscroll">${al.map(a=>`<div class="alarmb" data-act="goAlarm" data-v="${esc(a.turb)}">🚨 ALARMA · ${esc(tName(a.turb))} · ${esc(a.motivo)} · ⏱ <span data-since="${a.inicio}">${durS(aDur(a))}</span></div>`).join('')}
    <div class="ovbody">${body}</div></div></div>`;
@@ -876,6 +878,14 @@ document.addEventListener('click',e=>{
    case 'logout':modal('<p>¿Cerrar sesión en este dispositivo?</p>',()=>{try{localStorage.removeItem('wtg-auth')}catch(x){}location.reload()},'Cerrar sesión');break;
    case 'delpark':modal(`<p>¿Eliminar el parque <b>${esc((S.info||{}).nombre)}</b> de la lista?</p><p class="mut" style="font-size:12px">Antes se descarga un respaldo automático por las dudas.</p>`,async()=>{await doBackup();const pid=UI.pid;delete S.parks[pid];UI.cfgOpen=false;
        if(MODE==='db')serial('del',()=>db.doc('parques/'+pid).delete());else lsSave();UI.pid=null;S.subPid=null;const nx=Object.keys(S.parks)[0];if(nx)selectPark(nx);else{bindCfg();subPark();render()}},'Eliminar',true);break;
+   case 'full':{const id=UI.sel,nowL=toInp(nowI());const falt=PARTS.filter(x=>pState(id,x.k)!=='ok');
+     modal(`<h2>✅ Montada completa · ${esc(tName(id))}</h2><p>Se van a registrar como montadas las <b>${falt.length}</b> piezas que faltan: ${falt.map(x=>x.n).join(', ')}.</p>
+      <div class="pform"><label>Inicio<input type="datetime-local" id="fullI" value="${nowL}"></label><label>Fin<input type="datetime-local" id="fullF" value="${nowL}"></label></div>
+      <p class="mut" style="font-size:12px">Las piezas que ya se estaban izando conservan su hora de inicio. Si algo quedó mal, se corrige pieza por pieza en la tabla.</p>`,()=>{
+      const fi=fromInp($('#fullI').value)||nowI(),ff=fromInp($('#fullF').value)||nowI();if(ff<fi){toast('El fin no puede ser anterior al inicio');return}
+      const t=S.turb[id]?clone(S.turb[id]):{parts:{}};t.parts=t.parts||{};
+      PARTS.forEach(x=>{const v=t.parts[x.k];if(v&&v.inicio&&v.fin)return;t.parts[x.k]=v&&v.inicio?{...v,fin:ff<v.inicio?v.inicio:ff}:{inicio:fi,fin:ff}});
+      S.turb[id]=t;saveTurb(id);toast(tName(id)+' registrada como montada completa ✔')},'Marcar completa');break}
    case 'tsz':setTs(UI.ts*(+v));break;
    case 'lock':c.locked=!c.locked;saveCfg(true);break;
    case 'mm':UI.moveMode=v;render();break;
