@@ -30,7 +30,7 @@ body::before{content:"";position:fixed;inset:-8%;z-index:-1;pointer-events:none;
 .btn.pri{background:linear-gradient(135deg,var(--g1),var(--g2));border-color:transparent;color:#fff;box-shadow:0 8px 20px -8px color-mix(in srgb,var(--g1) 70%,transparent)}
 .btn.pri:hover{box-shadow:0 10px 26px -6px color-mix(in srgb,var(--g1) 80%,transparent)}
 /* entrada escalonada al cambiar de pestaña */
-#main.cx-in>*{animation:cxUp .6s var(--cxe) both;animation-delay:calc(var(--i,0)*55ms)}
+#main.cx-in>*:not(.win):not(.mbg){animation:cxUp .6s var(--cxe) both;animation-delay:calc(var(--i,0)*55ms)}
 @keyframes cxUp{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
 /* barras y anillo: crecen suave */
 .bar i,.trk i{transition:width 1s var(--cxe),height 1s var(--cxe)}

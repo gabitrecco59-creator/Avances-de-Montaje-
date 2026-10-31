@@ -177,6 +177,17 @@ main.wide{max-width:1840px}
 @media(max-width:520px){.pform{grid-template-columns:1fr}}
 .psel{max-width:180px;padding:3px 8px;font-size:12px;font-weight:700;margin-right:6px;border-radius:8px}
 .sub{display:flex;align-items:center;flex-wrap:wrap;gap:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{border-radius:20px;padding:7px 12px;font-weight:600;font-size:13px;background:var(--pe);border:0;color:var(--tx)}.chip.on{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff}.chip.on.dn{background:var(--er)}
+.full{width:100%;display:block;margin:0 0 10px}textarea.full{resize:vertical;background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:10px;color:var(--tx);font:inherit}
+.ad{font-weight:700;font-size:13px;text-transform:capitalize;margin:14px 0 6px;color:var(--ac)}
+.ae{padding:10px 0;border-bottom:1px solid var(--bd)}.ae:last-child{border:0}.ae .t{color:var(--mu);font-size:12px;margin-bottom:3px}
+.atx{white-space:pre-wrap;word-break:break-word;font-size:14px}
+.lv{display:inline-block;border-radius:20px;padding:1px 8px;font-weight:800;font-size:11px;color:#fff;margin-left:4px}
+.lnk{cursor:pointer;text-decoration:underline}
+.cierre{margin-top:6px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,var(--ok) 12%,transparent);font-size:13px}
+.phrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}.phrow img.phx{width:96px;height:96px;object-fit:cover;border-radius:10px;border:1px solid var(--bd);cursor:pointer}
+.thb{position:relative;display:inline-flex;align-items:center;justify-content:center}.thb img{width:78px;height:78px;object-fit:cover;border-radius:10px;border:1px solid var(--bd)}.thb button{position:absolute;top:-6px;right:-6px;padding:0 6px;border-radius:50%;background:var(--card)}.thb.ld{width:96px;height:96px;border-radius:10px;background:var(--pe);color:var(--mu)}
+@media print{body.print-acta header,body.print-acta #banner,body.print-acta .acta-form,body.print-acta .note,body.print-acta button,body.print-acta .chips,body.print-acta #toast{display:none!important}body.print-acta .card{border:0;box-shadow:none}body.print-acta::before{display:none}}
 .btnlike{display:inline-flex;align-items:center;border:1px solid var(--bd);border-radius:10px;padding:8px 12px;font-size:13px;cursor:pointer}
 #modal .box .pform input{width:100%;min-width:0}
 #modal .box{max-width:480px!important}
@@ -287,7 +298,7 @@ const CCOL=['#3fa9f5','#f5a623','#7ed321','#c86bff','#f8e71c','#50e3c2','#ff6b6b
 const MOTIVOS=['Viento','Grúa / equipo de izaje','Falta de material','Seguridad','Clima (lluvia / tormenta)','Logística / acceso','Calidad / NC','Otro'];
 
 let db=null, MODE='loading', NOTE='', cfgDirty=false;
-const S={parks:{},cfg:null,info:null,turb:{},alarms:{},loaded:false,subPid:null};
+const S={parks:{},cfg:null,info:null,turb:{},alarms:{},acta:{},loaded:false,subPid:null};
 const UI={tab:'mapa',sel:null,moveMode:'turb',draft:{},ov:false,ms:.32};
 UI.vb={x:0,y:0,w:1000};UI.ts=1;UI.cfgOpen=false;try{UI.pid=localStorage.getItem('wtg-pid')||null;const t=+localStorage.getItem('wtg-ts');if(t>=.4&&t<=3)UI.ts=t}catch(e){UI.pid=null}
 const FILT=[['lines','Líneas de circuito'],['box','Recuadro'],['name','Nombre WTG'],['circ','Circuito'],['pct','% avance'],['ghost','Piezas pendientes']];
@@ -311,7 +322,7 @@ function durS(ms){const s=Math.max(0,Math.floor(ms/1000));return `${Math.floor(s
 function toInp(iso){if(!iso)return '';const d=new Date(iso);return new Date(d-d.getTimezoneOffset()*60000).toISOString().slice(0,16)}
 function fromInp(v){return v?new Date(v).toISOString():null}
 function toast(t){const el=$('#toast');el.textContent=t;el.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>el.style.display='none',3200)}
-function modal(html,onOk,okLabel='Confirmar',danger){const m=$('#modal');m.innerHTML=`<div class="box">${html}<div class="row" style="justify-content:flex-end;margin-top:14px"><button data-m="no">Cancelar</button><button class="${danger?'danger':'pri'}" data-m="ok">${okLabel}</button></div></div>`;m.style.display='flex';m.onclick=e=>{const b=e.target.closest('[data-m]');if(!b&&e.target!==m)return;m.style.display='none';if(b&&b.dataset.m==='ok')onOk()}}
+function modal(html,onOk,okLabel='Confirmar',danger){const m=$('#modal');m.innerHTML=`<div class="box">${html}<div class="row" style="justify-content:flex-end;margin-top:14px"><button data-m="no">Cancelar</button><button class="${danger?'danger':'pri'}" data-m="ok">${okLabel}</button></div></div>`;m.style.display='flex';m.onclick=e=>{const b=e.target.closest('[data-m]');if(!b&&e.target!==m)return;if(b&&b.dataset.m==='ok'){if(onOk()===false)return}m.style.display='none'}}
 
 /* ===== estado derivado ===== */
 const parts=id=>(S.turb[id]&&S.turb[id].parts)||{};
@@ -334,7 +345,7 @@ const PP=()=>'parques/'+UI.pid;
 function bindCfg(){const p=S.parks[UI.pid];S.cfg=p?p.cfg:null;S.info=p?p.info:null;if(S.info){try{localStorage.setItem('wtg-pinfo',JSON.stringify(S.info))}catch(e){}}}
 const LSK='wtg-montaje-v2';
 function lsAll(){try{const v=JSON.parse(localStorage.getItem(LSK)||'null');if(v)return v}catch(e){}return{parks:{},data:{}}}
-function lsSave(){const a=lsAll();a.parks=S.parks;if(UI.pid)a.data[UI.pid]={turb:S.turb,alarms:S.alarms};try{localStorage.setItem(LSK,JSON.stringify(a))}catch(e){toast('No hay espacio en este navegador para guardar')}}
+function lsSave(){const a=lsAll();a.parks=S.parks;if(UI.pid)a.data[UI.pid]={turb:S.turb,alarms:S.alarms,acta:S.acta,fotos:(a.data[UI.pid]||{}).fotos||{}};try{localStorage.setItem(LSK,JSON.stringify(a))}catch(e){toast('No hay espacio en este navegador para guardar')}}
 function lsLoad(){const a=lsAll();
   try{const o=JSON.parse(localStorage.getItem('wtg-montaje-v1')||'null');if(o&&o.cfg&&!Object.keys(a.parks).length){const pid='p'+Date.now().toString(36);a.parks[pid]={info:{nombre:'Mi parque',n:o.cfg.turbs.length,circs:o.cfg.circs.length,modelo:'',potencia:0,creado:nowI()},cfg:o.cfg};a.data[pid]={turb:o.turb||{},alarms:o.alarms||{}};UI.pid=pid;localStorage.setItem(LSK,JSON.stringify(a))}}catch(e){}
   S.parks=a.parks||{};if(!S.parks[UI.pid])UI.pid=Object.keys(S.parks)[0]||null;S.loaded=true;bindCfg();subPark()}
@@ -348,12 +359,13 @@ function saveTurb(id){render();if(MODE!=='db'){lsSave();return}const d={parts:cl
 function saveAlarm(a){S.alarms[a.id]=a;render();if(MODE!=='db'){lsSave();return}const d=clone(a),pp=PP();serial('a'+a.id,()=>db.doc(pp+'/alarmas/'+a.id).set(d))}
 function delAlarm(id){delete S.alarms[id];render();if(MODE!=='db'){lsSave();return}const pp=PP();serial('a'+id,()=>db.doc(pp+'/alarmas/'+id).delete())}
 function setPart(id,k,val){const t=S.turb[id]?clone(S.turb[id]):{parts:{}};t.parts=t.parts||{};if(val)t.parts[k]=val;else delete t.parts[k];S.turb[id]=t;saveTurb(id)}
-let unT=null,unA=null;
-function subPark(){if(unT)unT();if(unA)unA();unT=unA=null;S.turb={};S.alarms={};S.subPid=UI.pid;if(!UI.pid)return;
-  if(MODE!=='db'){const d=lsAll().data[UI.pid]||{};S.turb=d.turb||{};S.alarms=d.alarms||{};return}
+let unT=null,unA=null,unC=null;
+function subPark(){if(unT)unT();if(unA)unA();if(unC)unC();unT=unA=unC=null;S.turb={};S.alarms={};S.acta={};PH={};S.subPid=UI.pid;if(!UI.pid)return;
+  if(MODE!=='db'){const d=lsAll().data[UI.pid]||{};S.turb=d.turb||{};S.alarms=d.alarms||{};S.acta=d.acta||{};return}
   const pp=PP(),pid=UI.pid;
   unT=db.collection(pp+'/turbinas').onSnapshot(q=>{if(S.subPid!==pid)return;const t={};q.docs.forEach(d=>t[d.id]=clone(d.data()));S.turb=t;render()},permErr);
-  unA=db.collection(pp+'/alarmas').onSnapshot(q=>{if(S.subPid!==pid)return;const a={};q.docs.forEach(d=>a[d.id]=clone(d.data()));S.alarms=a;render()},permErr)}
+  unA=db.collection(pp+'/alarmas').onSnapshot(q=>{if(S.subPid!==pid)return;const a={};q.docs.forEach(d=>a[d.id]=clone(d.data()));S.alarms=a;render()},permErr);
+  unC=db.collection(pp+'/acta').onSnapshot(q=>{if(S.subPid!==pid)return;const a={};q.docs.forEach(d=>a[d.id]=clone(d.data()));S.acta=a;render()},permErr)}
 function permErr(e){NOTE=e&&e.code==='invalid_argument'?'Firebase rechazó el acceso. Hay que actualizar las reglas de Firestore (permiso para las colecciones montaje_*).':'Error de base de datos: '+((e&&e.message)||e);render()}
 function selectPark(pid){if(pid===UI.pid)return;UI.pid=pid;try{localStorage.setItem('wtg-pid',pid)}catch(e){}UI.sel=null;UI.ov=false;UI.le=false;bindCfg();subPark();render();setTimeout(fitAll,50)}
 function newPid(){return 'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,5)}
@@ -367,7 +379,7 @@ function migrate(){if(migrate.on)return;migrate.on=true;
     toast('Pasé tus datos anteriores a un parque nuevo. Completá su nombre, modelo y potencia.')},()=>{})}
 
 /* ===== respaldos ===== */
-function bkData(){return{v:2,fecha:nowI(),pid:UI.pid,info:clone(S.info),cfg:clone(S.cfg),turb:clone(S.turb),alarms:clone(S.alarms)}}
+function bkData(){return{v:2,fecha:nowI(),pid:UI.pid,info:clone(S.info),cfg:clone(S.cfg),turb:clone(S.turb),alarms:clone(S.alarms),acta:clone(S.acta)}}
 function slug(t){return String(t||'parque').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-|-$/g,'').toLowerCase()}
 function download(name,text){try{const u=URL.createObjectURL(new Blob([text],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);return true}catch(e){return false}}
 async function doBackup(){if(!S.cfg)return;const d=bkData(),txt=JSON.stringify(d),f=d.fecha;
@@ -386,6 +398,7 @@ function restoreData(d){if(!d||!d.cfg){toast('El archivo no es un respaldo váli
     Object.keys(nt).forEach(id=>{const v=clone(nt[id]);serial('t'+id,()=>db.doc(pp+'/turbinas/'+id).set(v))});
     Object.keys(S.alarms).forEach(id=>{if(!na[id])serial('a'+id,()=>db.doc(pp+'/alarmas/'+id).delete())});
     Object.keys(na).forEach(id=>{const v=clone(na[id]);serial('a'+id,()=>db.doc(pp+'/alarmas/'+id).set(v))})}
+  if(d.acta){const nc=d.acta;if(MODE==='db'){const pp=PP();Object.keys(nc).forEach(id=>{const v=clone(nc[id]);serial('c'+id,()=>db.doc(pp+'/acta/'+id).set(v))})}S.acta={...S.acta,...clone(nc)}}
   S.turb=clone(nt);S.alarms=clone(na);if(MODE!=='db')lsSave();render();toast('Respaldo restaurado ✔')}
 const needBk=()=>S.info&&S.cfg&&(Object.keys(S.turb).length||S.cfg.locked)&&(!S.info.lastBk||Date.now()-new Date(S.info.lastBk)>864e5);
 
@@ -449,7 +462,7 @@ function render(){
   let h=NOTE?`<div class="note">${esc(NOTE)}</div>`:'';
   if(MODE==='local')h+=`<div class="note">Modo local: los datos se guardan sólo en este navegador (Firebase no está configurado o no respondió).</div>`;
   if(needBk())h+=`<div class="note row"><span class="grow">💾 ${S.info.lastBk?'Último respaldo: '+fmt(S.info.lastBk)+'.':'Todavía no hay respaldo de este parque.'} Creá uno para no perder información.</span><button class="sm pri" data-act="bk">Crear respaldo</button></div>`;
-  h+=({mapa:mapView,turbina:turbView,alarmas:alarmView,registro:logView}[UI.tab]||mapView)();
+  h+=({mapa:mapView,turbina:turbView,alarmas:alarmView,acta:actaView,registro:logView}[UI.tab]||mapView)();
   if(UI.ov&&S.cfg.turbs.find(t=>t.id===UI.sel))h+=ovView();else UI.ov=false;
   if(UI.cfgOpen)h+=cfgWin();
   const sc0=document.querySelector('#ov .ovscroll'),sc1=document.querySelector('#cfgw .ovscroll');const y0=sc0?sc0.scrollTop:0,y1=sc1?sc1.scrollTop:0;
@@ -463,7 +476,7 @@ window.toggleTheme=()=>{const n=isDark()?'light':'dark';document.documentElement
 function renderHeader(){
   let tot='';
   if(S.cfg){const ts=S.cfg.turbs;const full=ts.filter(t=>prog(t.id).ok===NM).length;const pz=ts.reduce((a,t)=>a+prog(t.id).ok,0);tot=`<span class="badge tot">${full}/${ts.length} WTG completas · ${ts.length?Math.round(pz/(ts.length*NM)*100):0}% piezas</span>`}
-  const tabs=[['mapa','🗺️ Mapa'],['turbina','🌀 Turbina'],['alarmas','🚨 Alarmas'+(actAlarms().length?` (${actAlarms().length})`:'')],['registro','📋 Registro']];
+  const tabs=[['mapa','🗺️ Mapa'],['turbina','🌀 Turbina'],['alarmas','🚨 Alarmas'+(actAlarms().length?` (${actAlarms().length})`:'')],['acta','📝 Acta'+(nAbiertos()?` (${nAbiertos()}⚠️)`:'')],['registro','📋 Registro']];
   const I=S.info||{};const sub=S.cfg?[I.modelo||'Vestas',`${S.cfg.turbs.length} WTG`,totMW(I),`${S.cfg.circs.length} circ.`].filter(Boolean).join(' · '):'Vestas';
   const pids=Object.keys(S.parks);const psel=pids.length?`<select class="psel" data-act2="park" title="Parque">${pids.map(id=>`<option value="${id}" ${id===UI.pid?'selected':''}>${esc((S.parks[id].info||{}).nombre||'Parque')}</option>`).join('')}<option value="__new">➕ Nuevo parque…</option></select>`:'';
   const st=MODE==='db'?'<span class="pill ok"><i></i>Compartido</span>':MODE==='local'?'<span class="pill lo"><i></i>Local</span>':'<span class="pill"><i></i>Conectando…</span>';
@@ -763,6 +776,7 @@ function turbView(){
    <p class="mut" style="font-size:12px;margin:6px 0 0">Tocá una pieza del acopio para <b style="color:var(--cur)">iniciar el izaje</b> (registra fecha y hora de inicio). Tocála otra vez para marcarla <b style="color:var(--ok)">montada</b> (registra el final). Las piezas grises oscuras todavía no se pueden montar.</p></div>
   </div><div>
    <div class="card"><h2>Registro de montaje · ${esc(t.name)}</h2><div class="tw"><table><tr><th>Pieza</th><th>Estado</th><th>Inicio</th><th>Fin</th><th>Duración</th><th></th></tr>${rows}</table></div></div>
+   ${wtgActa(t)}
    <div class="card"><h2>Tiempo perdido · ${esc(t.name)}: ${dur(lostMs)}</h2>${lost.length?`<div class="tw"><table><tr><th>Motivo</th><th>Inicio</th><th>Fin</th><th>Duración</th></tr>${lost.sort((a,b)=>a.inicio<b.inicio?1:-1).map(a=>`<tr><td>${esc(a.motivo)}${a.turb==='PARQUE'?' <span class="badge">parque</span>':''}<div class="mut" style="font-size:11px">${esc(a.detalle)} · ${esc(a.sup)}</div></td><td>${fmt(a.inicio)}</td><td>${a.fin?fmt(a.fin):'<b style="color:var(--bad)">ACTIVA</b>'}</td><td>${dur(aDur(a))}</td></tr>`).join('')}</table></div>`:'<p class="mut">Sin alarmas registradas.</p>'}</div>
   </div></div>`;
 }
@@ -816,6 +830,96 @@ function alarmView(){
    <td>${a.fin?dur(aDur(a)):`<b style="color:var(--bad)" data-since="${a.inicio}">${durS(aDur(a))}</b>`}</td>
    <td><button class="sm" data-act="adel" data-v="${a.id}">🗑</button></td></tr>`).join('')||'<tr><td colspan="7" class="mut">Sin alarmas.</td></tr>'}</table></div></div>`;
 }
+
+/* ===== acta de avances (igual que Commissioning) ===== */
+let PH={};const PHshow={};
+UI.ac={tipo:'acta',fil:'all',text:'',wtg:'',comp:'',sev:'Mayor',ph:[]};
+const SEVC={Menor:'#d97706',Mayor:'#ea580c','Crítico':'var(--er)'};
+const isDano=a=>a.tipo==='dano',cerrado=a=>a.estado==='cerrado';
+const actaArr=()=>Object.entries(S.acta).map(([id,a])=>({id,...a})).sort((a,b)=>a.at<b.at?1:-1);
+const nAbiertos=()=>Object.values(S.acta||{}).filter(a=>isDano(a)&&!cerrado(a)).length;
+const dayKey=d=>d.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+const hhmm=iso=>iso?new Date(iso).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}):'…';
+const myName=()=>(UI.draft.sup||'').trim();
+function mentions(a,t){const num=parseInt(String(t.name).replace(/\D+/g,''),10),nm=String(t.name).toLowerCase();
+  const toks=String(a.wtg||'').toLowerCase().split(/[\s,;\/&]+|\by\b/).filter(Boolean);
+  if(toks.some(x=>x===nm||(!isNaN(num)&&/^\D*\d+$/.test(x)&&parseInt(x.replace(/\D+/g,''),10)===num)))return true;
+  const tx=String(a.text||'').toLowerCase();if(tx.includes(nm))return true;
+  if(!isNaN(num)){const re=/wtg'?s?\s*((?:\d{1,3}(?:\s*(?:,|y|e|\/|&)\s*)?)+)/gi;let m;while((m=re.exec(tx))){if((m[1].match(/\d{1,3}/g)||[]).some(n=>+n===num))return true}}
+  return false}
+async function shrink(file){const url=URL.createObjectURL(file);
+  try{const img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=url});let max=1280,q=.72,out,w,h;
+   for(let t=0;t<7;t++){const sc=Math.min(1,max/Math.max(img.width,img.height));w=Math.max(1,Math.round(img.width*sc));h=Math.max(1,Math.round(img.height*sc));
+    const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);out=c.toDataURL('image/jpeg',q);if(out.length<=330000)break;max*=.85;q=Math.max(.45,q-.05)}
+   if(out.length>420000)throw new Error('grande');return{data:out,w,h}}finally{URL.revokeObjectURL(url)}}
+async function addPhotos(inp,arr,after){const fs=[...inp.files];inp.value='';let bad=0;
+  for(const f of fs){if(arr.length>=4){toast('Máximo 4 fotos por registro');break}try{arr.push(await shrink(f))}catch(e){bad++}}
+  if(bad)toast('No se pudo leer '+bad+' foto'+(bad>1?'s':''));after()}
+const thumbs=(arr,act)=>arr.map((f,i)=>`<span class="thb"><img src="${f.data}" alt="Foto ${i+1}"><button class="sm" data-act="${act}" data-v="${i}" aria-label="Quitar foto">✕</button></span>`).join('');
+function savePhoto(id,data){if(MODE==='db'){const pp=PP();serial('f'+id,()=>db.doc(pp+'/fotos/'+id).set(data))}else{const a=lsAll();const d=a.data[UI.pid]=a.data[UI.pid]||{};d.fotos=d.fotos||{};d.fotos[id]=data;try{localStorage.setItem(LSK,JSON.stringify(a))}catch(e){toast('Sin espacio local para las fotos')}}}
+function saveActa(id,a){S.acta[id]=a;render();if(MODE!=='db'){lsSave();return}const d=clone(a),pp=PP();serial('c'+id,()=>db.doc(pp+'/acta/'+id).set(d))}
+function phIds(a,id){const L=[];for(let i=0;i<(a.nfotos||0);i++)L.push(id+'_'+i);for(let k=0;k<(a.cierreFotos||0);k++)L.push(id+'_c'+k);return L}
+function loadPh(id){const a=S.acta[id];if(!a||PH[id])return;const ids=phIds(a,id);PH[id]={};
+  if(MODE!=='db'){const f=(lsAll().data[UI.pid]||{}).fotos||{};ids.forEach(x=>PH[id][x]=f[x]||null);render();return}
+  const pp=PP();ids.forEach(x=>{const un=db.doc(pp+'/fotos/'+x).onSnapshot(s=>{if(s.metadata.fromCache&&!s.exists)return;un();PH[id][x]=s.exists?s.data():null;render()},()=>{PH[id][x]=null;render()})})}
+function photoBlock(a){const n0=a.nfotos||0,n1=a.cierreFotos||0;if(!n0&&!n1)return '';
+  if(!PHshow[a.id])return `<button class="sm" data-act="phshow" data-v="${a.id}" style="margin-top:6px">📷 Ver ${n0+n1} foto${n0+n1>1?'s':''}${n1?` (${n1} de cierre)`:''}</button>`;
+  const P=PH[a.id]||{},img=x=>P[x]===undefined?`<span class="thb ld">…</span>`:P[x]?`<img class="phx" src="${P[x].data}" data-act="phopen" data-v="${a.id}|${x}" alt="">`:`<span class="thb ld">✕</span>`;
+  const ap=[],ci=[];for(let i=0;i<n0;i++)ap.push(img(a.id+'_'+i));for(let k=0;k<n1;k++)ci.push(img(a.id+'_c'+k));
+  return (ap.length?`<div class="t">${isDano(a)?'Evidencia del daño':'Fotos'}</div><div class="phrow">${ap.join('')}</div>`:'')+(ci.length?`<div class="t" style="color:var(--ok)">Evidencia de cierre</div><div class="phrow">${ci.join('')}</div>`:'')}
+function entryHtml(a,withDate){const dano=isDano(a),cr=cerrado(a);
+  return `<div class="ae"><div class="t">${withDate?new Date(a.at).toLocaleDateString('es-AR')+' ':''}${hhmm(a.at)} · <b>${esc(a.byName||'—')}</b>${a.wtg?` · ${esc(a.wtg)}`:''}${dano?` <span class="lv" style="background:${SEVC[a.sev]||SEVC.Mayor}">⚠️ DAÑO${a.sev?' · '+esc(a.sev):''}</span> <span class="lv" style="background:${cr?'var(--ok)':'#64748b'}">${cr?'✅ CERRADO':'🔴 ABIERTO'}</span>`:''}${a.editN?` <span class="lnk" data-act="acedits" data-v="${a.id}">· ✏️ editado${a.editN>1?' ×'+a.editN:''} por ${esc(a.editedByName||'—')}</span>`:''}</div>
+   ${dano&&a.comp?`<div class="t"><b>Componente:</b> ${esc(a.comp)}</div>`:''}<div class="atx">${esc(a.text)}</div>
+   ${cr?`<div class="cierre"><b>✅ Cierre</b> · ${esc(a.cierreByName||'')} · ${fmt(a.cierreAt)}<div class="atx">${esc(a.cierreTxt||'')}</div></div>`:''}${photoBlock(a)}
+   <div class="row" style="margin-top:6px;gap:6px"><button class="sm" data-act="acedit" data-v="${a.id}">✏️ Editar</button>${dano?(cr?`<button class="sm" data-act="acreopen" data-v="${a.id}">↩ Reabrir</button>`:`<button class="sm ok" data-act="acclose" data-v="${a.id}">✅ Cerrar caso</button>`):''}</div></div>`}
+function actaList(){const A=actaArr(),f=UI.ac.fil;
+  const L=A.filter(a=>f==='all'||(f==='dano'?isDano(a):f==='abierto'?isDano(a)&&!cerrado(a):!isDano(a)));
+  if(!L.length)return `<p class="mut">${A.length?'No hay registros de este tipo.':'Todavía no hay registros. Escribí el primero arriba.'}</p>`;
+  let h='',last='';L.forEach(a=>{const k=dayKey(new Date(a.at));if(k!==last){h+=`<div class="ad">${esc(k)}</div>`;last=k}h+=entryHtml(a,false)});return h}
+function actaView(){const A=actaArr(),D=UI.ac,dn=D.tipo==='dano',nd=A.filter(isDano).length,nab=nAbiertos();
+  return `<div class="card acta-form"><h2>${dn?'⚠️ Reportar daño (para NCR)':'📝 Nuevo registro'}</h2>
+   <div class="chips" style="margin-bottom:10px"><button class="chip ${dn?'':'on'}" data-act="actipo" data-v="acta">📝 Registro de acta</button><button class="chip ${dn?'on dn':''}" data-act="actipo" data-v="dano">⚠️ Daño (NCR)</button></div>
+   <input data-draft="sup" placeholder="Tu nombre (queda en el registro)" value="${esc(UI.draft.sup||'')}" class="full" maxlength="60">
+   ${dn?`<input data-ac="comp" class="full" maxlength="80" placeholder="Componente / sistema dañado (ej.: Pala B, brida T3)" value="${esc(D.comp)}"><select data-ac="sev" class="full">${['Menor','Mayor','Crítico'].map(v=>`<option ${D.sev===v?'selected':''}>${v}</option>`).join('')}</select>`:''}
+   <textarea data-ac="text" rows="4" maxlength="2000" class="full" placeholder="${dn?'Describí el daño: qué pasó, dónde, cuándo y cómo se detectó':'Ej.: Hoy se izaron T3 y T4 de la WTG05; viento en el límite a la tarde'}">${esc(D.text)}</textarea>
+   <input data-ac="wtg" list="wtgl" class="full" maxlength="60" placeholder="${dn?'WTG afectada (obligatorio, ej.: WTG05)':'WTG involucradas (opcional, ej.: WTG05, WTG07)'}" value="${esc(D.wtg)}">
+   <datalist id="wtgl">${S.cfg.turbs.map(t=>`<option value="${esc(t.name)}">`).join('')}</datalist>
+   <div class="phrow">${thumbs(D.ph,'phrm')}</div>
+   <label class="btnlike" style="margin:4px 0 10px">📷 Agregar fotos (hasta 4)<input type="file" accept="image/*" multiple hidden id="acfiles"></label>
+   <div><button class="${dn?'danger':'pri'}" data-act="acadd" style="${dn?'background:var(--er);color:#fff':''}">${dn?'Registrar daño':'Registrar en el acta'}</button></div>
+   <p class="mut" style="font-size:12px;margin:8px 0 0">Cada registro queda guardado con fecha, hora y tu nombre. No se puede borrar: si hay un error, editalo (queda la versión anterior) o agregá una corrección.</p></div>
+  <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2 style="margin:0">Acta de avances</h2><div class="row"><button class="sm" data-act="acdl">⬇ Descargar</button><button class="sm" data-act="acprint">🖨 Imprimir</button></div></div>
+   <div class="chips" style="margin:6px 0 8px">${[['all',`Todo (${A.length})`],['acta',`📝 Actas (${A.length-nd})`],['dano',`⚠️ Daños (${nd})`],['abierto',`🔴 Abiertos (${nab})`]].map(([k,l])=>`<button class="chip ${D.fil===k?'on':''}" data-act="acfil" data-v="${k}">${l}</button>`).join('')}</div>
+   <div class="alist">${actaList()}</div></div>`}
+function wtgActa(t){const L=actaArr().filter(a=>mentions(a,t)),nd=L.filter(isDano).length;
+  return `<div class="card"><h2>📝 Acta de ${esc(t.name)} · ${L.length} registro${L.length===1?'':'s'}${nd?` · ⚠️ ${nd} daño${nd>1?'s':''}`:''}</h2>${L.length?L.map(a=>entryHtml(a,true)).join(''):`<p class="mut" style="font-size:13px">Sin registros. Aparecen cuando el texto o el campo WTG menciona ${esc(t.name)}.</p>`}</div>`}
+function actaTxt(){return 'ACTA DE AVANCES - MONTAJE · '+((S.info||{}).nombre||'')+'\n\n'+actaArr().reverse().map(a=>`[${fmt(a.at)}] ${a.byName||''}${a.wtg?' · '+a.wtg:''}${isDano(a)?` · DAÑO ${a.sev||''} · ${cerrado(a)?'CERRADO':'ABIERTO'}${a.comp?' · '+a.comp:''}`:''}\n${a.text}${cerrado(a)?`\n  → Cierre (${a.cierreByName||''}, ${fmt(a.cierreAt)}): ${a.cierreTxt||''}`:''}${a.nfotos?`\n  (${a.nfotos} foto${a.nfotos>1?'s':''})`:''}`).join('\n\n')}
+function acAdd(){const D=UI.ac,dn=D.tipo==='dano',name=myName(),text=D.text.trim();
+  if(!name){toast('Escribí tu nombre');return}if(!text){toast(dn?'Describí el daño':'Escribí algo para registrar');return}if(dn&&!D.wtg.trim()){toast('Indicá la WTG afectada');return}
+  try{localStorage.setItem('wtg-sup',name)}catch(e){}
+  const id='c'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),ph=D.ph.slice();
+  const a={text,wtg:D.wtg.trim(),tipo:D.tipo,nfotos:ph.length,byName:name,at:nowI()};if(dn){a.comp=D.comp.trim();a.sev=D.sev;a.estado='abierto'}
+  ph.forEach((f,i)=>savePhoto(id+'_'+i,{actaId:id,i,data:f.data,w:f.w,h:f.h}));
+  if(ph.length){PH[id]={};ph.forEach((f,i)=>PH[id][id+'_'+i]=f)}
+  D.text='';D.wtg='';D.comp='';D.ph=[];saveActa(id,a);toast(dn?'⚠️ Daño registrado':'📝 Registrado en el acta')}
+let clPh=[];
+function acModalClose(id){const a=S.acta[id];if(!a)return;clPh=[];
+  const body=()=>`<h2>✅ Cerrar caso</h2><p class="mut" style="font-size:13px">${esc(a.wtg||'')}${a.comp?' · '+esc(a.comp):''}. Para cerrarlo hace falta una descripción de lo que se hizo y <b>al menos 1 foto de evidencia</b>.</p>
+    <textarea id="clt" rows="4" maxlength="1000" class="full" placeholder="¿Qué se hizo para resolverlo? (obligatorio)"></textarea><div class="phrow" id="clth"></div>
+    <label class="btnlike" style="margin:6px 0">📷 Fotos de evidencia (1 a 4)<input type="file" accept="image/*" multiple hidden id="clfiles"></label>`;
+  modal(body(),()=>{const t=($('#clt').value||'').trim();if(!t){toast('Describí qué se hizo');return false}if(!clPh.length){toast('Falta la evidencia: agregá al menos 1 foto');return false}
+    const name=myName()||'—',n=clPh.length;clPh.forEach((f,k)=>savePhoto(id+'_c'+k,{actaId:id,i:100+k,fase:'cierre',data:f.data,w:f.w,h:f.h}));if(PH[id])clPh.forEach((f,k)=>PH[id][id+'_c'+k]=f);
+    const hist=(a.hist||[]).concat([{kind:'cierre',byName:name,at:nowI()}]);saveActa(id,{...a,estado:'cerrado',cierreTxt:t,cierreByName:name,cierreAt:nowI(),cierreFotos:n,hist});clPh=[]},'Cerrar caso')}
+function acModalEdit(id){const a=S.acta[id];if(!a)return;const dn=isDano(a);
+  modal(`<h2>✏️ Editar ${dn?'daño':'registro'}</h2><p class="mut" style="font-size:12px">Queda guardado quién lo editó y la versión anterior.</p>
+    ${dn?`<input id="edc" class="full" maxlength="80" placeholder="Componente" value="${esc(a.comp||'')}"><select id="eds" class="full">${['Menor','Mayor','Crítico'].map(v=>`<option ${(a.sev||'Mayor')===v?'selected':''}>${v}</option>`).join('')}</select>`:''}
+    <textarea id="edt" rows="6" maxlength="2000" class="full">${esc(a.text)}</textarea><input id="edw" class="full" maxlength="60" placeholder="WTG" value="${esc(a.wtg||'')}">`,()=>{
+    const text=$('#edt').value.trim(),wtg=$('#edw').value.trim(),comp=dn?$('#edc').value.trim():'',sev=dn?$('#eds').value:'';
+    if(!text){toast('El texto no puede quedar vacío');return false}if(text===a.text&&wtg===(a.wtg||'')&&(!dn||(comp===(a.comp||'')&&sev===(a.sev||''))))return;
+    const name=myName()||'—',hist=(a.hist||[]).concat([{kind:'edit',prevText:a.text,prevWtg:a.wtg||'',prevComp:a.comp||'',prevSev:a.sev||'',byName:name,at:nowI()}]);
+    const u={...a,text,wtg,editedByName:name,editedAt:nowI(),editN:(a.editN||0)+1,hist};if(dn){u.comp=comp;u.sev=sev}saveActa(id,u)},'Guardar')}
+function acModalEdits(id){const a=S.acta[id];if(!a)return;const H=(a.hist||[]).slice().reverse();
+  modal(`<h2>✏️ Versiones anteriores</h2>${H.length?H.map(x=>`<div class="ae"><div class="t"><b>${x.kind==='cierre'?'✅ Cierre del caso':x.kind==='reapertura'?'↩ Reapertura':'✏️ Edición'}</b> · ${esc(x.byName||'—')} · ${fmt(x.at)}</div>${x.kind==='edit'?`<div class="t">Antes decía${x.prevComp?' ('+esc(x.prevComp)+')':''}${x.prevWtg?' · '+esc(x.prevWtg):''}:</div><div class="atx">${esc(x.prevText)}</div>`:''}</div>`).join(''):'<p class="mut">No hay versiones guardadas.</p>'}`,()=>{},'Cerrar')}
 
 /* ===== vista registro ===== */
 function logView(){
@@ -901,7 +1005,7 @@ document.addEventListener('click',e=>{
    case 'theme':window.toggleTheme();break;
    case 'goAlarm':if(v==='PARQUE'){UI.ov=false;UI.tab='alarmas';render()}else openOv(v);break;
    case 'create':{const i=readPark('s');if(i)createPark(i);break}
-   case 'newpark':UI.cfgOpen=false;render();modal(`<h2>➕ Nuevo parque</h2>${parkForm('m')}`,()=>{const i=readPark('m');if(i)createPark(i)},'Crear parque');break;
+   case 'newpark':UI.cfgOpen=false;render();modal(`<h2>➕ Nuevo parque</h2>${parkForm('m')}`,()=>{const i=readPark('m');if(!i)return false;createPark(i)},'Crear parque');break;
    case 'cfg':UI.cfgOpen=true;S.bk=undefined;render();break;
    case 'cfgclose':UI.cfgOpen=false;flushSaves().then(ok=>{render();toast(ok?'Configuración guardada ✔':'Revisá: hubo un error al guardar')});break;
    case 'bk':doBackup();break;
@@ -918,6 +1022,19 @@ document.addEventListener('click',e=>{
       const t=S.turb[id]?clone(S.turb[id]):{parts:{}};t.parts=t.parts||{};
       MECH.forEach(x=>{const v=t.parts[x.k];if(v&&v.inicio&&v.fin)return;t.parts[x.k]=v&&v.inicio?{...v,fin:ff<v.inicio?v.inicio:ff}:{inicio:fi,fin:ff}});
       S.turb[id]=t;saveTurb(id);toast(tName(id)+' registrada como montada completa ✔')},'Marcar completa');break}
+   case 'actipo':UI.ac.tipo=v;render();break;
+   case 'acfil':UI.ac.fil=v;render();break;
+   case 'acadd':acAdd();break;
+   case 'phrm':UI.ac.ph.splice(+v,1);render();break;
+   case 'clrm':clPh.splice(+v,1);{const el=$('#clth');if(el)el.innerHTML=thumbs(clPh,'clrm')}break;
+   case 'phshow':PHshow[v]=true;loadPh(v);render();break;
+   case 'phopen':{const [id,x]=v.split('|'),f=(PH[id]||{})[x];if(f)modal(`<img src="${f.data}" style="width:100%;border-radius:10px;display:block">`,()=>{},'Cerrar');break}
+   case 'acedit':acModalEdit(v);break;
+   case 'acedits':acModalEdits(v);break;
+   case 'acclose':acModalClose(v);break;
+   case 'acreopen':{const a=S.acta[v];if(!a)break;modal('<p>¿Reabrir este caso? Queda registrado quién lo reabrió.</p>',()=>saveActa(v,{...a,estado:'abierto',hist:(a.hist||[]).concat([{kind:'reapertura',byName:myName()||'—',at:nowI()}])}),'Reabrir');break}
+   case 'acdl':download('acta-montaje-'+slug((S.info||{}).nombre)+'-'+nowI().slice(0,10)+'.txt',actaTxt());break;
+   case 'acprint':document.body.classList.add('print-acta');setTimeout(()=>{window.print();setTimeout(()=>document.body.classList.remove('print-acta'),500)},50);break;
    case 'tsz':setTs(UI.ts*(+v));break;
    case 'lock':c.locked=!c.locked;saveCfg(true);break;
    case 'mm':UI.moveMode=v;render();break;
@@ -951,15 +1068,18 @@ document.addEventListener('click',e=>{
        Object.keys(S.turb).forEach(id=>{S.turb[id]={parts:{}};saveTurb(id)});Object.keys(S.alarms).forEach(delAlarm);toast('Registros borrados')},'Borrar todo',true);break;
   }
 });
-document.addEventListener('input',e=>{if(e.target.dataset.cst){const ci=S.cfg.circs[UI.ec],f=e.target.dataset.cst;ci[f]=f==='w'?+e.target.value:e.target.value;if(f==='name'&&!ci.name.trim())ci.name='Circuito '+(UI.ec+1);const w=document.getElementById('cwv');if(w&&f==='w')w.textContent=ci.w;const m=document.getElementById('map');if(m)m.innerHTML=mapSvg();return}if(e.target.id==='msr'){setMs(+e.target.value);return}if(e.target.id==='tsr'){setTs(+e.target.value);return}const d=e.target.dataset.draft;if(d)UI.draft[d]=e.target.value});
+document.addEventListener('input',e=>{if(e.target.dataset.ac){UI.ac[e.target.dataset.ac]=e.target.value;return}if(e.target.dataset.cst){const ci=S.cfg.circs[UI.ec],f=e.target.dataset.cst;ci[f]=f==='w'?+e.target.value:e.target.value;if(f==='name'&&!ci.name.trim())ci.name='Circuito '+(UI.ec+1);const w=document.getElementById('cwv');if(w&&f==='w')w.textContent=ci.w;const m=document.getElementById('map');if(m)m.innerHTML=mapSvg();return}if(e.target.id==='msr'){setMs(+e.target.value);return}if(e.target.id==='tsr'){setTs(+e.target.value);return}const d=e.target.dataset.draft;if(d)UI.draft[d]=e.target.value});
 document.addEventListener('change',e=>{
   const el=e.target,c=S.cfg;
   if(el.dataset.draft){UI.draft[el.dataset.draft]=el.value;return}
   if(el.dataset.cst){saveCfg();return}
+  if(el.dataset.ac){UI.ac[el.dataset.ac]=el.value;return}
+  if(el.id==='acfiles'){addPhotos(el,UI.ac.ph,render);return}
+  if(el.id==='clfiles'){addPhotos(el,clPh,()=>{const t=$('#clth');if(t)t.innerHTML=thumbs(clPh,'clrm')});return}
   if(el.id==='bkfile'&&el.files&&el.files[0]){const f=el.files[0];f.text().then(t=>{let d;try{d=JSON.parse(t)}catch(x){toast('Archivo inválido');return}
      modal(`<p>¿Restaurar el respaldo <b>${esc(f.name)}</b>${d.fecha?' del '+fmt(d.fecha):''}? Reemplaza los datos actuales de este parque.</p>`,()=>restoreData(d),'Restaurar',true)});el.value='';return}
   if(el.dataset.inf){const f=el.dataset.inf;S.info[f]=f==='potencia'?Math.max(0,+String(el.value).replace(',','.')||0):el.value.trim();if(f==='nombre'&&!S.info.nombre)S.info.nombre='Parque';S.info.n=S.cfg.turbs.length;S.info.circs=S.cfg.circs.length;saveCfg();return}
-  if(el.dataset.act2==='park'){if(el.value==='__new'){el.value=UI.pid;modal(`<h2>➕ Nuevo parque</h2>${parkForm('m')}`,()=>{const i=readPark('m');if(i)createPark(i)},'Crear parque')}else selectPark(el.value);return}
+  if(el.dataset.act2==='park'){if(el.value==='__new'){el.value=UI.pid;modal(`<h2>➕ Nuevo parque</h2>${parkForm('m')}`,()=>{const i=readPark('m');if(!i)return false;createPark(i)},'Crear parque')}else selectPark(el.value);return}
   if(el.dataset.act2==='ec'){UI.ec=+el.value;UI.selV=null;render();return}
   if(el.dataset.act2==='selT'){UI.sel=el.value;render();return}
   if(el.dataset.ed){const k=el.dataset.v,f=el.dataset.ed,cur={...(parts(UI.sel)[k]||{})};const val=fromInp(el.value);
