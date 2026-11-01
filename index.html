@@ -269,6 +269,25 @@ button.ic{width:34px;height:34px;padding:0;display:inline-flex;align-items:cente
 .sumg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px 14px}
 .sumg .lab{display:flex;justify-content:space-between;font-size:12px}
 .note{background:var(--note-bg);border:1px solid var(--note-bd);color:var(--note-tx);padding:8px 12px;border-radius:8px;margin-bottom:10px}
+
+/* mensajes informativos */
+.imsg{position:relative;min-height:74px;overflow:hidden;border-radius:14px}
+.im{position:absolute;inset:0;display:flex;gap:10px;align-items:flex-start;padding:10px 12px 12px;border-radius:14px;border:1px solid color-mix(in srgb,var(--c,var(--ac)) 45%,transparent);background:linear-gradient(135deg,color-mix(in srgb,var(--c,var(--ac)) 16%,var(--card)),var(--card));overflow:hidden}
+.im-info{--c:var(--ac)}.im-ok{--c:var(--ok)}.im-warn{--c:#f59e0b}.im-bad{--c:var(--er)}.im-star{--c:#facc15}.im-rec{--c:#fbbf24}
+.im-ic{font-size:24px;line-height:1;flex:none;margin-top:2px}
+.im-rec .im-ic,.im-star .im-ic{animation:imStar 1.6s ease-in-out infinite;filter:drop-shadow(0 0 8px #facc15)}
+.im-rec{background:linear-gradient(120deg,#78350f55,var(--card) 45%,#a1620755);box-shadow:inset 0 0 0 1px #fbbf2466,0 0 22px -8px #fbbf24}
+.im-rec::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,#fde68a33 50%,transparent 65%);transform:translateX(-100%);animation:imShine 3s ease-in-out infinite}
+.im-b{min-width:0;flex:1}.im-t{display:flex;justify-content:space-between;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--c)}.im-t span{color:var(--mu);font-weight:600;letter-spacing:0}
+.im-x{font-size:13px;line-height:1.4;margin-top:3px;color:var(--tx)}.im-x b{color:var(--c)}
+.im-p{position:absolute;left:0;bottom:0;height:3px;background:var(--c);opacity:.7;animation:imP 9s linear both}
+.im-in{animation:ntIn .55s cubic-bezier(.2,.9,.25,1.15) both}.im-out{animation:ntOut .45s ease-in both}
+@keyframes imStar{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.18) rotate(-8deg)}}
+@keyframes imShine{0%,40%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+@keyframes imP{from{width:0}to{width:100%}}
+.pb-av{display:flex;flex-direction:column;gap:8px}.pb-av .pb-row{gap:10px}.pb-av .pb-ring{width:76px}.pb-av .kq-s{flex:1;grid-template-columns:repeat(4,minmax(0,1fr))}.pb-av .imsg{flex:1;min-height:78px}.pb-av .im-x{font-size:12.5px;line-height:1.35}
+.sump .imsg{min-height:122px;margin:-2px 0 10px}.sump .im-x{font-size:12.5px}
+@media (prefers-reduced-motion:reduce){.im-in,.im-out,.im-ic,.im-p,.im-rec::after{animation:none!important}}
 </style>
 <link rel="stylesheet" href="/fx.css">
 </head>
@@ -806,7 +825,7 @@ function summary(){
   const ts=S.cfg.turbs,n=ts.length||1;
   const full=ts.filter(t=>prog(t.id).ok===NM).length;const pz=ts.reduce((a,t)=>a+prog(t.id).ok,0);
   const lost=Object.values(S.alarms).reduce((a,x)=>a+aDur(x),0);
-  return `<div class="card"><h2>Cuadro de montaje del parque</h2>
+  return `<div class="card"><h2>Cuadro de montaje del parque</h2>${imsgBox()}
   <div class="kpi" style="margin-bottom:10px"><div>WTG completas<b>${full}/${ts.length}</b></div><div>Piezas montadas<b>${pz}/${ts.length*NM}</b></div><div>Avance<b>${Math.round(pz/(n*NM)*100)}%</b></div><div>Izando ahora<b style="color:var(--cur)">${ts.reduce((a,t)=>a+prog(t.id).cur,0)}</b></div><div>Tiempo perdido<b style="color:${actAlarms().length?'var(--bad)':'inherit'}">${dur(lost)}</b></div></div>
   <div class="sumg">${PARTS.map(p=>{const ok=ts.filter(t=>pState(t.id,p.k)==='ok').length,cu=ts.filter(t=>pState(t.id,p.k)==='curso').length;
    return `<div><div class="lab"><span><i class="dot" style="background:${p.c}"></i>${p.n}</span><b>${ok}/${ts.length}${cu?` <span style="color:var(--cur)">+${cu}</span>`:''}</b></div><div class="bar"><i style="width:${ok/n*100}%;background:${p.c}"></i></div></div>`}).join('')}</div></div>`;
@@ -1160,6 +1179,63 @@ function recos(){const R=[];
   if(needBk())R.push(['💾','Hay cambios sin respaldo: creá uno desde ⚙️ Configuración.']);
   return R}
 
+/* ===== mensajes informativos rotativos (estado de la grúa, clima de la jornada, récords, ritmo) ===== */
+function durH(ms){const m=Math.max(0,Math.round(ms/6e4)),h=Math.floor(m/60),d=Math.floor(h/24);return d>=2?`${d} días ${h%24} h`:h?`${h} h${m%60?` ${m%60} min`:''}`:`${m} min`}
+const dKey=s=>{const d=new Date(s);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
+function partsTxt(ks){const tw=['t1','t2','t3','t4','t5'].filter(k=>ks.includes(k)),o=ks.filter(k=>!tw.includes(k)).map(k=>PK[k].n);
+  const t=tw.length>=2?`T${tw[0].slice(1)} a T${tw[tw.length-1].slice(1)}`:tw.length?PK[tw[0]].n:'';const L=[...(ks.includes('base')?['la base']:[]),...(t?[t]:[]),...o.filter(x=>x!==PK.base.n)];
+  return L.length>1?L.slice(0,-1).join(', ')+' y '+L[L.length-1]:L[0]||''}
+function infoMsgs(){const c=S.cfg;if(!c||!c.turbs)return[];const M=[],ts=c.turbs,TT=ts.length*NM,now=Date.now();
+  /* 1 · dónde está la grúa y qué está pasando */
+  const cid=craneTid();
+  if(cid){const t=ts.find(x=>x.id===cid),ps=parts(cid),done=MECH.filter(p=>ps[p.k]&&ps[p.k].fin).map(p=>p.k),cur=MECH.find(p=>ps[p.k]&&ps[p.k].inicio&&!ps[p.k].fin),nx=MECH.find(p=>!(ps[p.k]&&ps[p.k].fin)&&!(cur&&cur.k===p.k));
+    let s=`En este momento la grúa se ubica en <b>${esc(t.name)}</b>`;
+    if(!done.length&&!cur)s+=`, lista para comenzar el montaje. Primera pieza: <b>${PK[nx?nx.k:'base'].n}</b>.`;
+    else{if(done.length)s+=`; lleva montado ${partsTxt(done)}`;
+      s+=cur?`. Ahora está <b>izando ${PK[cur.k].n}</b> (desde las ${hhmm(ps[cur.k].inicio)}).`:nx?`. El equipo prepara <b>${PK[nx.k].n}</b> para ser montado.`:'.';
+      s+=` Van ${done.length} de ${NM} piezas en esta turbina.`}
+    M.push({ic:'🏗️',tag:'Montaje ahora',k:'info',t:s})}
+  else if(ts.length)M.push({ic:'🎉',tag:'Montaje',k:'rec',t:`¡Montaje mecánico completo en las ${ts.length} turbinas del parque!`});
+  /* 2 · clima de la próxima jornada */
+  if(WX&&WX.hourly){const h=WX.hourly,T=wxC(),d=new Date(),tom=new Date(d.getTime()+864e5),am=d.getHours()<11;
+    const blocks=am?[[dKey(d),Math.max(6,d.getHours()),12,'esta mañana'],[dKey(d),12,18,'esta tarde']]:d.getHours()<17?[[dKey(d),d.getHours(),18,'el resto de la tarde'],[dKey(tom),6,12,'la jornada de mañana']]:[[dKey(tom),6,12,'la jornada de mañana (06 a 12 h)'],[dKey(tom),12,18,'mañana a la tarde']];
+    blocks.forEach(([dk,h0,h1,lab])=>{const I=[];h.time.forEach((s,i)=>{if(s.slice(0,10)===dk&&+s.slice(11,13)>=h0&&+s.slice(11,13)<h1)I.push(i)});if(!I.length)return;
+      const v=I.map(i=>h.wind_speed_100m[i]),g=I.map(i=>h.wind_gusts_10m[i]),vmn=Math.min(...v),vmx=Math.max(...v),gmx=Math.max(...g),e=Math.max(vmx,gmx);
+      const st=I.find(i=>storm(h.weather_code[i],(h.cape||[])[i])),rn=I.filter(i=>h.weather_code[i]>=61).length;
+      const base=`Para ${lab} se esperan vientos de ${Math.round(vmn)} a ${Math.round(vmx)} m/s a 100 m (ráfagas hasta ${Math.round(gmx)})`;
+      if(st!=null)M.push({ic:'⛈️',tag:'Clima · advertencia',k:'bad',t:`${base} y <b>posible tormenta desde las ${h.time[st].slice(11,16)}</b>. Prever bajar al personal de altura.`});
+      else if(e>=T.stop)M.push({ic:'⛔',tag:'Clima · advertencia',k:'bad',t:`${base}. <b>Superan el límite de ${T.stop} m/s</b>: planificar izajes fuera de ese horario.`});
+      else if(e>=T.cau)M.push({ic:'⚠️',tag:'Clima · precaución',k:'warn',t:`${base}. Zona de precaución: consultar al supervisor antes de izar palas o nacelle.`});
+      else M.push({ic:'☀️',tag:'Clima · buenas condiciones',k:'ok',t:`${base}${rn?', con algo de lluvia':''}. <b>Buenas condiciones para izar</b> 💪`})})}
+  /* 3 · récords */
+  const ev=[];ts.forEach(t=>{const ps=parts(t.id);MECH.forEach(p=>{const v=ps[p.k];if(v&&v.fin)ev.push({t,k:p.k,fin:v.fin})})});
+  const today=dKey(now),byDay={};ev.forEach(e=>{const k=dKey(e.fin);byDay[k]=(byDay[k]||0)+1});
+  const hoy=byDay[today]||0,prev=Object.entries(byDay).filter(([k])=>k!==today),pmx=prev.length?Math.max(...prev.map(x=>x[1])):0;
+  if(hoy&&prev.length&&hoy>pmx)M.push({ic:'🏆',tag:'¡Nuevo récord!',k:'rec',t:`Hoy el equipo montó <b>${hoy} piezas</b>: la mayor cantidad en un día desde que empezó el parque (récord anterior: ${pmx}). ¡Excelente trabajo!`});
+  else if(pmx){const bd=prev.find(x=>x[1]===pmx)[0];M.push({ic:'⭐',tag:'Récord del parque',k:'star',t:`El récord es de <b>${pmx} piezas en un día</b> (${bd.slice(8)}/${bd.slice(5,7)}). Hoy van ${hoy}${hoy&&pmx-hoy<=3?` — ¡faltan ${pmx-hoy+1} para superarlo!`:'.'}`})}
+  const sp=ts.map(t=>{const ps=parts(t.id),a=ps.t1&&(ps.t1.inicio||ps.t1.fin),b=ps.pc&&ps.pc.fin;if(!a||!b||prog(t.id).ok<NM)return null;return{t,ms:new Date(b)-new Date(a),end:b}}).filter(x=>x&&x.ms>0);
+  if(sp.length>=2){const best=sp.reduce((a,b)=>b.ms<a.ms?b:a),last=sp.reduce((a,b)=>b.end>a.end?b:a);
+    if(best===last&&now-new Date(best.end)<36*3600e3)M.push({ic:'🏆',tag:'¡Récord de velocidad!',k:'rec',t:`<b>${esc(best.t.name)}</b> se montó en <b>${durH(best.ms)}</b> (de T1 a Pala C): la turbina más rápida del parque. ¡Felicitaciones al equipo!`});
+    else M.push({ic:'⭐',tag:'Turbina más rápida',k:'star',t:`<b>${esc(best.t.name)}</b> tiene el récord de velocidad: armada en ${durH(best.ms)} (de T1 a Pala C). Promedio del parque: ${durH(sp.reduce((a,b)=>a+b.ms,0)/sp.length)}.`})}
+  /* 4 · resumen del día y ritmo */
+  const full=ts.filter(t=>prog(t.id).ok===NM),fullHoy=full.filter(t=>{const ps=parts(t.id);return ps.pc&&ps.pc.fin&&dKey(ps.pc.fin)===today}).length;
+  if(hoy)M.push({ic:'📊',tag:'Jornada de hoy',k:'info',t:`Hoy ${hoy>1?'se montaron':'se montó'} <b>${hoy} pieza${hoy>1?'s':''}</b>${fullHoy?` y ${fullHoy>1?'se completaron':'se completó'} <b>${fullHoy} turbina${fullHoy>1?'s':''}</b>`:''}. Avance total: ${Math.round(ev.length/TT*100)}% del parque.`});
+  const w7=ev.filter(e=>now-new Date(e.fin)<7*864e5),days=new Set(w7.map(e=>dKey(e.fin))).size,rem=TT-ev.length;
+  if(days>=2&&rem>0){const rate=w7.length/days,dd=Math.ceil(rem/rate),f=new Date(now+dd*864e5*7/5);
+    M.push({ic:'📅',tag:'Ritmo de montaje',k:'info',t:`Promedio de los últimos días: <b>${rate.toFixed(1)} piezas por jornada</b>. Faltan ${rem} piezas: a este ritmo el montaje mecánico terminaría cerca del <b>${f.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})}</b> (≈${dd} jornadas).`})}
+  const pct=ev.length/TT*100,ms=[25,50,75,90,100].find(x=>x>pct);
+  if(ms&&ev.length){const need=Math.ceil(TT*ms/100)-ev.length;if(need<=NM*2)M.push({ic:'🎯',tag:'Próximo hito',k:'star',t:`Faltan solo <b>${need} pieza${need>1?'s':''}</b> para llegar al <b>${ms}%</b> del parque montado.`})}
+  const en=ts.filter(t=>prog(t.id).ener).length,rn=ts.filter(t=>prog(t.id).run).length;
+  if(en||rn)M.push({ic:'⚡',tag:'Energización',k:'info',t:`${en} de ${ts.length} turbinas energizadas y ${rn} en RUN.${full.length-en>0?` Hay ${full.length-en} montada${full.length-en>1?'s':''} esperando energización.`:''}`});
+  const al=actAlarms();if(al.length)M.unshift({ic:'🚨',tag:'Alarma activa',k:'bad',t:al.map(a=>`<b>${esc(tName(a.turb))}</b> · ${esc(a.motivo)} · desde las ${hhmm(a.inicio)} (${durH(aDur(a))} perdidos)`).join('<br>')});
+  return M}
+function imsgItem(L,i,anim){if(!L.length)return '';const k=((i%L.length)+L.length)%L.length,m=L[k];
+  return `<div class="im im-${m.k} ${anim?'im-in':''}"><span class="im-ic">${m.ic}</span><div class="im-b"><div class="im-t">${m.tag}<span>${k+1}/${L.length}</span></div><div class="im-x">${m.t}</div></div><i class="im-p"></i></div>`}
+let imI=0;
+function imsgBox(cls){const L=infoMsgs();return L.length?`<div class="imsg ${cls||''}">${imsgItem(L,imI,false)}</div>`:''}
+setInterval(()=>{const B=document.querySelectorAll('.imsg');if(!B.length||document.hidden)return;imI++;const L=infoMsgs();
+  B.forEach(box=>{const old=box.firstElementChild;if(old){old.classList.remove('im-in');old.classList.add('im-out');setTimeout(()=>old.remove(),450)}box.insertAdjacentHTML('beforeend',imsgItem(L,imI,true))})},9000);
+
 /* ===== modo presentación ===== */
 function presView(){
   const c=S.cfg,ts=c.turbs,n=ts.length||1,TT=n*NM,pz=ts.reduce((a,t)=>a+prog(t.id).ok,0),p=pz/TT*100,I=S.info||{};
@@ -1173,14 +1249,14 @@ function presView(){
    ${mob?presMob(lay,{p,pz,TT,n,full,ener,run,cur,nw,l,R,I,r,C}):`<div class="pres-map"><svg id="map" class="map" viewBox="${vbStr()}" preserveAspectRatio="xMidYMid meet">${mapSvg()}</svg></div>
    <div class="pres-bot">
     <div class="pb pb-sim"><div class="tt"><span>Secuencia de montaje</span></div><div id="simslot"></div></div>
-    <div class="pb"><div class="tt"><span>Avance del parque</span></div><div class="pb-row"><svg viewBox="0 0 120 120" class="pb-ring"><defs><linearGradient id="gpr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--g1)"/><stop offset="1" stop-color="var(--g2)"/></linearGradient></defs><circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--pe)" stroke-width="12"/>${p>0?`<circle cx="60" cy="60" r="${r}" fill="none" stroke="${p>=100?'var(--ok)':'url(#gpr)'}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C*p/100} ${C}" transform="rotate(-90 60 60)"/>`:''}<text x="60" y="64" text-anchor="middle" font-size="22" font-weight="800" fill="var(--tx)">${Math.round(p)}%</text><text x="60" y="80" text-anchor="middle" font-size="8" fill="var(--mu)">${pz}/${TT} piezas</text></svg>
-     <div class="kq kq-s"><div><b style="color:var(--g1)">${full}<small>/${n}</small></b><span>montadas</span></div><div><b style="color:#facc15">${ener}</b><span>⚡ energiz.</span></div><div><b style="color:var(--ok)">${run}</b><span>▶ RUN</span></div><div><b style="color:var(--nt)">${cur}</b><span>izando</span></div></div></div></div>
+    <div class="pb pb-av"><div class="tt"><span>Avance del parque</span></div><div class="pb-row"><svg viewBox="0 0 120 120" class="pb-ring"><defs><linearGradient id="gpr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--g1)"/><stop offset="1" stop-color="var(--g2)"/></linearGradient></defs><circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--pe)" stroke-width="12"/>${p>0?`<circle cx="60" cy="60" r="${r}" fill="none" stroke="${p>=100?'var(--ok)':'url(#gpr)'}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C*p/100} ${C}" transform="rotate(-90 60 60)"/>`:''}<text x="60" y="64" text-anchor="middle" font-size="22" font-weight="800" fill="var(--tx)">${Math.round(p)}%</text><text x="60" y="80" text-anchor="middle" font-size="8" fill="var(--mu)">${pz}/${TT} piezas</text></svg>
+     <div class="kq kq-s"><div><b style="color:var(--g1)">${full}<small>/${n}</small></b><span>montadas</span></div><div><b style="color:#facc15">${ener}</b><span>⚡ energiz.</span></div><div><b style="color:var(--ok)">${run}</b><span>▶ RUN</span></div><div><b style="color:var(--nt)">${cur}</b><span>izando</span></div></div></div>${imsgBox()}</div>
     <div class="pb"><div class="tt"><span>Avance por circuito</span></div><div class="pb-sc">${hbars(c.circs.map((ci,i)=>{const T=ts.filter(t=>t.circ===i),okp=T.reduce((a,t)=>a+prog(t.id).ok,0),tot=T.length*NM||1;return [esc(ci.name),okp,tot,cc(i),Math.round(okp/tot*100)+'%']}))}</div></div>
     <div class="pb pb-wx"><div class="tt"><span>Clima · viento a 100 m</span>${nw?`<span class="lv" style="background:${LV[l][1]}">${['OK','Precaución','ALARMA'][l]}</span>`:''}</div>
      ${I.lat==null?'<p class="mut" style="font-size:12px">Sin ubicación del parque.</p>':nw?`<div class="pb-row"><div>${wxCompass(nw.d)}</div><div><div class="big-n">${nw.v.toFixed(1)}<small> m/s</small></div><div class="mut" style="font-size:12px">del ${dirName(nw.d)} · ráfagas ${nw.g.toFixed(0)} · ${wxIcon(nw.code)} ${Math.round(nw.t)}°</div>${R.map(([e,t])=>`<div class="pb-al">${e} ${esc(t)}</div>`).join('')}</div></div>${wxHourly()}`:`<p class="mut" style="font-size:12px">${esc(WXerr||'Cargando clima…')}</p>`}</div>
    </div>`}</div>`}
 const NT_SEV=e=>/⛔|🚨/.test(e)?['var(--er)','Alerta']:/⚠️|💨|⛈|🌧️/.test(e)?['#f59e0b','Precaución']:/✅|🕒/.test(e)?['var(--ok)','Info']:['var(--ac)','Aviso'];
-function ntList(){const R=recos();return R.length?R:[['✅','Sin alertas: todo en orden en el parque.']]}
+function ntList(){const R=recos().concat(infoMsgs().filter(m=>m.k!=='bad').map(m=>[m.ic,m.t.replace(/<[^>]+>/g,'')]));return R.length?R:[['✅','Sin alertas: todo en orden en el parque.']]}
 function ntHtml(i,anim){const L=ntList(),k=((i%L.length)+L.length)%L.length,[e,t]=L[k],[c,lab]=NT_SEV(e);
   return `<div class="nt ${anim?'nt-in':''}" style="--c:${c}"><span class="nt-ic">${e}</span><div class="nt-b"><div class="nt-t">${lab}<span>${k+1}/${L.length}</span></div><div class="nt-x">${esc(t)}</div></div><i class="nt-p"></i></div>`}
 let ntI=0;
